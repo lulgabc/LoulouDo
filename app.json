@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "LoulouDo 鹿鹿打卡",
+    "slug": "louloudou",
+    "scheme": "louloudou",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "app.louloudou.kids"
+    },
+    "android": {
+      "package": "app.louloudou.kids",
+      "adaptiveIcon": {
+        "backgroundColor": "#FFEAF3",
+        "foregroundImage": "./assets/android-icon-foreground.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#FFF1F7",
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 160
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}
