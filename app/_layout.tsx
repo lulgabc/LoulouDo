@@ -8,19 +8,23 @@ import * as SplashScreen from 'expo-splash-screen';
 import { ZCOOLKuaiLe_400Regular } from '@expo-google-fonts/zcool-kuaile';
 import {
   Baloo2_600SemiBold,
+  Baloo2_700Bold,
   Baloo2_800ExtraBold,
 } from '@expo-google-fonts/baloo-2';
 import { StoreProvider, useApp } from '@/store/AppStore';
-import { THEMES, heading } from '@/theme/themes';
+import { THEMES, heading, applyLocaleToFonts } from '@/theme/themes';
+import { htmlLang } from '@/i18n/locales';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 function Shell() {
   const { state, hydrated } = useApp();
   const theme = THEMES[state.settings.themeId] ?? THEMES.candy;
+  applyLocaleToFonts(state.settings.locale);
   const [fontsLoaded, fontError] = useFonts({
     ZCOOLKuaiLe_400Regular,
     Baloo2_600SemiBold,
+    Baloo2_700Bold,
     Baloo2_800ExtraBold,
   });
   const ready = hydrated && (fontsLoaded || Boolean(fontError));
@@ -28,6 +32,12 @@ function Shell() {
   useEffect(() => {
     if (ready) SplashScreen.hideAsync().catch(() => {});
   }, [ready]);
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = htmlLang(state.settings.locale);
+    }
+  }, [state.settings.locale]);
 
   if (!ready) {
     return (

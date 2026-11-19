@@ -4,16 +4,18 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useApp } from '@/store/AppStore';
 import { useTheme, heading, numberStyle, shadowStyle } from '@/theme/themes';
-import { formatCN, todayISO } from '@/domain/date';
+import { todayISO } from '@/domain/date';
 import { coinsToMoney } from '@/domain/logic';
 import { CATEGORY_MAP } from '@/domain/constants';
 import { Btn, Card, Empty, ProgressBar, Row, Screen, SectionTitle } from '@/components/ui';
 import { Ring } from '@/components/charts';
 import { Mascot } from '@/components/Mascot';
+import { useI18n } from '@/i18n';
 import { Coin, CoinValue } from '@/components/Coin';
 
 export default function WalletScreen() {
   const theme = useTheme();
+  const { t, formatDate, formatMoney } = useI18n();
   const { entries, balance, state, activeProfile } = useApp();
   const rate = state.settings.rate;
   const value = coinsToMoney(balance, rate);
@@ -49,9 +51,9 @@ export default function WalletScreen() {
 
   return (
     <Screen>
-      <Text style={heading(24, theme.text)}>金币钱包</Text>
+      <Text style={heading(24, theme.text)}>{t('wallet.title')}</Text>
       <Text style={{ fontSize: 11, color: theme.textSoft, marginTop: 3, marginBottom: 13 }}>
-        {rate} 金币 = ¥1 · 零花钱由爸爸妈妈保管
+        {t('wallet.rateNote', { rate })}
       </Text>
 
       <View style={{ borderRadius: theme.radius + 6, overflow: 'hidden', marginBottom: 16, ...shadowStyle(theme) }}>
@@ -69,7 +71,7 @@ export default function WalletScreen() {
           <Row style={{ justifyContent: 'space-between' }}>
             <View>
               <Text style={{ fontSize: 11, color: theme.dark ? 'rgba(255,255,255,0.75)' : 'rgba(74,42,60,0.7)' }}>
-                我的金币
+                {t('wallet.myCoins')}
               </Text>
               <Row style={{ alignItems: 'flex-end', gap: 8 }}>
                 <Text style={numberStyle(44, heroInk)}>{balance}</Text>
@@ -78,7 +80,7 @@ export default function WalletScreen() {
                 </View>
               </Row>
               <Text style={{ fontSize: 12, color: heroInk, opacity: 0.8 }}>
-                ≈ ¥{value.toFixed(2)} 零花钱
+                {t('wallet.worth', { money: formatMoney(value) })}
               </Text>
             </View>
             <View style={{ opacity: 0.98 }}>
@@ -87,7 +89,7 @@ export default function WalletScreen() {
           </Row>
 
           <Btn
-            label="兑换零花钱"
+            label={t('wallet.redeem')}
             emoji="💰"
             onPress={() => router.push('/redeem')}
             disabled={balance <= 0}
@@ -111,21 +113,27 @@ export default function WalletScreen() {
             }
           />
           <View style={{ flex: 1, gap: 4 }}>
-            <Text style={{ fontSize: 10, color: theme.textSoft }}>心愿存钱罐</Text>
+            <Text style={{ fontSize: 10, color: theme.textSoft }}>{t('wallet.wish')}</Text>
             <Text style={heading(16, theme.text)} numberOfLines={1}>
-              {activeProfile.wish.title}
+              {activeProfile.wish.titleKey ? t(activeProfile.wish.titleKey) : activeProfile.wish.title}
             </Text>
             <ProgressBar value={wishPct} color={theme.candy} height={7} />
             <Text style={{ fontSize: 10, color: theme.textSoft }}>
-              已攒 ¥{value.toFixed(2)} / 目标 ¥{activeProfile.wish.target} ·{' '}
+              {t('wallet.saved', {
+                saved: formatMoney(value),
+                target: formatMoney(activeProfile.wish.target),
+              })}{' '}
+              ·{' '}
               {wishPct >= 1
-                ? '目标达成，好厉害！'
-                : `还差 ¥${Math.max(0, activeProfile.wish.target - value).toFixed(2)}`}
+                ? t('wallet.targetDone')
+                : t('wallet.needMore', {
+                    amount: formatMoney(Math.max(0, activeProfile.wish.target - value)),
+                  })}
             </Text>
           </View>
         </Row>
         <Btn
-          label="修改心愿"
+          label={t('wallet.editWish')}
           variant="ghost"
           small
           onPress={() => router.push('/settings')}
@@ -144,7 +152,7 @@ export default function WalletScreen() {
             borderColor: theme.border,
           }}
         >
-          <Text style={{ fontSize: 10, color: theme.textSoft }}>累计赚到</Text>
+          <Text style={{ fontSize: 10, color: theme.textSoft }}>{t('wallet.earnedTotal')}</Text>
           <CoinValue value={totals.earned} size={14} color={theme.text} prefix="" style={{ marginTop: 3 }} />
         </View>
         <View
@@ -157,23 +165,27 @@ export default function WalletScreen() {
             borderColor: theme.border,
           }}
         >
-          <Text style={{ fontSize: 10, color: theme.textSoft }}>累计兑换</Text>
-          <Text style={numberStyle(20, theme.text)}>¥ {totals.spentMoney.toFixed(2)}</Text>
+          <Text style={{ fontSize: 10, color: theme.textSoft }}>{t('wallet.redeemedTotal')}</Text>
+          <Text style={numberStyle(20, theme.text)}>¥ {formatMoney(totals.spentMoney)}</Text>
         </View>
       </Row>
 
-      <SectionTitle emoji="📒" title="金币存折" right={<Text style={{ fontSize: 10, color: theme.textSoft }}>最近记录</Text>} />
+      <SectionTitle
+        emoji="📒"
+        title={t('wallet.ledger')}
+        right={<Text style={{ fontSize: 10, color: theme.textSoft }}>{t('wallet.recent')}</Text>}
+      />
 
       {groups.length === 0 ? (
         <Card>
-          <Empty emoji="💰" title="存折还是空的" hint="完成第一件任务，就会存进第一枚金币" />
+          <Empty emoji="💰" title={t('wallet.emptyTitle')} hint={t('wallet.emptyHint')} />
         </Card>
       ) : (
         groups.map(([date, list]) => (
           <View key={date} style={{ marginBottom: 10 }}>
             <Text style={{ fontSize: 10, color: theme.textSoft, marginBottom: 5, marginLeft: 4 }}>
-              {formatCN(date)}
-              {date === todayISO() ? ' · 今天' : ''}
+              {formatDate(date)}
+              {date === todayISO() ? ` · ${t('common.today')}` : ''}
             </Text>
             <Card style={{ paddingVertical: 4, paddingHorizontal: 14 }}>
               {list.map((entry, idx) => (
@@ -186,19 +198,25 @@ export default function WalletScreen() {
                     <View style={{ flex: 1 }}>
                       <Text style={{ ...heading(12.5, theme.text) }}>
                         {entry.type === 'redeem'
-                          ? `兑换零花钱 ¥${(entry.money ?? 0).toFixed(2)}`
+                          ? t('wallet.redeemEntry', { money: formatMoney(entry.money ?? 0) })
                           : entry.type === 'bonus'
-                            ? entry.label ?? '奖励'
-                            : entry.taskTitle ?? '任务完成'}
+                            ? entry.labelKey
+                              ? t(entry.labelKey)
+                              : entry.label ?? t('wallet.bonus')
+                            : entry.taskKey
+                              ? t(entry.taskKey)
+                              : entry.taskTitle ?? t('wallet.taskFallback')}
                       </Text>
                       <Text style={{ fontSize: 9.5, color: theme.textSoft, marginTop: 1 }}>
                         {entry.type === 'redeem'
-                          ? `${entry.coins} 金币 · 汇率 ${entry.rate ?? rate}`
+                          ? t('wallet.rateSnapshot', { coins: entry.coins, rate: entry.rate ?? rate })
                           : entry.type === 'bonus'
-                            ? '额外奖励'
+                            ? t('wallet.bonus')
                             : entry.category
-                              ? `${CATEGORY_MAP[entry.category].emoji} ${CATEGORY_MAP[entry.category].short}任务`
-                              : '任务'}
+                              ? `${CATEGORY_MAP[entry.category].emoji} ${t(
+                                  `category.${entry.category}.name`,
+                                )}`
+                              : t('wallet.taskFallback')}
                       </Text>
                     </View>
                     <Text
@@ -219,7 +237,7 @@ export default function WalletScreen() {
       )}
 
       <Text style={{ fontSize: 10, color: theme.textSoft, textAlign: 'center', marginTop: 6 }}>
-        金币和零花钱都由爸爸妈妈一起管理 💛
+        {t('wallet.footer')}
       </Text>
     </Screen>
   );

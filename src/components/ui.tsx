@@ -192,17 +192,21 @@ export function IconBtn({
   size = 42,
   bg,
   style,
+  label,
 }: {
   emoji: string;
   onPress: () => void;
   size?: number;
   bg?: string;
   style?: ViewStyle;
+  label?: string;
 }) {
   const theme = useTheme();
   return (
     <Pressable
       onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={label ?? emoji}
       style={({ pressed }) => [
         {
           width: size,
@@ -348,6 +352,7 @@ export function Stepper({
   min = 0,
   max = 9999,
   suffix,
+  compact,
 }: {
   value: number;
   onChange: (v: number) => void;
@@ -355,6 +360,7 @@ export function Stepper({
   min?: number;
   max?: number;
   suffix?: string;
+  compact?: boolean;
 }) {
   const theme = useTheme();
   const btn = (label: string, delta: number, disabled: boolean) => (
@@ -362,9 +368,9 @@ export function Stepper({
       onPress={() => onChange(Math.min(max, Math.max(min, value + delta)))}
       disabled={disabled}
       style={({ pressed }) => ({
-        width: 36,
-        height: 36,
-        borderRadius: 18,
+        width: compact ? 30 : 36,
+        height: compact ? 30 : 36,
+        borderRadius: compact ? 15 : 18,
         backgroundColor: theme.chip,
         alignItems: 'center',
         justifyContent: 'center',
@@ -373,13 +379,19 @@ export function Stepper({
         borderColor: theme.border,
       })}
     >
-      <Text style={{ ...heading(18, theme.text), lineHeight: 22 }}>{label}</Text>
+      <Text style={{ ...heading(compact ? 16 : 18, theme.text), lineHeight: 22 }}>{label}</Text>
     </Pressable>
   );
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: compact ? 6 : 10 }}>
       {btn('−', -step, value <= min)}
-      <Text style={{ ...heading(17, theme.text), minWidth: 58, textAlign: 'center' }}>
+      <Text
+        style={{
+          ...heading(compact ? 15 : 17, theme.text),
+          minWidth: compact ? 30 : 58,
+          textAlign: 'center',
+        }}
+      >
         {value}
         {suffix ? <Text style={{ fontSize: 12 }}>{suffix}</Text> : null}
       </Text>

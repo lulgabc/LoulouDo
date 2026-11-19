@@ -1,0 +1,374 @@
+[
+  {
+    "locale": "zh",
+    "width": 393,
+    "errors": [],
+    "stored": "zh",
+    "welcome": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": [
+        "鹿鹿打卡",
+        "把每天的小事，变成闪闪发光的冒险 ✨",
+        "打卡赚金币，金币换零花钱",
+        "每日打卡",
+        "金币奖励",
+        "成长报表",
+        "🌐 语言",
+        "中文"
+      ]
+    },
+    "home": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": [
+        "下午好呀，小鹿",
+        "11月19日 周四 · 今天也要开心呀",
+        "连续 0 天",
+        "今天想先做哪一件呀？完成一件就有金币哦。",
+        "今日进度",
+        "全部 11",
+        "每日 6",
+        "周末"
+      ]
+    },
+    "report": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": [
+        "下午好呀，小鹿",
+        "11月19日 周四 · 今天也要开心呀",
+        "连续 0 天",
+        "今天想先做哪一件呀？完成一件就有金币哦。",
+        "今日进度",
+        "全部 11",
+        "每日 6",
+        "周末"
+      ]
+    },
+    "settings": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": [
+        "下午好呀，小鹿",
+        "11月19日 周四 · 今天也要开心呀",
+        "连续 0 天",
+        "今天想先做哪一件呀？完成一件就有金币哦。",
+        "今日进度",
+        "全部 11",
+        "每日 6",
+        "周末"
+      ]
+    }
+  },
+  {
+    "locale": "en",
+    "width": 393,
+    "errors": [],
+    "stored": "en",
+    "welcome": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": [
+        "中文"
+      ]
+    },
+    "home": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": []
+    },
+    "report": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": []
+    },
+    "settings": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": [
+        "中文"
+      ]
+    }
+  },
+  {
+    "locale": "fr",
+    "width": 393,
+    "errors": [],
+    "stored": "fr",
+    "welcome": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": [
+        "中文"
+      ]
+    },
+    "home": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": []
+    },
+    "report": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": []
+    },
+    "settings": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": [
+        "中文"
+      ]
+    }
+  },
+  {
+    "locale": "de",
+    "width": 393,
+    "errors": [],
+    "stored": "de",
+    "welcome": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": [
+        "中文"
+      ]
+    },
+    "home": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": []
+    },
+    "report": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": []
+    },
+    "settings": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": [
+        "中文"
+      ]
+    }
+  },
+  {
+    "locale": "it",
+    "width": 393,
+    "errors": [],
+    "stored": "it",
+    "welcome": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": [
+        "中文"
+      ]
+    },
+    "home": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": []
+    },
+    "report": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": []
+    },
+    "settings": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": [
+        "中文"
+      ]
+    }
+  },
+  {
+    "locale": "es",
+    "width": 393,
+    "errors": [],
+    "stored": "es",
+    "welcome": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": [
+        "中文"
+      ]
+    },
+    "home": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": []
+    },
+    "report": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": []
+    },
+    "settings": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": [
+        "中文"
+      ]
+    }
+  },
+  {
+    "locale": "pt",
+    "width": 393,
+    "errors": [],
+    "stored": "pt",
+    "welcome": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": [
+        "中文"
+      ]
+    },
+    "home": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": []
+    },
+    "report": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": []
+    },
+    "settings": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": [
+        "中文"
+      ]
+    }
+  },
+  {
+    "locale": "fr",
+    "width": 320,
+    "errors": [],
+    "stored": "fr",
+    "welcome": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": [
+        "中文"
+      ]
+    },
+    "home": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": []
+    },
+    "report": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": []
+    },
+    "settings": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": [
+        "中文"
+      ]
+    }
+  },
+  {
+    "locale": "de",
+    "width": 320,
+    "errors": [],
+    "stored": "de",
+    "welcome": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": [
+        "中文"
+      ]
+    },
+    "home": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": []
+    },
+    "report": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": []
+    },
+    "settings": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": [
+        "中文"
+      ]
+    }
+  },
+  {
+    "locale": "pt",
+    "width": 320,
+    "errors": [],
+    "stored": "pt",
+    "welcome": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": [
+        "中文"
+      ]
+    },
+    "home": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": []
+    },
+    "report": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": []
+    },
+    "settings": {
+      "overflow": [],
+      "clipped": [],
+      "inputs": [],
+      "han": [
+        "中文"
+      ]
+    }
+  }
+]

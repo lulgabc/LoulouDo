@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { useTheme, heading, numberStyle } from '@/theme/themes';
-import { shortDate } from '@/domain/date';
+import { useI18n } from '@/i18n';
 
 export function CoinBars({
   points,
@@ -14,9 +14,9 @@ export function CoinBars({
   labelMode?: 'weekday' | 'date';
 }) {
   const theme = useTheme();
+  const { weekdayShort, formatShort } = useI18n();
   const max = Math.max(1, ...points.map((p) => p.coins));
   const peak = Math.max(...points.map((p) => p.coins));
-  const weekCn = ['日', '一', '二', '三', '四', '五', '六'];
 
   return (
     <View style={{ flexDirection: 'row', alignItems: 'flex-end', height: height + 42, gap: 5 }}>
@@ -44,9 +44,7 @@ export function CoinBars({
               }}
             />
             <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 6 }}>
-              {labelMode === 'weekday'
-                ? weekCn[new Date(`${p.date}T12:00:00`).getDay()]
-                : shortDate(p.date)}
+              {labelMode === 'weekday' ? weekdayShort(p.date) : formatShort(p.date)}
             </Text>
           </View>
         );

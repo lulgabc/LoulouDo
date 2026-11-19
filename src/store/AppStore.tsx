@@ -14,6 +14,8 @@ import { createInitialState, DEFAULT_HOLIDAYS } from '@/domain/seed';
 import { CATEGORIES, ONBOARDING_BONUS, STORAGE_KEY } from '@/domain/constants';
 import { balanceOf, computeAllClearBonus, coinsToMoney, isTaskCompleted, taskCoinValue } from '@/domain/logic';
 import { todayISO } from '@/domain/date';
+import { isLocale, type Locale } from '@/i18n/locales';
+import { detectLocale } from '@/i18n/detectLocale';
 
 function makeId(prefix: string): string {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
@@ -26,6 +28,7 @@ type Action =
   | { type: 'saveTask'; draft: TaskDraft }
   | { type: 'deleteTask'; id: string }
   | { type: 'setTheme'; themeId: ThemeId }
+  | { type: 'setLocale'; locale: Locale }
   | { type: 'setRate'; rate: number }
   | { type: 'setCategoryCoins'; category: Category; coins: number }
   | { type: 'completeOnboarding'; name: string; avatar: string; themeId: ThemeId }
@@ -72,6 +75,7 @@ function reducer(state: AppState, action: Action): AppState {
         emoji: task.emoji,
         category: task.category,
         taskKind: task.kind,
+        taskKey: task.titleKey,
       };
       entries = [...entries, entry];
       const profileTasks = state.tasks.filter((t) => t.profileId === entry.profileId);
@@ -93,6 +97,7 @@ function reducer(state: AppState, action: Action): AppState {
             at: new Date().toISOString(),
             coins: bonus,
             label: '全勤宝箱',
+            labelKey: 'bonus.allClear',
             emoji: '🎁',
           },
         ];
@@ -115,6 +120,7 @@ function reducer(state: AppState, action: Action): AppState {
         rate: state.settings.rate,
         emoji: '💰',
         label: '兑换零花钱',
+        labelKey: 'wallet.redeemEntry',
       };
       return { ...state, entries: [...state.entries, entry] };
     }
@@ -133,6 +139,7 @@ function reducer(state: AppState, action: Action): AppState {
                   category: draft.category,
                   kind: draft.kind,
                   coins: draft.coins,
+                  titleKey: undefined,
                   startDate: draft.kind === 'once' ? draft.startDate : undefined,
                   endDate: draft.kind === 'once' ? draft.endDate : undefined,
                 }
@@ -160,6 +167,9 @@ function reducer(state: AppState, action: Action): AppState {
         ...state,
         tasks: state.tasks.filter((t) => t.id !== action.id),
       };
+
+    case 'setLocale':
+      return { ...state, settings: { ...state.settings, locale: action.locale } };
 
     case 'setTheme': {
       if (state.settings.themeId === action.themeId) return state;
@@ -202,6 +212,7 @@ function reducer(state: AppState, action: Action): AppState {
             at: new Date().toISOString(),
             coins: ONBOARDING_BONUS,
             label: '新手见面礼',
+            labelKey: 'bonus.welcome',
             emoji: '🎉',
           },
         ],
@@ -214,7 +225,7 @@ function reducer(state: AppState, action: Action): AppState {
         id: makeId('kid'),
         name: action.name.trim() || '宝贝',
         avatar: action.avatar,
-        wish: { title: '小小愿望', target: 100 },
+        wish: { title: '小小愿望', titleKey: 'seed.wish.default', target: 100 },
       };
       return {
         ...state,
@@ -268,11 +279,14 @@ function reducer(state: AppState, action: Action): AppState {
         },
       };
 
-    case 'reset':
+    case 'reset': {
+      const fresh = createInitialState();
       return {
-        ...createInitialState(),
+        ...fresh,
         onboarded: false,
+        settings: { ...fresh.settings, locale: state.settings.locale },
       };
+    }
 
     default:
       return state;
@@ -292,6 +306,7 @@ interface StoreValue {
   saveTask: (draft: TaskDraft) => void;
   deleteTask: (id: string) => void;
   setTheme: (themeId: ThemeId) => void;
+  setLocale: (locale: Locale) => void;
   setRate: (rate: number) => void;
   setCategoryCoins: (category: Category, coins: number) => void;
   completeOnboarding: (name: string, avatar: string, themeId: ThemeId) => void;
@@ -317,6 +332,66 @@ function normalize(raw: unknown): AppState {
     if (typeof value === 'number' && value > 0) categoryCoins[cat.id] = value;
   }
   const themeId = parsed.settings?.themeId;
+
+  // 旧版本数据迁移：把内置中文示例标题补上翻译 key
+  const legacyTaskKeys: Record<string, string> = {
+    自己刷牙洗脸: 'seed.task.brush',
+    收拾小书包: 'seed.task.bag',
+    '阅读 20 分钟': 'seed.task.read',
+    '喝够 8 杯水': 'seed.task.water',
+    '练琴 15 分钟': 'seed.task.piano',
+    九点前上床睡觉: 'seed.task.sleep',
+    '户外运动 1 小时': 'seed.task.outdoor',
+    帮家里做一件家务: 'seed.task.chore',
+    整理自己的房间: 'seed.task.room',
+    写一篇假期日记: 'seed.task.diary',
+    学做一道新菜: 'seed.task.cook',
+    '游泳练习 45 分钟': 'seed.task.swim',
+    '连续跳绳 100 下': 'seed.task.jump',
+    '完成 1000 片拼图': 'seed.task.puzzle',
+    钢琴小演出登台: 'seed.task.stage',
+  };
+  const legacyHolidayKeys: Record<string, string> = {
+    秋假: 'seed.holiday.autumn',
+    寒假: 'seed.holiday.winter',
+    暑假: 'seed.holiday.summer',
+  };
+  const legacyWishKeys: Record<string, string> = {
+    乐高小城堡: 'seed.wish.castle',
+    小小愿望: 'seed.wish.default',
+  };
+  const legacyLabelKeys: Record<string, string> = {
+    全勤宝箱: 'bonus.allClear',
+    新手见面礼: 'bonus.welcome',
+    兑换零花钱: 'wallet.redeemEntry',
+  };
+
+  const tasks = (Array.isArray(parsed.tasks) ? parsed.tasks : base.tasks).map((task) => ({
+    ...task,
+    titleKey: task.titleKey ?? legacyTaskKeys[task.title],
+  }));
+  const taskKeyById = new Map(tasks.map((task) => [task.id, task.titleKey]));
+  const profiles = (parsed.profiles as Profile[]).map((profile) => ({
+    ...profile,
+    wish: {
+      ...profile.wish,
+      titleKey:
+        profile.wish.titleKey ?? legacyWishKeys[profile.wish.title] ?? undefined,
+    },
+  }));
+  const holidays = (Array.isArray(parsed.settings?.holidays)
+    ? parsed.settings.holidays
+    : DEFAULT_HOLIDAYS
+  ).map((holiday) => ({
+    ...holiday,
+    nameKey: holiday.nameKey ?? legacyHolidayKeys[holiday.name],
+  }));
+  const entries = (Array.isArray(parsed.entries) ? parsed.entries : []).map((entry) => ({
+    ...entry,
+    taskKey: entry.taskKey ?? taskKeyById.get(entry.taskId ?? ''),
+    labelKey: entry.labelKey ?? legacyLabelKeys[entry.label ?? ''],
+  }));
+
   return {
     ...base,
     ...parsed,
@@ -325,9 +400,10 @@ function normalize(raw: unknown): AppState {
       parsed.profiles?.some((p) => p.id === parsed.activeProfileId)
         ? (parsed.activeProfileId as string)
         : base.activeProfileId,
-    tasks: Array.isArray(parsed.tasks) ? parsed.tasks : base.tasks,
-    entries: Array.isArray(parsed.entries) ? parsed.entries : [],
+    tasks,
+    entries,
     settings: {
+      locale: isLocale(parsed.settings?.locale) ? parsed.settings.locale : detectLocale(),
       themeId: themeId === 'pop' || themeId === 'sticker' || themeId === 'galaxy' || themeId === 'candy'
         ? themeId
         : base.settings.themeId,
@@ -335,17 +411,15 @@ function normalize(raw: unknown): AppState {
         ? parsed.settings.rate
         : base.settings.rate,
       categoryCoins,
-      holidays: Array.isArray(parsed.settings?.holidays)
-        ? parsed.settings.holidays
-        : DEFAULT_HOLIDAYS,
+      holidays,
     },
-    profiles: parsed.profiles as Profile[],
+    profiles,
     onboarded: parsed.onboarded === true,
   };
 }
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, undefined, createInitialState);
+  const [state, dispatch] = useReducer(reducer, undefined, () => createInitialState(detectLocale()));
   const [hydrated, setHydrated] = useState(false);
   const hydratedRef = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -410,6 +484,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const saveTask = useCallback((draft: TaskDraft) => dispatch({ type: 'saveTask', draft }), []);
   const deleteTask = useCallback((id: string) => dispatch({ type: 'deleteTask', id }), []);
   const setTheme = useCallback((themeId: ThemeId) => dispatch({ type: 'setTheme', themeId }), []);
+  const setLocale = useCallback((locale: Locale) => dispatch({ type: 'setLocale', locale }), []);
   const setRate = useCallback((rate: number) => dispatch({ type: 'setRate', rate }), []);
   const setCategoryCoins = useCallback(
     (category: Category, coins: number) => dispatch({ type: 'setCategoryCoins', category, coins }),
@@ -452,6 +527,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     saveTask,
     deleteTask,
     setTheme,
+    setLocale,
     setRate,
     setCategoryCoins,
     completeOnboarding,

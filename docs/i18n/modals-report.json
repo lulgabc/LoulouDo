@@ -1,0 +1,66 @@
+[
+  {
+    "locale": "en",
+    "errors": [],
+    "redeem": {
+      "overflow": [],
+      "clipped": []
+    },
+    "editor": {
+      "overflow": [],
+      "clipped": []
+    },
+    "holidays": {
+      "overflow": [],
+      "clipped": []
+    }
+  },
+  {
+    "locale": "de",
+    "errors": [],
+    "redeem": {
+      "overflow": [],
+      "clipped": []
+    },
+    "editor": {
+      "overflow": [],
+      "clipped": []
+    },
+    "holidays": {
+      "overflow": [],
+      "clipped": []
+    }
+  },
+  {
+    "locale": "fr",
+    "errors": [],
+    "redeem": {
+      "overflow": [],
+      "clipped": []
+    },
+    "editor": {
+      "overflow": [],
+      "clipped": []
+    },
+    "holidays": {
+      "overflow": [],
+      "clipped": []
+    }
+  },
+  {
+    "locale": "pt",
+    "errors": [],
+    "redeem": {
+      "overflow": [],
+      "clipped": []
+    },
+    "editor": {
+      "overflow": [],
+      "clipped": []
+    },
+    "holidays": {
+      "overflow": [],
+      "clipped": []
+    }
+  }
+]

@@ -5,9 +5,11 @@ import { useApp } from '@/store/AppStore';
 import { useTheme, heading } from '@/theme/themes';
 import { addDays, isISODate, todayISO } from '@/domain/date';
 import { Btn, Card, Empty, IconBtn, Pill, Row, Screen, SectionTitle } from '@/components/ui';
+import { useI18n } from '@/i18n';
 
 export default function HolidaysScreen() {
   const theme = useTheme();
+  const { t } = useI18n();
   const { state, addHoliday, removeHoliday } = useApp();
   const today = todayISO();
   const [name, setName] = useState('');
@@ -20,15 +22,15 @@ export default function HolidaysScreen() {
 
   const submit = () => {
     if (!name.trim()) {
-      setError('给假期起一个名字吧，例如「寒假」');
+      setError(t('holidays.errorName'));
       return;
     }
     if (!isISODate(start) || !isISODate(end)) {
-      setError('日期格式要像 2027-01-25 这样哦');
+      setError(t('holidays.errorDate'));
       return;
     }
     if (start > end) {
-      setError('开始日期不能晚于结束日期');
+      setError(t('holidays.errorOrder'));
       return;
     }
     addHoliday(name.trim(), start, end);
@@ -71,32 +73,45 @@ export default function HolidaysScreen() {
     <Screen>
       <Row style={{ gap: 10, marginBottom: 14 }}>
         <IconBtn emoji="✕" onPress={() => router.back()} size={38} />
-        <View>
-          <Text style={heading(20, theme.text)}>假期设置</Text>
-          <Text style={{ fontSize: 10, color: theme.textSoft }}>
-            这段时间里，假期任务才会出现
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Text style={heading(20, theme.text)} numberOfLines={1}>
+            {t('holidays.title')}
+          </Text>
+          <Text style={{ fontSize: 10, color: theme.textSoft }} numberOfLines={2}>
+            {t('holidays.subtitle')}
           </Text>
         </View>
       </Row>
 
-      <SectionTitle emoji="📅" title="我的假期" />
+      <SectionTitle emoji="📅" title={t('holidays.mine')} />
       {holidays.length === 0 ? (
         <Card style={{ marginBottom: 14 }}>
-          <Empty emoji="🏖️" title="还没有假期" hint="添加寒假、暑假或旅行日期，假期任务就会自动出现" />
+          <Empty emoji="🏖️" title={t('holidays.emptyTitle')} hint={t('holidays.emptyHint')} />
         </Card>
       ) : (
         <Card style={{ marginBottom: 14, paddingVertical: 4, paddingHorizontal: 14 }}>
           {holidays.map((h, idx) => {
-            const status = today < h.start ? '未来' : today > h.end ? '已结束' : '进行中';
+            const statusKey =
+              today < h.start
+                ? 'holidays.statusFuture'
+                : today > h.end
+                  ? 'holidays.statusPast'
+                  : 'holidays.statusActive';
             const color =
-              status === '进行中' ? theme.secondary : status === '未来' ? theme.primary : theme.textSoft;
+              statusKey === 'holidays.statusActive'
+                ? theme.secondary
+                : statusKey === 'holidays.statusFuture'
+                  ? theme.primary
+                  : theme.textSoft;
             return (
               <View key={h.id}>
                 {idx > 0 ? <View style={{ height: 1, backgroundColor: theme.border }} /> : null}
                 <Row style={{ paddingVertical: 11, justifyContent: 'space-between' }}>
                   <View style={{ flex: 1 }}>
                     <Row style={{ gap: 6 }}>
-                      <Text style={heading(14, theme.text)}>{h.name}</Text>
+                      <Text style={heading(14, theme.text)}>
+                        {h.nameKey ? t(h.nameKey) : h.name}
+                      </Text>
                       <View
                         style={{
                           backgroundColor: color + '22',
@@ -105,7 +120,7 @@ export default function HolidaysScreen() {
                           paddingVertical: 1,
                         }}
                       >
-                        <Text style={{ fontSize: 8.5, color }}>{status}</Text>
+                        <Text style={{ fontSize: 8.5, color }}>{t(statusKey)}</Text>
                       </View>
                     </Row>
                     <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 2 }}>
@@ -124,7 +139,7 @@ export default function HolidaysScreen() {
                     hitSlop={8}
                   >
                     <Text style={{ fontSize: 10, color: confirmId === h.id ? theme.danger : theme.textSoft }}>
-                      {confirmId === h.id ? '确认删除' : '删除'}
+                      {confirmId === h.id ? t('holidays.confirmDelete') : t('holidays.delete')}
                     </Text>
                   </Pressable>
                 </Row>
@@ -134,27 +149,27 @@ export default function HolidaysScreen() {
         </Card>
       )}
 
-      <SectionTitle emoji="＋" title="添加一段假期" />
+      <SectionTitle emoji="＋" title={t('holidays.addSection')} />
       <Card>
-        {field(name, setName, '假期名字，例如「寒假」')}
+        {field(name, setName, t('holidays.namePlaceholder'))}
         <Row style={{ gap: 8, marginTop: 8 }}>
-          {field(start, setStart, '开始日期')}
-          <Text style={{ color: theme.textSoft, alignSelf: 'center' }}>至</Text>
-          {field(end, setEnd, '结束日期')}
+          {field(start, setStart, t('holidays.startPlaceholder'))}
+          <Text style={{ color: theme.textSoft, alignSelf: 'center' }}>{t('holidays.to')}</Text>
+          {field(end, setEnd, t('holidays.endPlaceholder'))}
         </Row>
         <Text style={{ fontSize: 9.5, color: theme.textSoft, marginTop: 6 }}>
-          日期格式：YYYY-MM-DD，例如 2026-11-19
+          {t('holidays.formatHint')}
         </Text>
         <Row style={{ gap: 7, marginTop: 10, flexWrap: 'wrap' }}>
           <Pill
-            label="从今天开始 7 天"
+            label={t('holidays.quick7')}
             onPress={() => {
               setStart(today);
               setEnd(addDays(today, 6));
             }}
           />
           <Pill
-            label="30 天"
+            label={t('holidays.quick30')}
             onPress={() => {
               setStart(today);
               setEnd(addDays(today, 29));
@@ -164,9 +179,9 @@ export default function HolidaysScreen() {
         {error ? (
           <Text style={{ fontSize: 10.5, color: theme.danger, marginTop: 9 }}>{error}</Text>
         ) : null}
-        <Btn label="添加假期" emoji="🎒" onPress={submit} style={{ marginTop: 12 }} small />
+        <Btn label={t('holidays.addBtn')} emoji="🎒" onPress={submit} style={{ marginTop: 12 }} small />
         <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 10, lineHeight: 16 }}>
-          把假期理解成「允许出现假期任务的日子」：放假、旅行、夏令营都可以加进来。
+          {t('holidays.explainer')}
         </Text>
       </Card>
     </Screen>

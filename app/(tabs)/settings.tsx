@@ -8,11 +8,14 @@ import { todayISO } from '@/domain/date';
 import { CATEGORIES } from '@/domain/constants';
 import type { ThemeId } from '@/types';
 import { AVATARS } from '@/domain/constants';
-import { Btn, Card, Label, Pill, Row, Screen, SectionTitle, Stepper } from '@/components/ui';
+import { Btn, Card, IconBtn, Label, Pill, Row, Screen, SectionTitle, Stepper } from '@/components/ui';
 import { SkinPicker } from '@/components/SkinPicker';
+import { LanguagePicker } from '@/components/LanguagePicker';
+import { useI18n } from '@/i18n';
 
 export default function SettingsScreen() {
   const theme = useTheme();
+  const { t, formatMoney } = useI18n();
   const {
     state,
     activeProfile,
@@ -48,7 +51,7 @@ export default function SettingsScreen() {
   };
 
   const startAdd = () => {
-    setName('小宝贝');
+    setName(t('welcome.defaultName'));
     setAvatar('🐰');
     setConfirmRemoveProfile(false);
     setMode('add');
@@ -61,7 +64,10 @@ export default function SettingsScreen() {
       updateProfile(activeProfile.id, {
         name: name.trim() || activeProfile.name,
         avatar,
-        wish: { title: wishTitle.trim() || '小小愿望', target: Math.max(0, wishTarget) },
+        wish: {
+          title: wishTitle.trim() || t('seed.wish.default'),
+          target: Math.max(0, wishTarget),
+        },
       });
     }
     setMode('view');
@@ -112,9 +118,9 @@ export default function SettingsScreen() {
 
   return (
     <Screen>
-      <Text style={heading(24, theme.text)}>设置</Text>
+      <Text style={heading(24, theme.text)}>{t('settings.title')}</Text>
       <Text style={{ fontSize: 11, color: theme.textSoft, marginTop: 3, marginBottom: 13 }}>
-        把 LoulouDo 调成你家的样子
+        {t('settings.subtitle')}
       </Text>
 
       <Card style={{ marginBottom: 14 }}>
@@ -139,15 +145,20 @@ export default function SettingsScreen() {
                     {activeProfile.name}
                   </Text>
                   <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 3 }} numberOfLines={1}>
-                    🎁 {activeProfile.wish.title} · 目标 ¥{activeProfile.wish.target}
+                    🎁 {activeProfile.wish.titleKey
+                      ? t(activeProfile.wish.titleKey)
+                      : activeProfile.wish.title}{' '}
+                    · {t('settings.wishTarget', { target: formatMoney(activeProfile.wish.target) })}
                   </Text>
                 </View>
               </Row>
-              <Pill label="编辑" onPress={startEdit} />
+              <IconBtn emoji="✏️" size={38} onPress={startEdit} label={t('settings.edit')} />
             </Row>
 
             <View style={{ height: 1, backgroundColor: theme.border, marginVertical: 12 }} />
-            <Text style={{ fontSize: 10, color: theme.textSoft, marginBottom: 7 }}>家里的小宝贝</Text>
+            <Text style={{ fontSize: 10, color: theme.textSoft, marginBottom: 7 }}>
+              {t('settings.family')}
+            </Text>
             <Row style={{ gap: 7, flexWrap: 'wrap' }}>
               {profiles.map((p) => (
                 <Pill
@@ -158,37 +169,37 @@ export default function SettingsScreen() {
                   onPress={() => switchProfile(p.id)}
                 />
               ))}
-              <Pill label="＋ 添加" onPress={startAdd} />
+              <Pill label={`＋ ${t('settings.add')}`} onPress={startAdd} />
             </Row>
           </>
         ) : (
           <View>
             <Row style={{ justifyContent: 'space-between', marginBottom: 4 }}>
               <Text style={heading(16, theme.text)}>
-                {mode === 'add' ? '添加小宝贝' : '编辑小宝贝'}
+                {mode === 'add' ? t('settings.addKid') : t('settings.editKid')}
               </Text>
               <Pill
-                label="取消"
+                label={t('common.cancel')}
                 onPress={() => {
                   setConfirmRemoveProfile(false);
                   setMode('view');
                 }}
               />
             </Row>
-            {input(name, setName, '宝贝的名字')}
+            {input(name, setName, t('settings.name'))}
             {avatarRow}
             {mode === 'edit' ? (
               <View style={{ marginTop: 12 }}>
-                <Label>心愿存钱罐</Label>
-                {input(wishTitle, setWishTitle, '例如：乐高小城堡')}
+                <Label>{t('settings.wishSection')}</Label>
+                {input(wishTitle, setWishTitle, t('settings.wishPlaceholder'))}
                 <Row style={{ justifyContent: 'space-between' }}>
-                  <Text style={{ fontSize: 11, color: theme.textSoft }}>目标金额（元）</Text>
-                  <Stepper value={wishTarget} onChange={setWishTarget} step={10} min={0} max={9999} suffix="元" />
+                  <Text style={{ fontSize: 11, color: theme.textSoft }}>{t('settings.targetAmount')}</Text>
+                  <Stepper value={wishTarget} onChange={setWishTarget} step={10} min={0} max={9999} suffix="¥" />
                 </Row>
               </View>
             ) : null}
             <Btn
-              label={mode === 'add' ? '添加宝贝' : '保存资料'}
+              label={mode === 'add' ? t('settings.addKidBtn') : t('settings.saveProfile')}
               onPress={saveProfile}
               small
               style={{ marginTop: 12 }}
@@ -207,7 +218,9 @@ export default function SettingsScreen() {
                 style={{ marginTop: 10 }}
               >
                 <Text style={{ fontSize: 10, color: theme.danger, textAlign: 'center' }}>
-                  {confirmRemoveProfile ? '再点一次，确认删除资料和记录' : '删除这位宝贝的资料和记录'}
+                  {confirmRemoveProfile
+                    ? t('settings.confirmDeleteKid')
+                    : t('settings.deleteKid')}
                 </Text>
               </Pressable>
             ) : null}
@@ -215,21 +228,29 @@ export default function SettingsScreen() {
         )}
       </Card>
 
-      <SectionTitle emoji="🎨" title="换一个皮肤" />
+      <SectionTitle emoji="🌐" title={t('settings.language')} />
       <Card style={{ marginBottom: 14 }}>
-        <SkinPicker value={state.settings.themeId} onChange={(id: ThemeId) => setTheme(id)} />
+        <LanguagePicker />
         <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 9 }}>
-          立刻生效。糖果、撞色、手账、星空，今天想住在哪一个世界？
+          {t('settings.languageNote')}
         </Text>
       </Card>
 
-      <SectionTitle emoji="💰" title="金币规则" />
+      <SectionTitle emoji="🎨" title={t('settings.skins')} />
+      <Card style={{ marginBottom: 14 }}>
+        <SkinPicker value={state.settings.themeId} onChange={(id: ThemeId) => setTheme(id)} />
+        <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 9 }}>
+          {t('settings.skinsNote')}
+        </Text>
+      </Card>
+
+      <SectionTitle emoji="💰" title={t('settings.coinsRules')} />
       <Card style={{ marginBottom: 14 }}>
         <Row style={{ justifyContent: 'space-between', marginBottom: 10 }}>
           <View style={{ flex: 1 }}>
-            <Text style={heading(14, theme.text)}>兑换汇率</Text>
+            <Text style={heading(14, theme.text)}>{t('settings.rate')}</Text>
             <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 2 }}>
-              {state.settings.rate} 金币 = ¥1 零花钱
+              {t('settings.rateValue', { rate: state.settings.rate })}
             </Text>
           </View>
           <Stepper
@@ -243,12 +264,19 @@ export default function SettingsScreen() {
         </Row>
         <View style={{ height: 1, backgroundColor: theme.border, marginBottom: 4 }} />
         {CATEGORIES.map((cat) => (
-          <Row key={cat.id} style={{ justifyContent: 'space-between', paddingVertical: 7 }}>
-            <Row style={{ gap: 7 }}>
+          <Row key={cat.id} style={{ justifyContent: 'space-between', paddingVertical: 7, gap: 8 }}>
+            <Row style={{ gap: 7, flex: 1, minWidth: 0 }}>
               <Text style={{ fontSize: 16 }}>{cat.emoji}</Text>
-              <View>
-                <Text style={{ ...heading(12.5, theme.text) }}>{cat.name}</Text>
-                <Text style={{ fontSize: 9, color: theme.textSoft }}>完成一件的默认金币</Text>
+              <View style={{ flex: 1, minWidth: 0 }}>
+                <Text
+                  style={{ ...heading(12.5, theme.text), lineHeight: 15 }}
+                  numberOfLines={2}
+                >
+                  {t(`category.${cat.id}.name`)}
+                </Text>
+                <Text style={{ fontSize: 9, color: theme.textSoft }} numberOfLines={1}>
+                  {t('settings.categoryDefault')}
+                </Text>
               </View>
             </Row>
             <Stepper
@@ -256,44 +284,48 @@ export default function SettingsScreen() {
               onChange={(v) => setCategoryCoins(cat.id, v)}
               min={1}
               max={99}
+              compact
             />
           </Row>
         ))}
         <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 4 }}>
-          单个任务也可以单独设置奖励，以任务自己的设置为准。
+          {t('settings.rateHint')}
         </Text>
       </Card>
 
-      <SectionTitle emoji="🏖️" title="假期设置" />
+      <SectionTitle emoji="🏖️" title={t('settings.holidays')} />
       <Card onPress={() => router.push('/holidays')} style={{ marginBottom: 14 }}>
         <Row style={{ justifyContent: 'space-between' }}>
           <View style={{ flex: 1 }}>
             <Text style={heading(14, theme.text)}>
-              {activeHoliday ? `正在放「${activeHoliday.name}」` : '现在不是假期'}
+              {activeHoliday
+                ? t('settings.inHoliday', {
+                    name: activeHoliday.nameKey ? t(activeHoliday.nameKey) : activeHoliday.name,
+                  })
+                : t('settings.notHoliday')}
             </Text>
             <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 3 }}>
-              共 {state.settings.holidays.length} 段假期 · 假期任务只在假期日期出现
+              {t('settings.holidayCount', { n: state.settings.holidays.length })}
             </Text>
           </View>
           <Text style={{ fontSize: 20 }}>→</Text>
         </Row>
       </Card>
 
-      <SectionTitle emoji="🧸" title="关于与数据" />
+      <SectionTitle emoji="🧸" title={t('settings.about')} />
       <Card>
         <Row style={{ justifyContent: 'space-between', marginBottom: 6 }}>
-          <Text style={heading(14, theme.text)}>LoulouDo 鹿鹿打卡</Text>
+          <Text style={heading(14, theme.text)}>LoulouDo</Text>
           <Text style={numberStyle(12, theme.textSoft)}>
             v{Constants.expoConfig?.version ?? '1.0.0'}
           </Text>
         </Row>
         <Text style={{ fontSize: 10.5, color: theme.textSoft, lineHeight: 17 }}>
-          所有数据都只保存在这台设备上，不上传、不需要登录。用游戏化的小金币，
-          陪孩子把好习惯慢慢养出来。
+          {t('settings.aboutBody')}
         </Text>
         <View style={{ height: 12 }} />
         <Btn
-          label={confirmReset ? '再点一次，清空所有数据' : '清空所有数据'}
+          label={confirmReset ? t('settings.confirmClear') : t('settings.clearData')}
           variant="ghost"
           onPress={() => {
             if (!confirmReset) {
@@ -307,11 +339,13 @@ export default function SettingsScreen() {
         />
         {confirmReset ? (
           <Pressable onPress={() => setConfirmReset(false)} style={{ marginTop: 8 }}>
-            <Text style={{ fontSize: 10, color: theme.textSoft, textAlign: 'center' }}>取消</Text>
+            <Text style={{ fontSize: 10, color: theme.textSoft, textAlign: 'center' }}>
+              {t('common.cancel')}
+            </Text>
           </Pressable>
         ) : null}
         <Text style={{ fontSize: 9.5, color: theme.textSoft, textAlign: 'center', marginTop: 12 }}>
-          认真打卡，也认真玩耍 💛
+          {t('settings.footer')}
         </Text>
       </Card>
     </Screen>

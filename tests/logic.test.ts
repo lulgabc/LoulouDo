@@ -33,6 +33,7 @@ const HOLIDAYS: HolidayRange[] = [
 
 const settings: AppState['settings'] = {
   themeId: 'candy',
+  locale: 'zh',
   rate: 100,
   categoryCoins: Object.fromEntries(CATEGORIES.map((c) => [c.id, c.defaultCoins])) as Record<
     Category,

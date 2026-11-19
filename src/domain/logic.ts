@@ -197,7 +197,7 @@ export interface RangeStats {
   series: DayPoint[];
   byCategory: Record<Category, CategoryStat>;
   streak: number;
-  topTask: { title: string; emoji: string; count: number } | null;
+  topTask: { title: string; emoji: string; count: number; taskKey?: string } | null;
   moneyValue: number;
 }
 
@@ -229,7 +229,7 @@ export function statsForRange(
   let completedFixed = 0;
   let onceCompleted = 0;
 
-  const taskCounts = new Map<string, { title: string; emoji: string; count: number }>();
+  const taskCounts = new Map<string, { title: string; emoji: string; count: number; taskKey?: string }>();
   const active = new Set<string>();
 
   for (const entry of inRange) {
@@ -260,6 +260,7 @@ export function statsForRange(
         title: entry.taskTitle ?? '任务',
         emoji: entry.emoji ?? '⭐',
         count: (current?.count ?? 0) + 1,
+        taskKey: entry.taskKey ?? current?.taskKey,
       });
     }
   }

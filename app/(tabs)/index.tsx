@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useApp } from '@/store/AppStore';
 import { useTheme, heading, numberStyle, shadowStyle } from '@/theme/themes';
-import { formatCN, greeting, todayISO } from '@/domain/date';
+import { todayISO } from '@/domain/date';
 import {
   currentStreak,
   dayProgress,
@@ -12,19 +12,21 @@ import {
   tasksDoneOn,
   tasksForDate,
 } from '@/domain/logic';
-import { CATEGORIES, CATEGORY_MAP } from '@/domain/constants';
+import { CATEGORIES } from '@/domain/constants';
 import type { Category, Task } from '@/types';
 import { Btn, Card, Empty, Pill, ProgressBar, Row, Screen, SectionTitle } from '@/components/ui';
 import { Mascot } from '@/components/Mascot';
 import { TaskCard } from '@/components/TaskCard';
 import { Confetti } from '@/components/Confetti';
 import { Coin } from '@/components/Coin';
+import { greetingKey, useI18n } from '@/i18n';
 import { tapFeedback } from '@/utils/feedback';
 
 type Filter = 'all' | Category;
 
 export default function HomeScreen() {
   const theme = useTheme();
+  const { t, formatDate } = useI18n();
   const { activeProfile, tasks, entries, balance, toggleTask, state } = useApp();
   const [filter, setFilter] = useState<Filter>('all');
   const [burst, setBurst] = useState(0);
@@ -77,12 +79,15 @@ export default function HomeScreen() {
   const percent = progressFull.total === 0 ? 0 : progressFull.done / progressFull.total;
   const cheer =
     progressFull.total === 0
-      ? '今天没有任务，去添加一件想挑战的事吧！'
+      ? t('home.cheerEmpty')
       : complete
-        ? '全部完成！你是今天的小英雄，宝箱送你啦 🎁'
+        ? t('home.cheerAll')
         : progressFull.done === 0
-          ? '今天想先做哪一件呀？完成一件就有金币哦。'
-          : `已经完成 ${progressFull.done} 件啦，还差 ${progressFull.pending.length} 件就全勤咯！`;
+          ? t('home.cheerStart')
+          : t('home.cheerProgress', {
+              done: progressFull.done,
+              left: progressFull.pending.length,
+            });
 
   return (
     <View style={{ flex: 1 }}>
@@ -108,14 +113,14 @@ export default function HomeScreen() {
               <Text style={{ fontSize: 24 }}>{activeProfile.avatar}</Text>
             </View>
             <View style={{ flex: 1, minWidth: 0 }}>
-              <Text style={heading(19, theme.text)} numberOfLines={1}>
-                {greeting()}，{activeProfile.name}
+              <Text style={heading(19, theme.text)} numberOfLines={2}>
+                {t(greetingKey())}，{activeProfile.name}
               </Text>
               <Text
                 style={{ fontSize: 11, color: theme.textSoft, marginTop: 1 }}
-                numberOfLines={1}
+                numberOfLines={2}
               >
-                {formatCN(today)} · 今天也要开心呀
+                {formatDate(today)} · {t('home.subtitle')}
               </Text>
             </View>
           </Pressable>
@@ -164,7 +169,7 @@ export default function HomeScreen() {
                 }}
               >
                 <Text style={{ fontSize: 12 }}>🔥</Text>
-                <Text style={heading(12, heroInk)}>连续 {streak} 天</Text>
+                <Text style={heading(12, heroInk)}>{t('home.streak', { n: streak })}</Text>
               </View>
               <Text style={numberStyle(16, heroInk)}>
                 {progressFull.done}
@@ -189,7 +194,7 @@ export default function HomeScreen() {
 
             <View style={{ marginTop: 10 }}>
               <Row style={{ justifyContent: 'space-between', marginBottom: 6 }}>
-                <Text style={heading(12, heroSoft)}>今日进度</Text>
+                <Text style={heading(12, heroSoft)}>{t('home.progress')}</Text>
                 <Text style={numberStyle(13, heroInk)}>{Math.round(percent * 100)}%</Text>
               </Row>
               <ProgressBar value={percent} track={heroTrack} color={heroFill} height={12} />
@@ -198,11 +203,16 @@ export default function HomeScreen() {
         </View>
 
         <View style={{ flexDirection: 'row', gap: 8, marginBottom: 15, flexWrap: 'wrap' }}>
-          <Pill label={`全部 ${counts.all}`} emoji="✨" active={filter === 'all'} onPress={() => setFilter('all')} />
+          <Pill
+            label={`${t('home.all')} ${counts.all}`}
+            emoji="✨"
+            active={filter === 'all'}
+            onPress={() => setFilter('all')}
+          />
           {CATEGORIES.map((cat) => (
             <Pill
               key={cat.id}
-              label={`${cat.short}${counts[cat.id] > 0 ? ` ${counts[cat.id]}` : ''}`}
+              label={`${t(`category.${cat.id}.short`)}${counts[cat.id] > 0 ? ` ${counts[cat.id]}` : ''}`}
               emoji={cat.emoji}
               active={filter === cat.id}
               onPress={() => setFilter(cat.id)}
@@ -212,10 +222,13 @@ export default function HomeScreen() {
 
         <SectionTitle
           emoji="🌈"
-          title={filter === 'all' ? '今天的任务' : CATEGORY_MAP[filter].name}
+          title={filter === 'all' ? t('home.todayTasks') : t(`category.${filter}.name`)}
           right={
             <Text style={{ fontSize: 11, color: theme.textSoft }}>
-              {visibleDone.length}/{visiblePending.length + visibleDone.length} 已完成
+              {t('home.completedOf', {
+                done: visibleDone.length,
+                total: visiblePending.length + visibleDone.length,
+              })}
             </Text>
           }
         />
@@ -224,10 +237,10 @@ export default function HomeScreen() {
           <Card>
             <Empty
               emoji="🌱"
-              title="这里还是空的"
-              hint="今天没有这个类别的任务，去「任务」页添加一件吧"
+              title={t('home.emptyTitle')}
+              hint={t('home.emptyHint')}
             />
-            <Btn label="添加任务" emoji="＋" variant="soft" onPress={() => router.push('/task-editor')} />
+            <Btn label={t('home.emptyAdd')} emoji="＋" variant="soft" onPress={() => router.push('/task-editor')} />
           </Card>
         ) : null}
 
@@ -245,7 +258,7 @@ export default function HomeScreen() {
         {visibleDone.length > 0 ? (
           <View style={{ marginTop: 6 }}>
             <Text style={{ fontSize: 11, color: theme.textSoft, marginBottom: 8 }}>
-              ✨ 已完成 {visibleDone.length} 件，真棒
+              ✨ {t('home.doneCount', { n: visibleDone.length })}
             </Text>
             {visibleDone.map((task) => (
               <TaskCard
@@ -265,9 +278,9 @@ export default function HomeScreen() {
             <Row style={{ gap: 10 }}>
               <Text style={{ fontSize: 30 }}>🎁</Text>
               <View style={{ flex: 1 }}>
-                <Text style={heading(15, theme.text)}>今日全勤宝箱打开啦！</Text>
+                <Text style={heading(15, theme.text)}>{t('home.allClearTitle')}</Text>
                 <Text style={{ fontSize: 11, color: theme.textSoft, marginTop: 2 }}>
-                  额外 +5 金币已经放进你的存钱罐
+                  {t('home.allClearHint')}
                 </Text>
               </View>
             </Row>
@@ -275,7 +288,7 @@ export default function HomeScreen() {
         ) : null}
 
         <Btn
-          label="添加一个新任务"
+          label={t('home.addTask')}
           emoji="＋"
           variant="ghost"
           onPress={() => router.push('/task-editor')}

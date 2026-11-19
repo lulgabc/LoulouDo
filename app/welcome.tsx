@@ -8,9 +8,12 @@ import { Btn, Card, Label, Screen } from '@/components/ui';
 import { Mascot } from '@/components/Mascot';
 import { SkinPicker } from '@/components/SkinPicker';
 import { tapFeedback } from '@/utils/feedback';
+import { useI18n } from '@/i18n';
+import { LanguagePicker } from '@/components/LanguagePicker';
 
 export default function WelcomeScreen() {
   const theme = useTheme();
+  const { t } = useI18n();
   const { state, completeOnboarding, setTheme } = useApp();
   const [name, setName] = useState('');
   const [avatar, setAvatar] = useState('🦌');
@@ -19,7 +22,7 @@ export default function WelcomeScreen() {
 
   const start = () => {
     tapFeedback('success');
-    completeOnboarding(name, avatar, state.settings.themeId);
+    completeOnboarding(name.trim() || t('welcome.defaultName'), avatar, state.settings.themeId);
     router.replace('/');
   };
 
@@ -39,17 +42,18 @@ export default function WelcomeScreen() {
           <Mascot size={172} mood="cheer" />
         </View>
         <Text style={{ ...numberStyle(38, theme.text), marginTop: 2 }}>LoulouDo</Text>
-        <Text style={{ ...heading(19, theme.text), marginTop: -2 }}>鹿鹿打卡</Text>
+        <Text style={{ ...heading(19, theme.text), marginTop: -2 }}>{t('welcome.brandSub')}</Text>
         <Text style={{ fontSize: 11.5, color: theme.textSoft, marginTop: 7, textAlign: 'center', lineHeight: 18 }}>
-          把每天的小事，变成闪闪发光的冒险 ✨{'\n'}打卡赚金币，金币换零花钱
+          {t('welcome.tagline1')}{'\n'}
+          {t('welcome.tagline2')}
         </Text>
       </View>
 
       <View style={{ flexDirection: 'row', gap: 6, justifyContent: 'center', marginVertical: 14 }}>
         {[
-          { icon: '✅', text: '每日打卡' },
-          { icon: '💰', text: '金币奖励' },
-          { icon: '📊', text: '成长报表' },
+          { icon: '✅', text: t('welcome.featureDaily') },
+          { icon: '💰', text: t('welcome.featureCoins') },
+          { icon: '📊', text: t('welcome.featureReport') },
         ].map((item) => (
           <View
             key={item.text}
@@ -71,12 +75,19 @@ export default function WelcomeScreen() {
         ))}
       </View>
 
+      <View style={{ marginBottom: 13 }}>
+        <Text style={{ fontSize: 10, color: theme.textSoft, marginBottom: 5 }}>
+          🌐 {t('welcome.language')}
+        </Text>
+        <LanguagePicker />
+      </View>
+
       <Card style={{ marginBottom: 13 }}>
-        <Label>怎么称呼你呀？</Label>
+        <Label>{t('welcome.nameLabel')}</Label>
         <TextInput
           value={name}
           onChangeText={setName}
-          placeholder="输入昵称，例如：小鹿"
+          placeholder={t('welcome.namePlaceholder')}
           placeholderTextColor={theme.textSoft}
           maxLength={12}
           style={{
@@ -90,7 +101,7 @@ export default function WelcomeScreen() {
             marginBottom: 12,
           }}
         />
-        <Label>选一个你的专属小头像</Label>
+        <Label>{t('welcome.avatarLabel')}</Label>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
           {AVATARS.map((a) => (
             <Pressable
@@ -114,13 +125,13 @@ export default function WelcomeScreen() {
       </Card>
 
       <Card style={{ marginBottom: 14 }}>
-        <Label>挑一个喜欢的皮肤（随时能换）</Label>
+        <Label>{t('welcome.skinLabel')}</Label>
         <SkinPicker value={state.settings.themeId} onChange={setTheme} />
       </Card>
 
-      <Btn label="开始我的打卡之旅" emoji="🚀" onPress={start} />
+      <Btn label={t('welcome.start')} emoji="🚀" onPress={start} />
       <Text style={{ fontSize: 9.5, color: theme.textSoft, textAlign: 'center', marginTop: 10, lineHeight: 15 }}>
-        数据只保存在这台设备上 · 不登录 · 无广告
+        {t('welcome.privacy')}
       </Text>
     </Screen>
   );

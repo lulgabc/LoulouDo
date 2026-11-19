@@ -1,8 +1,10 @@
 import { Platform, TextStyle, ViewStyle } from 'react-native';
 import { useApp } from '@/store/AppStore';
 import type { ThemeId } from '@/types';
+import type { Locale } from '@/i18n/locales';
 
 export const HEADING_FONT = 'ZCOOLKuaiLe_400Regular';
+export const LATIN_HEADING_FONT = 'Baloo2_700Bold';
 export const NUMBER_FONT = 'Baloo2_800ExtraBold';
 export const NUMBER_FONT_MEDIUM = 'Baloo2_600SemiBold';
 
@@ -192,6 +194,17 @@ export const THEMES: Record<ThemeId, Theme> = {
 
 export const THEME_LIST: Theme[] = [THEMES.candy, THEMES.pop, THEMES.sticker, THEMES.galaxy];
 
+/** 中文用圆润的站酷快乐体；其他语言用带重音符号的 Baloo 2。 */
+let activeLocale: Locale = 'zh';
+
+export function applyLocaleToFonts(locale: Locale) {
+  activeLocale = locale;
+}
+
+export function headingLocale(): Locale {
+  return activeLocale;
+}
+
 export function useTheme(): Theme {
   const { state } = useApp();
   return THEMES[state.settings.themeId] ?? THEMES.candy;
@@ -209,7 +222,7 @@ export function shadowStyle(theme: Theme): ViewStyle {
 
 export function heading(size = 20, color?: string): TextStyle {
   return {
-    fontFamily: HEADING_FONT,
+    fontFamily: activeLocale === 'zh' ? HEADING_FONT : LATIN_HEADING_FONT,
     fontSize: size,
     color,
     letterSpacing: 0.3,

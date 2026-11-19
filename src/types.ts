@@ -1,3 +1,5 @@
+import type { Locale } from '@/i18n/locales';
+
 /**
  * LoulouDo — 核心数据模型
  * 所有日期使用本地时区的 YYYY-MM-DD 字符串，避免时区漂移。
@@ -12,6 +14,8 @@ export interface Task {
   id: string;
   profileId: string;
   title: string;
+  /** 示例任务的翻译 key；用户编辑后清空，显示用户自己写的标题 */
+  titleKey?: string;
   emoji: string;
   category: Category;
   /** fixed: 按类别重复；once: 在 startDate~endDate 内可完成一次 */
@@ -32,6 +36,7 @@ export interface Profile {
   /** 心愿存钱罐（金额单位：元） */
   wish: {
     title: string;
+    titleKey?: string;
     target: number;
   };
 }
@@ -48,6 +53,7 @@ export interface LedgerEntry {
   coins: number;
   taskId?: string;
   taskTitle?: string;
+  taskKey?: string;
   emoji?: string;
   category?: Category;
   taskKind?: TaskKind;
@@ -57,17 +63,20 @@ export interface LedgerEntry {
   rate?: number;
   /** 奖励说明，例如「全勤宝箱」 */
   label?: string;
+  labelKey?: string;
 }
 
 export interface HolidayRange {
   id: string;
   name: string;
+  nameKey?: string;
   start: string;
   end: string;
 }
 
 export interface Settings {
   themeId: ThemeId;
+  locale: Locale;
   /** 多少金币兑换 1 元 */
   rate: number;
   categoryCoins: Record<Category, number>;
@@ -87,6 +96,8 @@ export interface AppState {
 export interface TaskDraft {
   id?: string;
   title: string;
+  /** 示例任务的翻译 key；用户编辑后清空，显示用户自己写的标题 */
+  titleKey?: string;
   emoji: string;
   category: Category;
   kind: TaskKind;

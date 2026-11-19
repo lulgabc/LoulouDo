@@ -89,7 +89,7 @@ if (!walletText.includes('金币存折')) throw new Error('钱包存折缺失');
 
 await page.getByRole('button', { name: '兑换零花钱' }).click();
 await page.waitForTimeout(800);
-await page.locator('input[placeholder*="金币数量"]').fill('50');
+await page.locator('input[placeholder="0"]').fill('50');
 await shot('09-redeem');
 await page.getByRole('button', { name: /^确认兑换/ }).click();
 await page.waitForTimeout(900);

@@ -3,6 +3,7 @@ import { Pressable, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { ThemeId } from '@/types';
 import { THEME_LIST, heading } from '@/theme/themes';
+import { useI18n } from '@/i18n';
 
 export function SkinPicker({
   value,
@@ -13,26 +14,27 @@ export function SkinPicker({
   onChange: (id: ThemeId) => void;
   columns?: number;
 }) {
+  const { t } = useI18n();
   const width = columns === 2 ? '48%' : '100%';
   return (
     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-      {THEME_LIST.map((t) => {
-        const active = value === t.id;
+      {THEME_LIST.map((th) => {
+        const active = value === th.id;
         return (
           <Pressable
-            key={t.id}
-            onPress={() => onChange(t.id)}
+            key={th.id}
+            onPress={() => onChange(th.id)}
             style={({ pressed }) => ({
               width,
               borderRadius: 18,
               overflow: 'hidden',
               borderWidth: active ? 3 : 1.5,
-              borderColor: active ? t.primary : t.border,
+              borderColor: active ? th.primary : th.border,
               transform: [{ scale: pressed ? 0.97 : 1 }],
-              backgroundColor: t.card,
+              backgroundColor: th.card,
             })}
           >
-            <LinearGradient colors={t.bgGradient} style={{ padding: 10, minHeight: 100 }}>
+            <LinearGradient colors={th.bgGradient} style={{ padding: 10, minHeight: 100 }}>
               <View
                 style={{
                   flexDirection: 'row',
@@ -41,21 +43,23 @@ export function SkinPicker({
                   minHeight: 20,
                 }}
               >
-                <Text style={{ fontSize: 18 }}>{t.emoji}</Text>
+                <Text style={{ fontSize: 18 }}>{th.emoji}</Text>
                 {active ? (
                   <View
                     style={{
-                      backgroundColor: t.primary,
+                      backgroundColor: th.primary,
                       borderRadius: 999,
                       paddingHorizontal: 7,
                       paddingVertical: 2,
                     }}
                   >
-                    <Text style={{ fontSize: 8, color: '#FFFFFF', fontWeight: '700' }}>使用中</Text>
+                    <Text style={{ fontSize: 8, color: '#FFFFFF', fontWeight: '700' }}>
+                      {t('skin.active')}
+                    </Text>
                   </View>
                 ) : (
                   <View style={{ flexDirection: 'row', gap: 3 }}>
-                    {[t.primary, t.accent, t.secondary].map((c, i) => (
+                    {[th.primary, th.accent, th.secondary].map((c, i) => (
                       <View
                         key={i}
                         style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: c }}
@@ -64,11 +68,11 @@ export function SkinPicker({
                   </View>
                 )}
               </View>
-              <Text style={{ ...heading(14, t.text), marginTop: 8 }} numberOfLines={1}>
-                {t.name}
+              <Text style={{ ...heading(14, th.text), marginTop: 8 }} numberOfLines={2}>
+                {t(`theme.${th.id}.name`)}
               </Text>
-              <Text style={{ fontSize: 9, color: t.textSoft, marginTop: 1 }} numberOfLines={1}>
-                {t.tagline}
+              <Text style={{ fontSize: 9, color: th.textSoft, marginTop: 1 }} numberOfLines={2}>
+                {t(`theme.${th.id}.tagline`)}
               </Text>
             </LinearGradient>
           </Pressable>

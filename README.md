@@ -30,6 +30,7 @@ LoulouDo 是一款面向 4–10 岁孩子的**跨平台（iOS / Android / Web）
 | 📊 成长报表 | 本周 / 本月 / 全部：金币柱状图、类别环图、完成率、最佳一天、家长小报告 |
 | 👨‍👩‍👧 多宝贝 | 一台设备可以给多个孩子分别记录任务、金币和报表 |
 | 🏖️ 假期管理 | 自定义假期日期段，假期任务只在假期出现 |
+| 🌍 七种语言 | 中文 / English / Français / Deutsch / Italiano / Español / Português，自动识别系统语言，随时切换 |
 | 💾 本地持久化 | AsyncStorage 自动保存，刷新/重启不丢数据 |
 
 ### 任务规则
@@ -70,6 +71,37 @@ LoulouDo 是一款面向 4–10 岁孩子的**跨平台（iOS / Android / Web）
 | ![假期](docs/screenshots/14-holidays.png) | ![编辑任务](docs/screenshots/15-task-editor.png) |
 
 > 截图全部由 `scripts/screenshots.mjs` 用真实 Chrome 跑完整交互后自动生成（见文末验证）。
+
+---
+
+## 🌍 多语言
+
+支持 **中文、English、Français、Deutsch、Italiano、Español、Português** 七种语言。
+
+- 首次启动根据系统语言自动选择，可在引导页或设置里随时切换；
+- 切换后，**示例任务、假期名称、心愿、历史存折标题**都会即时翻译（用户自己输入的内容保持原样）；
+- 日期、星期、金额使用 `Intl` 按语言格式化（如 `Do., 19. Nov.`、`¥0,50`）；
+- 中文使用站酷快乐体，其他语言自动切换到支持重音符号的 Baloo 2，避免 é / ü / ß 掉字；
+- 语言包有完整性与占位符一致性测试，缺 key 会直接让 TypeScript / 测试失败。
+
+| English · 首页 | Deutsch · 设置（320px） |
+| --- | --- |
+| ![English home](docs/i18n/en-02-home-393.jpg) | ![Deutsch settings](docs/i18n/de-04-settings-320.jpg) |
+
+| Français · 首页（320px） | Português · 报表 |
+| --- | --- |
+| ![Français home](docs/i18n/fr-02-home-320.jpg) | ![Português report](docs/i18n/pt-03-report.jpg) |
+
+巡检结果（393 / 320 两种宽度 × 7 语言）：
+
+- 0 条 console error；
+- 0 横向溢出、0 文字裁切、0 输入框超出屏幕；
+- 非中文界面 **0 中文残留**（语言选择器里的「中文」除外）；
+- 兑换、任务编辑器、假期三个弹层在 EN / DE / FR / PT 的 320px 下同样 0 问题；
+- 从 DE 切到 EN 后，示例任务与界面文案即时切换。
+
+> 截图与机器可读结果：`docs/i18n/`、`docs/i18n/report.json`、`docs/i18n/modals-report.json`。
+> 复跑：`npm run media:i18n`、`npm run media:i18n-modals`。
 
 ---
 
@@ -154,6 +186,8 @@ touch dist-pages/.nojekyll                    # 保留 _expo 目录
 npm run media:icons
 # 需要先 npm run export:web 并启动静态服务（端口 4173）
 npm run media:shots
+npm run media:i18n
+npm run media:i18n-modals
 ```
 
 ---
@@ -213,8 +247,8 @@ $ npx tsc --noEmit
 （通过，无输出）
 
 $ npx vitest run
-Test Files  1 passed (1)
-     Tests  25 passed (25)
+Test Files  2 passed (2)
+     Tests  35 passed (35)
 
 $ npx expo export -p web
 Exported: dist
@@ -229,6 +263,8 @@ Exported: dist
 - 切换到“星空梦想”皮肤 → 进入假期页 → 新建任务“给植物浇水”
 - 刷新页面 → 昵称、任务、皮肤（localStorage 中 `themeId: "galaxy"`）全部保留
 - 全程 **0 条 console error / page error**
+- 七语言巡检：非中文界面 0 中文残留，393/320 宽度下 0 溢出/裁切，三个弹层同样通过
+- DE → EN 切换后，示例任务和存折标题即时翻译
 
 ---
 

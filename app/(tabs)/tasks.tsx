@@ -16,9 +16,11 @@ import { Card, Empty, Row, Screen, SectionTitle } from '@/components/ui';
 import { TaskCard } from '@/components/TaskCard';
 import { Confetti } from '@/components/Confetti';
 import { tapFeedback } from '@/utils/feedback';
+import { useI18n } from '@/i18n';
 
 export default function TasksScreen() {
   const theme = useTheme();
+  const { t, tn } = useI18n();
   const { tasks, entries, state, toggleTask } = useApp();
   const today = todayISO();
   const holidays = state.settings.holidays;
@@ -45,9 +47,9 @@ export default function TasksScreen() {
       <Screen>
         <Row style={{ justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
           <View>
-            <Text style={heading(24, theme.text)}>任务清单</Text>
+            <Text style={heading(24, theme.text)}>{t('tasks.title')}</Text>
             <Text style={{ fontSize: 11, color: theme.textSoft, marginTop: 3 }}>
-              固定任务会自动重复 · 单次挑战只出现一次
+              {t('tasks.subtitle')}
             </Text>
           </View>
           <Pressable
@@ -68,7 +70,7 @@ export default function TasksScreen() {
         </Row>
 
         <Text style={{ fontSize: 10, color: theme.textSoft, marginBottom: 14 }}>
-          小提示：点任务名字可以修改或删除哦
+          {t('tasks.hint')}
         </Text>
 
         {grouped.map(({ cat, list }) => {
@@ -84,7 +86,7 @@ export default function TasksScreen() {
             <View key={cat.id} style={{ marginBottom: 11 }}>
               <SectionTitle
                 emoji={cat.emoji}
-                title={`${cat.name} · ${list.length}`}
+                title={`${t(`category.${cat.id}.name`)} · ${list.length}`}
                 right={
                   <Pressable
                     onPress={() =>
@@ -92,13 +94,13 @@ export default function TasksScreen() {
                     }
                     hitSlop={8}
                   >
-                    <Text style={{ ...heading(12, color) }}>＋ 添加</Text>
+                    <Text style={{ ...heading(12, color) }}>＋ {t('common.add')}</Text>
                   </Pressable>
                 }
               />
               {list.length === 0 ? (
                 <Card style={{ paddingVertical: 4 }}>
-                  <Empty emoji={cat.emoji} title="还没有任务" hint={cat.hint} />
+                  <Empty emoji={cat.emoji} title={t('tasks.emptyTitle')} hint={t(`category.${cat.id}.hint`)} />
                 </Card>
               ) : (
                 list.map((task) => {
@@ -112,17 +114,17 @@ export default function TasksScreen() {
 
                   let note: string | undefined;
                   if (onceDone) {
-                    note = doneToday ? '今天完成' : '挑战完成';
+                    note = doneToday ? t('task.doneToday') : t('task.challengeDone');
                   } else if (expired) {
-                    note = '已结束';
+                    note = t('task.ended');
                   } else if (future && task.startDate) {
-                    note = `${daysBetween(today, task.startDate)} 天后开始`;
+                    note = tn('task.startsIn', daysBetween(today, task.startDate));
                   } else if (!applies && task.category === 'weekend') {
-                    note = '周末打卡';
+                    note = t('task.weekendOnly');
                   } else if (!applies && task.category === 'holiday') {
-                    note = '假期专属';
+                    note = t('task.holidayOnly');
                   } else if (!applies && task.kind === 'once') {
-                    note = '单次挑战';
+                    note = t('task.once');
                   }
 
                   const enabled =
@@ -149,10 +151,9 @@ export default function TasksScreen() {
         })}
 
         <Card style={{ marginTop: 4, backgroundColor: theme.chip }}>
-          <Text style={{ ...heading(13, theme.text), marginBottom: 4 }}>💡 任务小课堂</Text>
+          <Text style={{ ...heading(13, theme.text), marginBottom: 4 }}>💡 {t('tasks.lessonTitle')}</Text>
           <Text style={{ fontSize: 11, color: theme.textSoft, lineHeight: 18 }}>
-            「每日」天天出现，「周末」只在周六日出现，「假期」只在你设置的假期日期出现。
-            特别挑战是单次的大任务，完成后会得到最多金币。
+            {t('tasks.lessonBody')}
           </Text>
         </Card>
       </Screen>

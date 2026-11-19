@@ -4,6 +4,7 @@ import { Redirect, Tabs } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '@/store/AppStore';
 import { useTheme, shadowStyle, heading } from '@/theme/themes';
+import { useI18n } from '@/i18n';
 
 type TabBarProps = {
   state: {
@@ -13,16 +14,17 @@ type TabBarProps = {
   navigateToTab: (routeKey: string) => void;
 };
 
-const META: Record<string, { icon: string; label: string }> = {
-  index: { icon: '🏡', label: '今日' },
-  tasks: { icon: '🗂️', label: '任务' },
-  report: { icon: '📊', label: '报表' },
-  wallet: { icon: '👛', label: '钱包' },
-  settings: { icon: '⚙️', label: '设置' },
+const META: Record<string, { icon: string; key: string }> = {
+  index: { icon: '🏡', key: 'today' },
+  tasks: { icon: '🗂️', key: 'tasks' },
+  report: { icon: '📊', key: 'report' },
+  wallet: { icon: '👛', key: 'wallet' },
+  settings: { icon: '⚙️', key: 'settings' },
 };
 
 function TabBar({ state, navigateToTab }: TabBarProps) {
   const theme = useTheme();
+  const { t } = useI18n();
   const insets = useSafeAreaInsets();
 
   return (
@@ -43,7 +45,8 @@ function TabBar({ state, navigateToTab }: TabBarProps) {
       >
         {state.routes.map((route, index) => {
         const focused = state.index === index;
-        const meta = META[route.name] ?? { icon: '⭐', label: route.name };
+        const meta = META[route.name] ?? { icon: '⭐', key: route.name };
+        const label = t(`tab.${meta.key}`);
         const onPress = () => {
           if (!focused) navigateToTab(route.key);
         };
@@ -53,32 +56,33 @@ function TabBar({ state, navigateToTab }: TabBarProps) {
             onPress={onPress}
             accessibilityRole="button"
             accessibilityState={{ selected: focused }}
-            accessibilityLabel={meta.label}
+            accessibilityLabel={label}
             style={styles.item}
           >
             <View
               style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 5,
-                paddingHorizontal: focused ? 12 : 6,
-                paddingVertical: 5,
+                width: 42,
+                height: 30,
                 borderRadius: 999,
+                alignItems: 'center',
+                justifyContent: 'center',
                 backgroundColor: focused ? theme.chip : 'transparent',
+                borderWidth: focused && theme.borderWidth > 1 ? 2 : 0,
+                borderColor: theme.border,
               }}
             >
-              <Text style={{ fontSize: focused ? 19 : 17, opacity: focused ? 1 : 0.65 }}>
-                {meta.icon}
-              </Text>
-              {focused ? (
-                <Text style={heading(12, theme.text)} numberOfLines={1}>
-                  {meta.label}
-                </Text>
-              ) : null}
+              <Text style={{ fontSize: 19, opacity: focused ? 1 : 0.7 }}>{meta.icon}</Text>
             </View>
-            {!focused ? (
-              <Text style={{ fontSize: 9, color: theme.textSoft, marginTop: 1 }}>{meta.label}</Text>
-            ) : null}
+            <Text
+              style={{
+                ...heading(9.5, focused ? theme.text : theme.textSoft),
+                marginTop: 2,
+                opacity: focused ? 1 : 0.9,
+              }}
+              numberOfLines={1}
+            >
+              {label}
+            </Text>
           </Pressable>
         );
       })}

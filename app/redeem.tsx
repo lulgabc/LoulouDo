@@ -7,10 +7,12 @@ import { coinsToMoney } from '@/domain/logic';
 import { Btn, Card, IconBtn, Row, Screen } from '@/components/ui';
 import { Confetti } from '@/components/Confetti';
 import { Coin } from '@/components/Coin';
+import { useI18n } from '@/i18n';
 import { tapFeedback } from '@/utils/feedback';
 
 export default function RedeemScreen() {
   const theme = useTheme();
+  const { t, formatMoney } = useI18n();
   const { balance, redeem, state } = useApp();
   const rate = state.settings.rate;
   const [raw, setRaw] = useState('');
@@ -27,10 +29,10 @@ export default function RedeemScreen() {
       { label: '¥1', coins: rate },
       { label: '¥5', coins: rate * 5 },
       { label: '¥10', coins: rate * 10 },
-      { label: '全部', coins: balance },
+      { label: t('redeem.quickAll'), coins: balance },
     ];
     return items.filter((item, i, arr) => item.coins > 0 && arr.findIndex((x) => x.coins === item.coins) === i);
-  }, [rate, balance]);
+  }, [rate, balance, t]);
 
   const confirm = () => {
     if (!valid) return;
@@ -48,8 +50,10 @@ export default function RedeemScreen() {
           <Row style={{ gap: 10 }}>
             <IconBtn emoji="✕" onPress={() => router.back()} size={38} />
             <View>
-              <Text style={heading(20, theme.text)}>兑换零花钱</Text>
-              <Text style={{ fontSize: 10, color: theme.textSoft }}>{rate} 金币 = ¥1</Text>
+              <Text style={heading(20, theme.text)}>{t('redeem.title')}</Text>
+              <Text style={{ fontSize: 10, color: theme.textSoft }}>
+                {t('redeem.rate', { rate })}
+              </Text>
             </View>
           </Row>
         </Row>
@@ -58,19 +62,21 @@ export default function RedeemScreen() {
           <View>
             <Card style={{ alignItems: 'center', paddingVertical: 26, gap: 8 }}>
               <Text style={{ fontSize: 60 }}>💰</Text>
-              <Text style={heading(22, theme.text)}>兑换成功！</Text>
-              <Text style={numberStyle(40, theme.primary)}>¥{result.money.toFixed(2)}</Text>
+              <Text style={heading(22, theme.text)}>{t('redeem.success')}</Text>
+              <Text style={numberStyle(40, theme.primary)}>
+                ¥{formatMoney(result.money)}
+              </Text>
               <Text style={{ fontSize: 12, color: theme.textSoft }}>
-                花掉了 {result.coins} 枚金币 · 剩余 {balance} 枚
+                {t('redeem.spent', { coins: result.coins, balance })}
               </Text>
               <View style={{ height: 8 }} />
               <Text style={{ fontSize: 12, color: theme.text, textAlign: 'center', lineHeight: 19 }}>
-                记得把这张小票给爸爸妈妈看，{'\n'}让他们把零花钱放进你的小钱包 💛
+                {t('redeem.receipt')}
               </Text>
             </Card>
-            <Btn label="完成" emoji="✓" onPress={() => router.back()} style={{ marginTop: 14 }} />
+            <Btn label={t('common.done')} emoji="✓" onPress={() => router.back()} style={{ marginTop: 14 }} />
             <Btn
-              label="再兑换一次"
+              label={t('redeem.again')}
               variant="ghost"
               onPress={() => {
                 setDone(false);
@@ -84,27 +90,29 @@ export default function RedeemScreen() {
             <Card style={{ marginBottom: 14 }}>
               <Row style={{ justifyContent: 'space-between' }}>
                 <View>
-                  <Text style={{ fontSize: 10, color: theme.textSoft }}>可用金币</Text>
+                  <Text style={{ fontSize: 10, color: theme.textSoft }}>{t('redeem.available')}</Text>
                   <Row style={{ gap: 6 }}>
                     <Text style={numberStyle(32, theme.text)}>{balance}</Text>
                     <Coin size={19} />
                   </Row>
                 </View>
                 <View style={{ alignItems: 'flex-end' }}>
-                  <Text style={{ fontSize: 10, color: theme.textSoft }}>全部兑换约</Text>
+                  <Text style={{ fontSize: 10, color: theme.textSoft }}>{t('redeem.allWorth')}</Text>
                   <Text style={numberStyle(22, theme.secondary)}>
-                    ¥{coinsToMoney(balance, rate).toFixed(2)}
+                    ¥{formatMoney(coinsToMoney(balance, rate))}
                   </Text>
                 </View>
               </Row>
             </Card>
 
             <Card style={{ marginBottom: 14 }}>
-              <Text style={{ fontSize: 11, color: theme.textSoft, marginBottom: 7 }}>要兑换多少金币？</Text>
+              <Text style={{ fontSize: 11, color: theme.textSoft, marginBottom: 7 }}>
+                {t('redeem.howMany')}
+              </Text>
               <TextInput
                 value={raw}
                 onChangeText={(text) => setRaw(text.replace(/[^0-9]/g, '').slice(0, 7))}
-                placeholder="输入金币数量"
+                placeholder={t('redeem.placeholder')}
                 placeholderTextColor={theme.textSoft}
                 keyboardType="number-pad"
                 style={{
@@ -150,27 +158,31 @@ export default function RedeemScreen() {
                 }}
               >
                 <Row style={{ justifyContent: 'space-between' }}>
-                  <Text style={{ fontSize: 11, color: theme.textSoft }}>可以换到</Text>
+                  <Text style={{ fontSize: 11, color: theme.textSoft }}>{t('redeem.canGet')}</Text>
                   <Text style={numberStyle(28, valid ? theme.primary : theme.textSoft)}>
-                    ¥{valid ? money.toFixed(2) : '0.00'}
+                    ¥{valid ? formatMoney(money) : formatMoney(0)}
                   </Text>
                 </Row>
                 {coins > balance ? (
                   <Text style={{ fontSize: 10, color: theme.danger, marginTop: 4 }}>
-                    金币不够啦，最多可以兑换 {balance} 枚
+                    {t('redeem.notEnough', { balance })}
                   </Text>
                 ) : null}
               </View>
             </Card>
 
             <Btn
-              label={valid ? `确认兑换 ¥${money.toFixed(2)}` : '输入金币数量'}
+              label={
+                valid
+                  ? t('redeem.confirm', { money: formatMoney(money) })
+                  : t('redeem.confirmPrompt')
+              }
               emoji={valid ? '🎉' : '💰'}
               onPress={confirm}
               disabled={!valid}
             />
             <Text style={{ fontSize: 10, color: theme.textSoft, textAlign: 'center', marginTop: 12, lineHeight: 16 }}>
-              兑换记录会保存在金币存折里；{'\n'}真实零花钱由爸爸妈妈发放，这不是真的支付哦。
+              {t('redeem.note')}
             </Text>
           </>
         )}

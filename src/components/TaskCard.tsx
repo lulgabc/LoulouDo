@@ -6,6 +6,7 @@ import { daysBetween, todayISO } from '@/domain/date';
 import { useTheme, heading, numberStyle } from '@/theme/themes';
 import { Card } from '@/components/ui';
 import { CoinValue } from '@/components/Coin';
+import { useI18n } from '@/i18n';
 
 export function categoryColor(task: Task, theme: ReturnType<typeof useTheme>): string {
   switch (task.category) {
@@ -28,7 +29,6 @@ export function TaskCard({
   coins,
   onToggle,
   onEdit,
-  waitDays,
   note,
   toggleDisabled,
 }: {
@@ -37,12 +37,13 @@ export function TaskCard({
   coins: number;
   onToggle: () => void;
   onEdit?: () => void;
-  waitDays?: number;
   note?: string;
   toggleDisabled?: boolean;
 }) {
   const theme = useTheme();
+  const { t } = useI18n();
   const cat = CATEGORY_MAP[task.category];
+  const title = task.titleKey ? t(task.titleKey) : task.title;
   const color = categoryColor(task, theme);
   const deadline =
     task.kind === 'once' && task.endDate
@@ -78,7 +79,7 @@ export function TaskCard({
             }}
             numberOfLines={2}
           >
-            {task.title}
+            {title}
           </Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 5, flexWrap: 'wrap' }}>
             <View
@@ -90,21 +91,23 @@ export function TaskCard({
               }}
             >
               <Text style={{ fontSize: 10, color: color, fontWeight: '700' }}>
-                {cat.emoji} {cat.short}
+                {cat.emoji} {t(`category.${task.category}.short`)}
               </Text>
             </View>
             <CoinValue value={coins} size={11} color={theme.coin} />
             {task.kind === 'once' ? (
               <Text style={{ fontSize: 10, color: theme.textSoft }}>
-                {note ?? (done ? '挑战完成' : deadline !== null ? (deadline === 0 ? '今天截止' : `还剩 ${deadline} 天`) : '单次挑战')}
+                {note ??
+                  (done
+                    ? t('task.challengeDone')
+                    : deadline !== null
+                      ? deadline === 0
+                        ? t('task.dueToday')
+                        : t('task.daysLeft', { n: deadline })
+                      : t('task.once'))}
               </Text>
             ) : note ? (
               <Text style={{ fontSize: 10, color: theme.textSoft }}>{note}</Text>
-            ) : null}
-            {waitDays !== undefined && waitDays > 0 && !done ? (
-              <Text style={{ fontSize: 10, color: theme.textSoft }}>
-                {waitDays === 1 ? '明天开始' : `${waitDays} 天后开始`}
-              </Text>
             ) : null}
           </View>
         </Pressable>
@@ -113,7 +116,7 @@ export function TaskCard({
           onPress={toggleDisabled ? undefined : onToggle}
           disabled={toggleDisabled}
           accessibilityRole="button"
-          accessibilityLabel={done ? `取消完成 ${task.title}` : `完成 ${task.title}`}
+          accessibilityLabel={done ? t('task.a11yUndo', { title }) : t('task.a11yComplete', { title })}
           style={({ pressed }) => ({
             width: 44,
             height: 44,

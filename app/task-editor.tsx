@@ -9,9 +9,11 @@ import type { Category, TaskKind } from '@/types';
 import { Btn, Card, IconBtn, Label, Pill, Row, Screen, Stepper } from '@/components/ui';
 import { tapFeedback } from '@/utils/feedback';
 import { Coin, CoinValue } from '@/components/Coin';
+import { useI18n } from '@/i18n';
 
 export default function TaskEditorScreen() {
   const theme = useTheme();
+  const { t } = useI18n();
   const params = useLocalSearchParams<{ id?: string; category?: string }>();
   const { tasks, state, saveTask, deleteTask } = useApp();
   const editing = useMemo(
@@ -22,7 +24,9 @@ export default function TaskEditorScreen() {
     editing?.category ??
     (CATEGORIES.some((c) => c.id === params.category) ? (params.category as Category) : 'daily');
 
-  const [title, setTitle] = useState(editing?.title ?? '');
+  const [title, setTitle] = useState(
+    editing ? (editing.titleKey ? t(editing.titleKey) : editing.title) : '',
+  );
   const [emoji, setEmoji] = useState(editing?.emoji ?? '🌟');
   const [category, setCategory] = useState<Category>(initialCategory);
   const [kind, setKind] = useState<TaskKind>(editing?.kind ?? 'fixed');
@@ -61,16 +65,16 @@ export default function TaskEditorScreen() {
 
   const submit = () => {
     if (!title.trim()) {
-      setError('给任务起一个名字吧');
+      setError(t('editor.errorTitle'));
       return;
     }
     if (kind === 'once') {
       if (!isISODate(startDate) || !isISODate(endDate)) {
-        setError('日期格式要像 2026-11-19 这样哦');
+        setError(t('editor.errorDate'));
         return;
       }
       if (startDate > endDate) {
-        setError('开始日期不能晚于结束日期');
+        setError(t('editor.errorOrder'));
         return;
       }
     }
@@ -90,17 +94,26 @@ export default function TaskEditorScreen() {
 
   return (
     <Screen>
-      <Row style={{ justifyContent: 'space-between', marginBottom: 14 }}>
-        <Row style={{ gap: 10 }}>
+      <Row style={{ justifyContent: 'space-between', marginBottom: 14, gap: 8 }}>
+        <Row style={{ gap: 10, flex: 1, minWidth: 0 }}>
           <IconBtn emoji="✕" onPress={() => router.back()} size={38} />
-          <View>
-            <Text style={heading(20, theme.text)}>{editing ? '编辑任务' : '新任务'}</Text>
-            <Text style={{ fontSize: 10, color: theme.textSoft }}>
-              {editing ? '改完记得保存' : '给今天加一点小挑战'}
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <Text style={heading(20, theme.text)} numberOfLines={1}>
+              {editing ? t('editor.edit') : t('editor.new')}
+            </Text>
+            <Text style={{ fontSize: 10, color: theme.textSoft }} numberOfLines={2}>
+              {editing ? t('editor.subtitleEdit') : t('editor.subtitleNew')}
             </Text>
           </View>
         </Row>
-        <Btn label="保存" small onPress={submit} />
+        <IconBtn
+          emoji="✓"
+          size={42}
+          onPress={submit}
+          label={t('common.save')}
+          bg={theme.primary}
+          style={{ flexShrink: 0 }}
+        />
       </Row>
 
       <Card style={{ marginBottom: 13 }}>
@@ -119,12 +132,12 @@ export default function TaskEditorScreen() {
           </View>
           <View style={{ flex: 1 }}>
             <Text style={heading(16, title ? theme.text : theme.textSoft)} numberOfLines={1}>
-              {title.trim() || '任务名字'}
+              {title.trim() || t('editor.previewTitle')}
             </Text>
             <Row style={{ gap: 4, marginTop: 3 }}>
               <Text style={{ fontSize: 10, color: theme.textSoft }}>
-                {CATEGORY_MAP[category].emoji} {CATEGORY_MAP[category].short} ·{' '}
-                {kind === 'once' ? '单次挑战' : '固定任务'} ·
+                {CATEGORY_MAP[category].emoji} {t(`category.${category}.short`)} ·{' '}
+                {kind === 'once' ? t('editor.once') : t('editor.fixed')} ·
               </Text>
               <CoinValue value={coins} size={10} color={theme.textSoft} />
             </Row>
@@ -132,14 +145,14 @@ export default function TaskEditorScreen() {
         </Row>
       </Card>
 
-      <Label>任务名字</Label>
+      <Label>{t('editor.nameLabel')}</Label>
       <TextInput
         value={title}
         onChangeText={(t) => {
           setTitle(t);
           setError('');
         }}
-        placeholder="例如：自己整理床铺"
+        placeholder={t('editor.namePlaceholder')}
         placeholderTextColor={theme.textSoft}
         maxLength={24}
         style={{
@@ -154,7 +167,7 @@ export default function TaskEditorScreen() {
         }}
       />
 
-      <Label>选一个小图标</Label>
+      <Label>{t('editor.emojiLabel')}</Label>
       <Card style={{ padding: 10, marginBottom: 13 }}>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
           {TASK_EMOJIS.map((e) => (
@@ -178,12 +191,12 @@ export default function TaskEditorScreen() {
         </View>
       </Card>
 
-      <Label>任务类别</Label>
+      <Label>{t('editor.categoryLabel')}</Label>
       <Row style={{ gap: 7, flexWrap: 'wrap', marginBottom: 5 }}>
         {CATEGORIES.map((cat) => (
           <Pill
             key={cat.id}
-            label={cat.short}
+            label={t(`category.${cat.id}.short`)}
             emoji={cat.emoji}
             active={category === cat.id}
             onPress={() => pickCategory(cat.id)}
@@ -191,10 +204,10 @@ export default function TaskEditorScreen() {
         ))}
       </Row>
       <Text style={{ fontSize: 10, color: theme.textSoft, marginBottom: 13 }}>
-        {CATEGORY_MAP[category].hint}
+        {t(`category.${category}.hint`)}
       </Text>
 
-      <Label>重复方式</Label>
+      <Label>{t('editor.kindLabel')}</Label>
       <Row style={{ gap: 8, marginBottom: 13 }}>
         <Pressable
           onPress={() => pickKind('fixed')}
@@ -208,9 +221,9 @@ export default function TaskEditorScreen() {
             opacity: category === 'special' ? 0.4 : 1,
           }}
         >
-          <Text style={heading(13, theme.text)}>🔁 固定任务</Text>
+          <Text style={heading(13, theme.text)}>🔁 {t('editor.fixed')}</Text>
           <Text style={{ fontSize: 9.5, color: theme.textSoft, marginTop: 3 }}>
-            按类别自动重复出现
+            {t('editor.fixedHint')}
           </Text>
         </Pressable>
         <Pressable
@@ -224,16 +237,16 @@ export default function TaskEditorScreen() {
             borderColor: kind === 'once' ? theme.primary : theme.border,
           }}
         >
-          <Text style={heading(13, theme.text)}>🎯 单次挑战</Text>
+          <Text style={heading(13, theme.text)}>🎯 {t('editor.once')}</Text>
           <Text style={{ fontSize: 9.5, color: theme.textSoft, marginTop: 3 }}>
-            只能完成一次的大任务
+            {t('editor.onceHint')}
           </Text>
         </Pressable>
       </Row>
 
       {kind === 'once' ? (
         <>
-          <Label>挑战时间</Label>
+          <Label>{t('editor.timeLabel')}</Label>
           <Row style={{ gap: 8, marginBottom: 6 }}>
             <TextInput
               value={startDate}
@@ -241,7 +254,7 @@ export default function TaskEditorScreen() {
                 setStartDate(t);
                 setError('');
               }}
-              placeholder="YYYY-MM-DD"
+              placeholder={t('editor.startPlaceholder')}
               placeholderTextColor={theme.textSoft}
               autoCapitalize="none"
               style={{
@@ -255,14 +268,14 @@ export default function TaskEditorScreen() {
                 borderColor: theme.border,
               }}
             />
-            <Text style={{ color: theme.textSoft, alignSelf: 'center' }}>至</Text>
+            <Text style={{ color: theme.textSoft, alignSelf: 'center' }}>{t('holidays.to')}</Text>
             <TextInput
               value={endDate}
               onChangeText={(t) => {
                 setEndDate(t);
                 setError('');
               }}
-              placeholder="YYYY-MM-DD"
+              placeholder={t('editor.endPlaceholder')}
               placeholderTextColor={theme.textSoft}
               autoCapitalize="none"
               style={{
@@ -278,24 +291,26 @@ export default function TaskEditorScreen() {
             />
           </Row>
           <Row style={{ gap: 7, marginBottom: 13 }}>
-            <Pill label="从今天开始" onPress={() => setStartDate(todayISO())} />
-            <Pill label="7 天后结束" onPress={() => setEndDate(addDays(startDate, 7))} />
-            <Pill label="30 天后结束" onPress={() => setEndDate(addDays(startDate, 30))} />
+            <Pill label={t('editor.startToday')} onPress={() => setStartDate(todayISO())} />
+            <Pill label={t('editor.end7')} onPress={() => setEndDate(addDays(startDate, 7))} />
+            <Pill label={t('editor.end30')} onPress={() => setEndDate(addDays(startDate, 30))} />
           </Row>
         </>
       ) : null}
 
-      <Label>完成奖励</Label>
+      <Label>{t('editor.rewardLabel')}</Label>
       <Card style={{ paddingVertical: 12, marginBottom: 4 }}>
         <Row style={{ justifyContent: 'space-between' }}>
           <Row style={{ gap: 6 }}>
             <Coin size={20} />
             <View>
-              <Text style={numberStyle(17, theme.text)}>{coins} 金币</Text>
+              <Text style={numberStyle(17, theme.text)}>{t('editor.rewardValue', { n: coins })}</Text>
               <Text style={{ fontSize: 9.5, color: theme.textSoft }}>
                 {customCoins === null
-                  ? `跟随「${CATEGORY_MAP[category].short}」默认奖励`
-                  : '自定义奖励'}
+                  ? t('editor.followDefault', {
+                      category: t(`category.${category}.short`),
+                    })
+                  : t('editor.customReward')}
               </Text>
             </View>
           </Row>
@@ -308,7 +323,7 @@ export default function TaskEditorScreen() {
         </Row>
         {customCoins !== null ? (
           <Pressable onPress={() => setCustomCoins(null)} style={{ marginTop: 8 }}>
-            <Text style={{ fontSize: 10, color: theme.primary }}>恢复类别默认奖励</Text>
+            <Text style={{ fontSize: 10, color: theme.primary }}>{t('editor.resetDefault')}</Text>
           </Pressable>
         ) : null}
       </Card>
@@ -317,11 +332,11 @@ export default function TaskEditorScreen() {
         <Text style={{ fontSize: 11, color: theme.danger, marginTop: 8 }}>{error}</Text>
       ) : null}
 
-      <Btn label={editing ? '保存修改' : '创建任务'} emoji="✨" onPress={submit} style={{ marginTop: 12 }} />
+      <Btn label={editing ? t('editor.saveChanges') : t('editor.create')} emoji="✨" onPress={submit} style={{ marginTop: 12 }} />
 
       {editing ? (
         <Btn
-          label={confirmDelete ? '再点一次，确认删除' : '删除这个任务'}
+          label={confirmDelete ? t('editor.confirmDelete') : t('editor.delete')}
           variant="ghost"
           onPress={() => {
             if (!confirmDelete) {
@@ -336,7 +351,7 @@ export default function TaskEditorScreen() {
       ) : null}
 
       <Text style={{ fontSize: 10, color: theme.textSoft, textAlign: 'center', marginTop: 12 }}>
-        任务金币可以在「设置」里调整类别默认值
+        {t('editor.hint')}
       </Text>
     </Screen>
   );

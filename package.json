@@ -14,7 +14,9 @@
     "export:web": "expo export -p web",
     "media:icons": "node scripts/generate-icons.mjs",
     "media:shots": "node scripts/screenshots.mjs",
-    "media:audit": "node scripts/layout-audit.mjs"
+    "media:audit": "node scripts/layout-audit.mjs",
+    "media:i18n": "node scripts/i18n-audit.mjs",
+    "media:i18n-modals": "node scripts/i18n-modals-audit.mjs"
   },
   "dependencies": {
     "@expo-google-fonts/baloo-2": "^0.4.2",
@@ -27,6 +29,7 @@
     "expo-haptics": "~58.0.8",
     "expo-linear-gradient": "~58.0.4",
     "expo-linking": "~58.0.17",
+    "expo-localization": "~58.0.5",
     "expo-router": "~58.0.32",
     "expo-splash-screen": "~58.0.14",
     "expo-status-bar": "~58.0.5",
