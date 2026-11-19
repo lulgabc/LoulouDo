@@ -71,7 +71,7 @@ export function Screen({
         {scroll ? (
           <ScrollView
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 132 }}
+            contentContainerStyle={{ paddingBottom: 104 }}
           >
             {inner}
           </ScrollView>

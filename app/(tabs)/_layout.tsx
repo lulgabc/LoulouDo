@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Redirect, Tabs } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '@/store/AppStore';
-import { useTheme, shadowStyle, heading } from '@/theme/themes';
+import { useTheme, heading } from '@/theme/themes';
 import { useI18n } from '@/i18n';
 
 type TabBarProps = {
@@ -29,20 +29,17 @@ function TabBar({ state, navigateToTab }: TabBarProps) {
 
   return (
     <View
-      pointerEvents="box-none"
-      style={[styles.barWrap, { bottom: Math.max(insets.bottom, 10) }]}
+      style={[
+        styles.barWrap,
+        {
+          backgroundColor: theme.tabBg,
+          borderTopColor: theme.border,
+          borderTopWidth: Math.max(theme.cardBorderWidth, 1),
+          paddingBottom: insets.bottom,
+        },
+      ]}
     >
-      <View
-        style={[
-          styles.bar,
-          {
-            backgroundColor: theme.tabBg,
-            borderColor: theme.border,
-            borderWidth: theme.cardBorderWidth,
-          },
-          shadowStyle(theme),
-        ]}
-      >
+      <View style={styles.bar}>
         {state.routes.map((route, index) => {
         const focused = state.index === index;
         const meta = META[route.name] ?? { icon: '⭐', key: route.name };
@@ -113,16 +110,16 @@ export default function TabsLayout() {
 const styles = StyleSheet.create({
   barWrap: {
     position: 'absolute',
-    left: 14,
-    right: 14,
-    alignItems: 'center',
+    left: 0,
+    right: 0,
+    bottom: 0,
     zIndex: 50,
   },
   bar: {
     width: '100%',
     maxWidth: 560,
-    height: 64,
-    borderRadius: 24,
+    height: 60,
+    alignSelf: 'center',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
