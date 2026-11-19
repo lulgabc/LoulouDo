@@ -149,6 +149,8 @@ for (const width of [393, 320]) {
   const before = await page.locator('body').innerText();
   await page.locator('[aria-label="Mehr"]').first().click();
   await page.waitForTimeout(700);
+  await page.locator('[aria-label="Sprache"]').first().click();
+  await page.waitForTimeout(500);
   await page.locator('[aria-label="English"]').first().click();
   await page.waitForTimeout(600);
   await page.locator('[aria-label="Today"]').first().click();

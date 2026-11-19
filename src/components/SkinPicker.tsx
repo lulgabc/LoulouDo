@@ -9,10 +9,12 @@ export function SkinPicker({
   value,
   onChange,
   columns = 2,
+  compact = false,
 }: {
   value: ThemeId;
   onChange: (id: ThemeId) => void;
   columns?: number;
+  compact?: boolean;
 }) {
   const { t } = useI18n();
   const width = columns === 2 ? '48%' : '100%';
@@ -34,7 +36,10 @@ export function SkinPicker({
               backgroundColor: th.card,
             })}
           >
-            <LinearGradient colors={th.bgGradient} style={{ padding: 10, minHeight: 100 }}>
+            <LinearGradient
+              colors={th.bgGradient}
+              style={{ padding: compact ? 9 : 10, minHeight: compact ? 70 : 100 }}
+            >
               <View
                 style={{
                   flexDirection: 'row',
@@ -47,14 +52,18 @@ export function SkinPicker({
                 {active ? (
                   <View
                     style={{
+                      width: compact ? 18 : undefined,
+                      height: compact ? 18 : undefined,
+                      borderRadius: 9,
                       backgroundColor: th.primary,
-                      borderRadius: 999,
-                      paddingHorizontal: 7,
-                      paddingVertical: 2,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      paddingHorizontal: compact ? 0 : 7,
+                      paddingVertical: compact ? 0 : 2,
                     }}
                   >
-                    <Text style={{ fontSize: 8, color: '#FFFFFF', fontWeight: '700' }}>
-                      {t('skin.active')}
+                    <Text style={{ fontSize: compact ? 10 : 8, color: '#FFFFFF', fontWeight: '700' }}>
+                      {compact ? '✓' : t('skin.active')}
                     </Text>
                   </View>
                 ) : (
@@ -68,12 +77,17 @@ export function SkinPicker({
                   </View>
                 )}
               </View>
-              <Text style={{ ...heading(14, th.text), marginTop: 8 }} numberOfLines={2}>
+              <Text
+                style={{ ...heading(compact ? 11.5 : 14, th.text), marginTop: compact ? 5 : 8 }}
+                numberOfLines={2}
+              >
                 {t(`theme.${th.id}.name`)}
               </Text>
-              <Text style={{ fontSize: 9, color: th.textSoft, marginTop: 1 }} numberOfLines={2}>
-                {t(`theme.${th.id}.tagline`)}
-              </Text>
+              {compact ? null : (
+                <Text style={{ fontSize: 9, color: th.textSoft, marginTop: 1 }} numberOfLines={2}>
+                  {t(`theme.${th.id}.tagline`)}
+                </Text>
+              )}
             </LinearGradient>
           </Pressable>
         );

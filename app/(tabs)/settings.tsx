@@ -3,19 +3,19 @@ import { Pressable, Text, TextInput, View } from 'react-native';
 import Constants from 'expo-constants';
 import { router } from 'expo-router';
 import { useApp } from '@/store/AppStore';
-import { useTheme, heading, numberStyle } from '@/theme/themes';
+import { useTheme, heading } from '@/theme/themes';
 import { todayISO } from '@/domain/date';
 import { CATEGORIES } from '@/domain/constants';
 import type { ThemeId } from '@/types';
 import { AVATARS } from '@/domain/constants';
-import { Board, Btn, Card, IconBtn, Label, Pill, Row, Screen, SectionTitle, Stepper } from '@/components/ui';
+import { Board, Btn, IconBtn, Label, Pill, Row, Screen, Stepper } from '@/components/ui';
 import { SkinPicker } from '@/components/SkinPicker';
-import { LanguagePicker } from '@/components/LanguagePicker';
+import { LanguageMenu } from '@/components/LanguageMenu';
 import { useI18n } from '@/i18n';
 
 export default function SettingsScreen() {
   const theme = useTheme();
-  const { t, formatMoney } = useI18n();
+  const { t, formatMoney, localeFlag, localeName } = useI18n();
   const {
     state,
     activeProfile,
@@ -37,6 +37,7 @@ export default function SettingsScreen() {
   const [wishTarget, setWishTarget] = useState(activeProfile.wish.target);
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmRemoveProfile, setConfirmRemoveProfile] = useState(false);
+  const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
 
   const today = todayISO();
   const activeHoliday = state.settings.holidays.find((h) => today >= h.start && today <= h.end);
@@ -116,154 +117,186 @@ export default function SettingsScreen() {
     />
   );
 
+  const sectionLabel = (emoji: string, text: string) => (
+    <Row style={{ gap: 6, marginBottom: 10 }}>
+      <Text style={{ fontSize: 14 }}>{emoji}</Text>
+      <Text style={heading(13, theme.text)}>{text}</Text>
+    </Row>
+  );
+
   return (
     <Screen>
       <Text style={heading(24, theme.text)}>{t('settings.title')}</Text>
-      <Text style={{ fontSize: 11, color: theme.textSoft, marginTop: 3, marginBottom: 13 }}>
-        {t('settings.subtitle')}
-      </Text>
 
-      <Card style={{ marginBottom: 14 }}>
-        {mode === 'view' ? (
-          <>
-            <Row style={{ justifyContent: 'space-between' }}>
-              <Row style={{ gap: 12 }}>
-                <View
-                  style={{
-                    width: 56,
-                    height: 56,
-                    borderRadius: 28,
-                    backgroundColor: theme.chip,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Text style={{ fontSize: 30 }}>{activeProfile.avatar}</Text>
-                </View>
-                <View style={{ flex: 1, minWidth: 0 }}>
-                  <Text style={heading(18, theme.text)} numberOfLines={1}>
-                    {activeProfile.name}
-                  </Text>
-                  <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 3 }} numberOfLines={1}>
-                    🎁 {activeProfile.wish.titleKey
-                      ? t(activeProfile.wish.titleKey)
-                      : activeProfile.wish.title}{' '}
-                    · {t('settings.wishTarget', { target: formatMoney(activeProfile.wish.target) })}
-                  </Text>
-                </View>
-              </Row>
-              <IconBtn emoji="✏️" size={38} onPress={startEdit} label={t('settings.edit')} />
-            </Row>
-
-            <View style={{ height: 1, backgroundColor: theme.border, marginVertical: 12 }} />
-            <Text style={{ fontSize: 10, color: theme.textSoft, marginBottom: 7 }}>
-              {t('settings.family')}
-            </Text>
-            <Row style={{ gap: 7, flexWrap: 'wrap' }}>
-              {profiles.map((p) => (
-                <Pill
-                  key={p.id}
-                  emoji={p.avatar}
-                  label={p.name}
-                  active={p.id === activeProfile.id}
-                  onPress={() => switchProfile(p.id)}
-                />
-              ))}
-              <Pill label={`＋ ${t('settings.add')}`} onPress={startAdd} />
-            </Row>
-          </>
-        ) : (
-          <View>
-            <Row style={{ justifyContent: 'space-between', marginBottom: 4 }}>
-              <Text style={heading(16, theme.text)}>
-                {mode === 'add' ? t('settings.addKid') : t('settings.editKid')}
-              </Text>
-              <Pill
-                label={t('common.cancel')}
-                onPress={() => {
-                  setConfirmRemoveProfile(false);
-                  setMode('view');
-                }}
-              />
-            </Row>
-            {input(name, setName, t('settings.name'))}
-            {avatarRow}
-            {mode === 'edit' ? (
-              <View style={{ marginTop: 12 }}>
-                <Label>{t('settings.wishSection')}</Label>
-                {input(wishTitle, setWishTitle, t('settings.wishPlaceholder'))}
-                <Row style={{ justifyContent: 'space-between' }}>
-                  <Text style={{ fontSize: 11, color: theme.textSoft }}>{t('settings.targetAmount')}</Text>
-                  <Stepper value={wishTarget} onChange={setWishTarget} step={10} min={0} max={9999} suffix="¥" />
+      <Board style={{ marginTop: 14 }}>
+        {/* 宝贝资料 */}
+        <View style={{ padding: 16, backgroundColor: theme.cardSoft }}>
+          {mode === 'view' ? (
+            <>
+              <Row style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <Row style={{ gap: 12, flex: 1, minWidth: 0 }}>
+                  <View
+                    style={{
+                      width: 54,
+                      height: 54,
+                      borderRadius: 27,
+                      backgroundColor: theme.chip,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderWidth: 1,
+                      borderColor: theme.border,
+                    }}
+                  >
+                    <Text style={{ fontSize: 28 }}>{activeProfile.avatar}</Text>
+                  </View>
+                  <View style={{ flex: 1, minWidth: 0, paddingTop: 2 }}>
+                    <Text style={heading(18, theme.text)} numberOfLines={1}>
+                      {activeProfile.name}
+                    </Text>
+                    <Text
+                      style={{ fontSize: 10.5, color: theme.textSoft, marginTop: 4 }}
+                      numberOfLines={2}
+                    >
+                      🎁 {activeProfile.wish.titleKey
+                        ? t(activeProfile.wish.titleKey)
+                        : activeProfile.wish.title}{' '}
+                      · {t('settings.wishTarget', { target: formatMoney(activeProfile.wish.target) })}
+                    </Text>
+                  </View>
                 </Row>
-              </View>
-            ) : null}
-            <Btn
-              label={mode === 'add' ? t('settings.addKidBtn') : t('settings.saveProfile')}
-              onPress={saveProfile}
-              small
-              style={{ marginTop: 12 }}
-            />
-            {mode === 'edit' && profiles.length > 1 ? (
-              <Pressable
-                onPress={() => {
-                  if (!confirmRemoveProfile) {
-                    setConfirmRemoveProfile(true);
-                    return;
-                  }
-                  removeProfile(activeProfile.id);
-                  setConfirmRemoveProfile(false);
-                  setMode('view');
-                }}
-                style={{ marginTop: 10 }}
-              >
-                <Text style={{ fontSize: 10, color: theme.danger, textAlign: 'center' }}>
-                  {confirmRemoveProfile
-                    ? t('settings.confirmDeleteKid')
-                    : t('settings.deleteKid')}
-                </Text>
-              </Pressable>
-            ) : null}
-          </View>
-        )}
-      </Card>
+                <IconBtn
+                  emoji="✏️"
+                  size={34}
+                  onPress={startEdit}
+                  label={t('settings.edit')}
+                  bg={theme.card}
+                />
+              </Row>
 
-      <SectionTitle emoji="🌐" title={t('settings.looks')} />
-      <Board style={{ marginBottom: 14 }}>
-        <View style={{ padding: 16 }}>
-          <Text style={{ ...heading(12.5, theme.text), marginBottom: 8 }}>
-            {t('settings.language')}
-          </Text>
-          <LanguagePicker />
-          <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 9 }}>
-            {t('settings.languageNote')}
-          </Text>
-        </View>
-        <View style={{ height: 1, backgroundColor: theme.border, marginHorizontal: 16 }} />
-        <View style={{ padding: 16 }}>
-          <Text style={{ ...heading(12.5, theme.text), marginBottom: 8 }}>
-            {t('settings.skins')}
-          </Text>
-          <SkinPicker value={state.settings.themeId} onChange={(id: ThemeId) => setTheme(id)} />
-          <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 9 }}>
-            {t('settings.skinsNote')}
-          </Text>
-        </View>
-      </Board>
-
-      <SectionTitle emoji="💰" title={t('settings.rules')} />
-      <Board style={{ marginBottom: 14 }}>
-        <View style={{ padding: 16 }}>
-          <Text style={{ ...heading(12.5, theme.text), marginBottom: 8 }}>
-            {t('settings.coinsRules')}
-          </Text>
-          <Row style={{ justifyContent: 'space-between', marginBottom: 10 }}>
-            <View style={{ flex: 1 }}>
-              <Text style={heading(14, theme.text)}>{t('settings.rate')}</Text>
-              <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 2 }}>
-                {t('settings.rateValue', { rate: state.settings.rate })}
+              <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 14, marginBottom: 7 }}>
+                {t('settings.family')}
               </Text>
+              <Row style={{ gap: 7, flexWrap: 'wrap' }}>
+                {profiles.map((p) => (
+                  <Pill
+                    key={p.id}
+                    emoji={p.avatar}
+                    label={p.name}
+                    active={p.id === activeProfile.id}
+                    onPress={() => switchProfile(p.id)}
+                  />
+                ))}
+                <Pill label={`＋ ${t('settings.add')}`} onPress={startAdd} />
+              </Row>
+            </>
+          ) : (
+            <View>
+              <Row style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <Text style={heading(16, theme.text)}>
+                  {mode === 'add' ? t('settings.addKid') : t('settings.editKid')}
+                </Text>
+                <Pressable
+                  onPress={() => {
+                    setConfirmRemoveProfile(false);
+                    setMode('view');
+                  }}
+                  hitSlop={8}
+                >
+                  <Text style={{ fontSize: 11, color: theme.textSoft }}>{t('common.cancel')}</Text>
+                </Pressable>
+              </Row>
+              {input(name, setName, t('settings.name'))}
+              {avatarRow}
+              {mode === 'edit' ? (
+                <View style={{ marginTop: 12 }}>
+                  <Label>{t('settings.wishSection')}</Label>
+                  {input(wishTitle, setWishTitle, t('settings.wishPlaceholder'))}
+                  <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 11, color: theme.textSoft }}>
+                      {t('settings.targetAmount')}
+                    </Text>
+                    <Stepper
+                      value={wishTarget}
+                      onChange={setWishTarget}
+                      step={10}
+                      min={0}
+                      max={9999}
+                      suffix="¥"
+                    />
+                  </Row>
+                </View>
+              ) : null}
+              <Btn
+                label={mode === 'add' ? t('settings.addKidBtn') : t('settings.saveProfile')}
+                onPress={saveProfile}
+                small
+                style={{ marginTop: 12 }}
+              />
+              {mode === 'edit' && profiles.length > 1 ? (
+                <Pressable
+                  onPress={() => {
+                    if (!confirmRemoveProfile) {
+                      setConfirmRemoveProfile(true);
+                      return;
+                    }
+                    removeProfile(activeProfile.id);
+                    setConfirmRemoveProfile(false);
+                    setMode('view');
+                  }}
+                  style={{ marginTop: 10 }}
+                >
+                  <Text style={{ fontSize: 10, color: theme.danger, textAlign: 'center' }}>
+                    {confirmRemoveProfile
+                      ? t('settings.confirmDeleteKid')
+                      : t('settings.deleteKid')}
+                  </Text>
+                </Pressable>
+              ) : null}
             </View>
+          )}
+        </View>
+
+        {/* 语言与外观 */}
+        <View style={{ height: 1, backgroundColor: theme.border }} />
+        <View style={{ padding: 16 }}>
+          {sectionLabel('🎨', t('settings.looks'))}
+
+          <Pressable
+            onPress={() => setLanguageMenuOpen(true)}
+            accessibilityRole="button"
+            accessibilityLabel={t('settings.language')}
+            style={({ pressed }) => ({
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              paddingVertical: 8,
+              opacity: pressed ? 0.7 : 1,
+            })}
+          >
+            <Text style={heading(13, theme.text)}>{t('settings.language')}</Text>
+            <Row style={{ gap: 6 }}>
+              <Text style={{ fontSize: 16 }}>{localeFlag}</Text>
+              <Text style={{ fontSize: 12, color: theme.textSoft }}>{localeName}</Text>
+              <Text style={{ fontSize: 13, color: theme.textSoft }}>▾</Text>
+            </Row>
+          </Pressable>
+
+          <View style={{ height: 1, backgroundColor: theme.border, marginVertical: 12 }} />
+
+          <SkinPicker
+            compact
+            value={state.settings.themeId}
+            onChange={(id: ThemeId) => setTheme(id)}
+          />
+        </View>
+
+        {/* 金币与假期 */}
+        <View style={{ height: 1, backgroundColor: theme.border }} />
+        <View style={{ padding: 16 }}>
+          {sectionLabel('💰', t('settings.rules'))}
+
+          <Row style={{ justifyContent: 'space-between', alignItems: 'center', paddingVertical: 4 }}>
+            <Text style={heading(13, theme.text)}>{t('settings.rate')}</Text>
             <Stepper
               value={state.settings.rate}
               onChange={setRate}
@@ -273,22 +306,22 @@ export default function SettingsScreen() {
               suffix=":1"
             />
           </Row>
-          <View style={{ height: 1, backgroundColor: theme.border, marginBottom: 4 }} />
+
+          <View style={{ height: 1, backgroundColor: theme.border, marginVertical: 10 }} />
+
           {CATEGORIES.map((cat) => (
-            <Row key={cat.id} style={{ justifyContent: 'space-between', paddingVertical: 7, gap: 8 }}>
+            <Row
+              key={cat.id}
+              style={{ justifyContent: 'space-between', paddingVertical: 6, gap: 8 }}
+            >
               <Row style={{ gap: 7, flex: 1, minWidth: 0 }}>
-                <Text style={{ fontSize: 16 }}>{cat.emoji}</Text>
-                <View style={{ flex: 1, minWidth: 0 }}>
-                  <Text
-                    style={{ ...heading(12.5, theme.text), lineHeight: 15 }}
-                    numberOfLines={2}
-                  >
-                    {t(`category.${cat.id}.name`)}
-                  </Text>
-                  <Text style={{ fontSize: 9, color: theme.textSoft }} numberOfLines={1}>
-                    {t('settings.categoryDefault')}
-                  </Text>
-                </View>
+                <Text style={{ fontSize: 15 }}>{cat.emoji}</Text>
+                <Text
+                  style={{ ...heading(12.5, theme.text), flex: 1, lineHeight: 15 }}
+                  numberOfLines={2}
+                >
+                  {t(`category.${cat.id}.name`)}
+                </Text>
               </Row>
               <Stepper
                 value={state.settings.categoryCoins[cat.id]}
@@ -299,74 +332,87 @@ export default function SettingsScreen() {
               />
             </Row>
           ))}
-          <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 4 }}>
-            {t('settings.rateHint')}
-          </Text>
-        </View>
 
-        <View style={{ height: 1, backgroundColor: theme.border, marginHorizontal: 16 }} />
-        <Pressable
-          onPress={() => router.push('/holidays')}
-          accessibilityRole="button"
-          style={{ padding: 16 }}
-        >
-          <Text style={{ ...heading(12.5, theme.text), marginBottom: 6 }}>
-            {t('settings.holidays')}
-          </Text>
-          <Row style={{ justifyContent: 'space-between' }}>
-            <View style={{ flex: 1 }}>
-              <Text style={heading(14, theme.text)}>
+          <View style={{ height: 1, backgroundColor: theme.border, marginVertical: 10 }} />
+
+          <Pressable
+            onPress={() => router.push('/holidays')}
+            accessibilityRole="button"
+            style={({ pressed }) => ({
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              paddingVertical: 4,
+              opacity: pressed ? 0.7 : 1,
+            })}
+          >
+            <View style={{ flex: 1, minWidth: 0 }}>
+              <Text style={heading(13, theme.text)}>{t('settings.holidays')}</Text>
+              <Text
+                style={{ fontSize: 10.5, color: theme.textSoft, marginTop: 2 }}
+                numberOfLines={1}
+              >
                 {activeHoliday
                   ? t('settings.inHoliday', {
                       name: activeHoliday.nameKey ? t(activeHoliday.nameKey) : activeHoliday.name,
                     })
                   : t('settings.notHoliday')}
               </Text>
-              <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 3 }}>
-                {t('settings.holidayCount', { n: state.settings.holidays.length })}
-              </Text>
             </View>
-            <Text style={{ fontSize: 20 }}>→</Text>
+            <Text style={{ fontSize: 16, color: theme.textSoft }}>›</Text>
+          </Pressable>
+        </View>
+
+        {/* 数据 */}
+        <View style={{ height: 1, backgroundColor: theme.border }} />
+        <View style={{ padding: 16 }}>
+          {sectionLabel('🧸', t('settings.dataSection'))}
+          <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+            <Text style={{ ...heading(12, theme.text) }}>LoulouDo</Text>
+            <Text style={{ fontSize: 10, color: theme.textSoft }}>
+              v{Constants.expoConfig?.version ?? '1.0.0'}
+            </Text>
           </Row>
-        </Pressable>
+          <Text style={{ fontSize: 9.5, color: theme.textSoft, marginTop: 3 }}>
+            {t('settings.localOnly')}
+          </Text>
+
+          <View style={{ height: 1, backgroundColor: theme.border, marginVertical: 12 }} />
+
+          <Pressable
+            onPress={() => {
+              if (!confirmReset) {
+                setConfirmReset(true);
+                return;
+              }
+              reset();
+              setConfirmReset(false);
+              router.replace('/welcome');
+            }}
+            accessibilityRole="button"
+            style={({ pressed }) => ({
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              opacity: pressed ? 0.65 : 1,
+            })}
+          >
+            <Text style={{ fontSize: 11.5, color: theme.danger }}>
+              {confirmReset ? t('settings.confirmClear') : t('settings.clearData')}
+            </Text>
+            {confirmReset ? (
+              <Pressable onPress={() => setConfirmReset(false)} hitSlop={8}>
+                <Text style={{ fontSize: 10.5, color: theme.textSoft }}>{t('common.cancel')}</Text>
+              </Pressable>
+            ) : null}
+          </Pressable>
+        </View>
       </Board>
 
-      <SectionTitle emoji="🧸" title={t('settings.about')} />
-      <Card>
-        <Row style={{ justifyContent: 'space-between', marginBottom: 6 }}>
-          <Text style={heading(14, theme.text)}>LoulouDo</Text>
-          <Text style={numberStyle(12, theme.textSoft)}>
-            v{Constants.expoConfig?.version ?? '1.0.0'}
-          </Text>
-        </Row>
-        <Text style={{ fontSize: 10.5, color: theme.textSoft, lineHeight: 17 }}>
-          {t('settings.aboutBody')}
-        </Text>
-        <View style={{ height: 12 }} />
-        <Btn
-          label={confirmReset ? t('settings.confirmClear') : t('settings.clearData')}
-          variant="ghost"
-          onPress={() => {
-            if (!confirmReset) {
-              setConfirmReset(true);
-              return;
-            }
-            reset();
-            setConfirmReset(false);
-            router.replace('/welcome');
-          }}
-        />
-        {confirmReset ? (
-          <Pressable onPress={() => setConfirmReset(false)} style={{ marginTop: 8 }}>
-            <Text style={{ fontSize: 10, color: theme.textSoft, textAlign: 'center' }}>
-              {t('common.cancel')}
-            </Text>
-          </Pressable>
-        ) : null}
-        <Text style={{ fontSize: 9.5, color: theme.textSoft, textAlign: 'center', marginTop: 12 }}>
-          {t('settings.footer')}
-        </Text>
-      </Card>
+      <LanguageMenu
+        visible={languageMenuOpen}
+        onClose={() => setLanguageMenuOpen(false)}
+      />
     </Screen>
   );
 }

@@ -103,6 +103,11 @@ if (!afterRedeem.includes('48')) throw new Error('兑换后余额不是 48');
 
 await tab('设置');
 await shot('11-settings-pop');
+await page.locator('[aria-label="语言"]').first().click();
+await page.waitForTimeout(500);
+await shot('11b-language-menu');
+await page.locator('[aria-label="中文"]').last().click();
+await page.waitForTimeout(500);
 await click('星空梦想', { wait: 700 });
 await shot('12-settings-galaxy', 500);
 

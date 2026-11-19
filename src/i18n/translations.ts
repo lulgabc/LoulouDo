@@ -186,6 +186,9 @@ const zh = {
   'settings.notHoliday': '现在不是假期',
   'settings.holidayCount': '共 {n} 段假期 · 假期任务只在假期日期出现',
   'settings.looks': '语言与外观',
+  'settings.appearance': '外观',
+  'settings.dataSection': '数据',
+  'settings.localOnly': '数据只保存在这台设备',
   'settings.rules': '金币与假期',
   'settings.about': '关于与数据',
   'settings.aboutBody':
@@ -495,6 +498,9 @@ const en: Dict = {
   'settings.notHoliday': 'Not on holiday now',
   'settings.holidayCount': 'Holidays: {n} · holiday tasks appear only on those dates',
   'settings.looks': 'Language & look',
+  'settings.appearance': 'Appearance',
+  'settings.dataSection': 'Data',
+  'settings.localOnly': 'Data stays on this device',
   'settings.rules': 'Coins & holidays',
   'settings.about': 'About & data',
   'settings.aboutBody':
@@ -801,6 +807,9 @@ const fr: Dict = {
   'settings.notHoliday': 'Pas en vacances',
   'settings.holidayCount': 'Vacances : {n} · les tâches de vacances n’apparaissent qu’à ces dates',
   'settings.looks': 'Langue et apparence',
+  'settings.appearance': 'Apparence',
+  'settings.dataSection': 'Données',
+  'settings.localOnly': 'Données sur cet appareil',
   'settings.rules': 'Pièces et vacances',
   'settings.about': 'À propos et données',
   'settings.aboutBody':
@@ -1107,6 +1116,9 @@ const de: Dict = {
   'settings.notHoliday': 'Gerade keine Ferien',
   'settings.holidayCount': 'Ferien: {n} · Ferienaufgaben erscheinen nur dann',
   'settings.looks': 'Sprache & Aussehen',
+  'settings.appearance': 'Aussehen',
+  'settings.dataSection': 'Daten',
+  'settings.localOnly': 'Daten nur auf diesem Gerät',
   'settings.rules': 'Münzen & Ferien',
   'settings.about': 'Über die App & Daten',
   'settings.aboutBody':
@@ -1413,6 +1425,9 @@ const it: Dict = {
   'settings.notHoliday': 'Non è periodo di vacanza',
   'settings.holidayCount': 'Vacanze: {n} · le attività compaiono solo in quelle date',
   'settings.looks': 'Lingua e aspetto',
+  'settings.appearance': 'Aspetto',
+  'settings.dataSection': 'Dati',
+  'settings.localOnly': 'Dati solo su questo dispositivo',
   'settings.rules': 'Monete e vacanze',
   'settings.about': 'Info e dati',
   'settings.aboutBody':
@@ -1719,6 +1734,9 @@ const es: Dict = {
   'settings.notHoliday': 'Ahora no hay vacaciones',
   'settings.holidayCount': 'Vacaciones: {n} · las tareas solo aparecen en esas fechas',
   'settings.looks': 'Idioma y aspecto',
+  'settings.appearance': 'Aspecto',
+  'settings.dataSection': 'Datos',
+  'settings.localOnly': 'Datos solo en este dispositivo',
   'settings.rules': 'Monedas y vacaciones',
   'settings.about': 'Acerca de y datos',
   'settings.aboutBody':
@@ -2025,6 +2043,9 @@ const pt: Dict = {
   'settings.notHoliday': 'Agora não é férias',
   'settings.holidayCount': 'Férias: {n} · as tarefas só aparecem nessas datas',
   'settings.looks': 'Idioma e aparência',
+  'settings.appearance': 'Aparência',
+  'settings.dataSection': 'Dados',
+  'settings.localOnly': 'Dados só neste aparelho',
   'settings.rules': 'Moedas e férias',
   'settings.about': 'Sobre e dados',
   'settings.aboutBody':
