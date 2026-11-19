@@ -41,7 +41,9 @@ export function Screen({
   );
 
   const inner = (
-    <View style={[styles.content, contentStyle]}>{children}</View>
+    <View style={[styles.content, { width: '100%', maxWidth: 560, alignSelf: 'center' }, contentStyle]}>
+      {children}
+    </View>
   );
 
   return (

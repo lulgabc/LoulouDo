@@ -55,10 +55,11 @@ export default function HolidaysScreen() {
       autoCapitalize="none"
       style={{
         flex,
-        ...heading(13, theme.text),
+        minWidth: 0,
+        ...heading(12.5, theme.text),
         backgroundColor: theme.cardSoft,
         borderRadius: theme.radiusSm,
-        paddingHorizontal: 12,
+        paddingHorizontal: 10,
         paddingVertical: 10,
         borderWidth: theme.borderWidth,
         borderColor: theme.border,
@@ -137,10 +138,13 @@ export default function HolidaysScreen() {
       <Card>
         {field(name, setName, '假期名字，例如「寒假」')}
         <Row style={{ gap: 8, marginTop: 8 }}>
-          {field(start, setStart, '开始 YYYY-MM-DD')}
+          {field(start, setStart, '开始日期')}
           <Text style={{ color: theme.textSoft, alignSelf: 'center' }}>至</Text>
-          {field(end, setEnd, '结束 YYYY-MM-DD')}
+          {field(end, setEnd, '结束日期')}
         </Row>
+        <Text style={{ fontSize: 9.5, color: theme.textSoft, marginTop: 6 }}>
+          日期格式：YYYY-MM-DD，例如 2026-11-19
+        </Text>
         <Row style={{ gap: 7, marginTop: 10, flexWrap: 'wrap' }}>
           <Pill
             label="从今天开始 7 天"

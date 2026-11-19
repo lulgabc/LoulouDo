@@ -112,7 +112,9 @@ export default function WalletScreen() {
           />
           <View style={{ flex: 1, gap: 4 }}>
             <Text style={{ fontSize: 10, color: theme.textSoft }}>心愿存钱罐</Text>
-            <Text style={heading(16, theme.text)}>{activeProfile.wish.title}</Text>
+            <Text style={heading(16, theme.text)} numberOfLines={1}>
+              {activeProfile.wish.title}
+            </Text>
             <ProgressBar value={wishPct} color={theme.candy} height={7} />
             <Text style={{ fontSize: 10, color: theme.textSoft }}>
               已攒 ¥{value.toFixed(2)} / 目标 ¥{activeProfile.wish.target} ·{' '}

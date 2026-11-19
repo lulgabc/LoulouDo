@@ -27,18 +27,21 @@ function TabBar({ state, navigateToTab }: TabBarProps) {
 
   return (
     <View
-      style={[
-        styles.bar,
-        {
-          backgroundColor: theme.tabBg,
-          borderColor: theme.border,
-          borderWidth: theme.borderWidth,
-          bottom: Math.max(insets.bottom, 10),
-        },
-        shadowStyle(theme),
-      ]}
+      pointerEvents="box-none"
+      style={[styles.barWrap, { bottom: Math.max(insets.bottom, 10) }]}
     >
-      {state.routes.map((route, index) => {
+      <View
+        style={[
+          styles.bar,
+          {
+            backgroundColor: theme.tabBg,
+            borderColor: theme.border,
+            borderWidth: theme.borderWidth,
+          },
+          shadowStyle(theme),
+        ]}
+      >
+        {state.routes.map((route, index) => {
         const focused = state.index === index;
         const meta = META[route.name] ?? { icon: '⭐', label: route.name };
         const onPress = () => {
@@ -79,6 +82,7 @@ function TabBar({ state, navigateToTab }: TabBarProps) {
           </Pressable>
         );
       })}
+      </View>
     </View>
   );
 }
@@ -103,17 +107,22 @@ export default function TabsLayout() {
 }
 
 const styles = StyleSheet.create({
-  bar: {
+  barWrap: {
     position: 'absolute',
     left: 14,
     right: 14,
+    alignItems: 'center',
+    zIndex: 50,
+  },
+  bar: {
+    width: '100%',
+    maxWidth: 560,
     height: 64,
     borderRadius: 24,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
     paddingHorizontal: 6,
-    zIndex: 50,
   },
   item: {
     flex: 1,

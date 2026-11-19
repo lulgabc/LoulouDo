@@ -13,7 +13,8 @@
     "test:watch": "vitest",
     "export:web": "expo export -p web",
     "media:icons": "node scripts/generate-icons.mjs",
-    "media:shots": "node scripts/screenshots.mjs"
+    "media:shots": "node scripts/screenshots.mjs",
+    "media:audit": "node scripts/layout-audit.mjs"
   },
   "dependencies": {
     "@expo-google-fonts/baloo-2": "^0.4.2",

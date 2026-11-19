@@ -90,7 +90,7 @@ export default function HomeScreen() {
         <Row style={{ justifyContent: 'space-between', marginBottom: 14, marginTop: 4 }}>
           <Pressable
             onPress={() => router.push('/settings')}
-            style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 10, opacity: pressed ? 0.75 : 1 })}
+            style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1, minWidth: 0, paddingRight: 8, opacity: pressed ? 0.75 : 1 })}
           >
             <View
               style={{
@@ -107,11 +107,14 @@ export default function HomeScreen() {
             >
               <Text style={{ fontSize: 24 }}>{activeProfile.avatar}</Text>
             </View>
-            <View>
-              <Text style={heading(19, theme.text)}>
+            <View style={{ flex: 1, minWidth: 0 }}>
+              <Text style={heading(19, theme.text)} numberOfLines={1}>
                 {greeting()}，{activeProfile.name}
               </Text>
-              <Text style={{ fontSize: 11, color: theme.textSoft, marginTop: 1 }}>
+              <Text
+                style={{ fontSize: 11, color: theme.textSoft, marginTop: 1 }}
+                numberOfLines={1}
+              >
                 {formatCN(today)} · 今天也要开心呀
               </Text>
             </View>
@@ -124,6 +127,7 @@ export default function HomeScreen() {
                 flexDirection: 'row',
                 alignItems: 'center',
                 gap: 5,
+                flexShrink: 0,
                 backgroundColor: theme.card,
                 paddingVertical: 8,
                 paddingHorizontal: 12,

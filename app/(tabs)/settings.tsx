@@ -134,9 +134,11 @@ export default function SettingsScreen() {
                 >
                   <Text style={{ fontSize: 30 }}>{activeProfile.avatar}</Text>
                 </View>
-                <View>
-                  <Text style={heading(18, theme.text)}>{activeProfile.name}</Text>
-                  <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 3 }}>
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  <Text style={heading(18, theme.text)} numberOfLines={1}>
+                    {activeProfile.name}
+                  </Text>
+                  <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 3 }} numberOfLines={1}>
                     🎁 {activeProfile.wish.title} · 目标 ¥{activeProfile.wish.target}
                   </Text>
                 </View>

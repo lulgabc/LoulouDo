@@ -67,6 +67,41 @@ LoulouDo 是一款面向 4–10 岁孩子的**跨平台（iOS / Android / Web）
 
 ---
 
+## 📐 手机适配巡检
+
+针对 5 种设备尺寸逐一跑完所有页面（欢迎、首页、任务、报表、钱包、设置、兑换、任务编辑、假期），
+自动检测横向溢出、输入框超出屏幕、页面级横向滚动，结果：
+
+| 设备 | 视口 | 结果 |
+| --- | --- | --- |
+| iPhone 15 | 393 × 852 | ✅ 0 问题 / 0 console error |
+| iPhone SE | 375 × 667 | ✅ 0 问题 / 0 console error |
+| 小屏 Android | 360 × 740 | ✅ 0 问题 / 0 console error |
+| 极小屏 | 320 × 568 | ✅ 0 问题 / 0 console error |
+| iPad 竖屏 | 768 × 1024 | ✅ 0 问题 / 0 console error |
+
+| 320 首页 | 320 报表 |
+| --- | --- |
+| ![320 首页](docs/mobile/tiny-320-home.jpg) | ![320 报表](docs/mobile/tiny-320-report.jpg) |
+
+| 320 设置（双列皮肤） | 320 假期日期输入 |
+| --- | --- |
+| ![320 设置](docs/mobile/tiny-320-settings.jpg) | ![320 假期](docs/mobile/tiny-320-holidays.jpg) |
+
+巡检中修掉的真实问题：
+
+- 皮肤卡片宽度从 `48.5%` 改为 `48%`，避免 320/360 宽度下被挤成单列；
+- “使用中”角标移到卡片右上角，不再压住皮肤描述；
+- 假期开始/结束日期输入增加 `minWidth: 0`，窄屏不再溢出卡片；
+- 长昵称在首页与设置页单行省略，不再挤压金币和编辑按钮；
+- 平板/桌面端内容最宽 560px 居中，悬浮 TabBar 同步收窄，不会拉成一条超宽横条；
+- 所有页面底部预留 132px，滚动到底时最后一张卡片在 TabBar 上方。
+
+> 全量截图在 `docs/mobile/`，机器可读结果在 `docs/mobile/layout-report.json`。
+> 复跑：`npm run media:audit`（需先 `npm run export:web` 并启动 4173 静态服务）。
+
+---
+
 ## 🚀 运行
 
 ```bash
