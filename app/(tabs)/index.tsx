@@ -16,7 +16,7 @@ import { CATEGORIES } from '@/domain/constants';
 import type { Category, Task } from '@/types';
 import { Btn, Card, Empty, Pill, ProgressBar, Row, Screen, SectionTitle } from '@/components/ui';
 import { Mascot } from '@/components/Mascot';
-import { TaskCard } from '@/components/TaskCard';
+import { TaskCard, colorForCategory } from '@/components/TaskCard';
 import { Confetti } from '@/components/Confetti';
 import { Coin } from '@/components/Coin';
 import { greetingKey, useI18n } from '@/i18n';
@@ -47,8 +47,9 @@ export default function HomeScreen() {
     [todayTasks, doneTasks],
   );
 
-  const visiblePending = filter === 'all' ? pending : pending.filter((t) => t.category === filter);
-  const visibleDone = filter === 'all' ? doneTasks : doneTasks.filter((t) => t.category === filter);
+  const visibleTasks =
+    filter === 'all' ? todayTasks : todayTasks.filter((t) => t.category === filter);
+  const visibleDone = visibleTasks.filter((t) => doneTasks.some((d) => d.id === t.id));
 
   const counts = useMemo(() => {
     const map = {} as Record<Filter, number>;
@@ -73,7 +74,7 @@ export default function HomeScreen() {
     }
     toggleTask(task.id);
     tapFeedback(done ? 'light' : 'success');
-    if (!done) setBurst((b) => b + 1);
+    if (!done && progressFull.pending.length === 1) setBurst((b) => b + 1);
   };
 
   const percent = progressFull.total === 0 ? 0 : progressFull.done / progressFull.total;
@@ -215,6 +216,7 @@ export default function HomeScreen() {
               label={`${t(`category.${cat.id}.short`)}${counts[cat.id] > 0 ? ` ${counts[cat.id]}` : ''}`}
               emoji={cat.emoji}
               active={filter === cat.id}
+              color={colorForCategory(cat.id, theme)}
               onPress={() => setFilter(cat.id)}
             />
           ))}
@@ -227,13 +229,13 @@ export default function HomeScreen() {
             <Text style={{ fontSize: 11, color: theme.textSoft }}>
               {t('home.completedOf', {
                 done: visibleDone.length,
-                total: visiblePending.length + visibleDone.length,
+                total: visibleTasks.length,
               })}
             </Text>
           }
         />
 
-        {visiblePending.length === 0 && visibleDone.length === 0 ? (
+        {visibleTasks.length === 0 ? (
           <Card>
             <Empty
               emoji="🌱"
@@ -244,34 +246,18 @@ export default function HomeScreen() {
           </Card>
         ) : null}
 
-        {visiblePending.map((task) => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            done={false}
-            coins={taskCoinValue(task, state.settings)}
-            onToggle={() => onToggle(task, false)}
-            onEdit={() => router.push({ pathname: '/task-editor', params: { id: task.id } })}
-          />
-        ))}
-
-        {visibleDone.length > 0 ? (
-          <View style={{ marginTop: 6 }}>
-            <Text style={{ fontSize: 11, color: theme.textSoft, marginBottom: 8 }}>
-              ✨ {t('home.doneCount', { n: visibleDone.length })}
-            </Text>
-            {visibleDone.map((task) => (
-              <TaskCard
-                key={task.id}
-                task={task}
-                done
-                coins={taskCoinValue(task, state.settings)}
-                onToggle={() => onToggle(task, true)}
-                onEdit={() => router.push({ pathname: '/task-editor', params: { id: task.id } })}
-              />
-            ))}
-          </View>
-        ) : null}
+        {visibleTasks.map((task) => {
+          const isDone = doneTasks.some((d) => d.id === task.id);
+          return (
+            <TaskCard
+              key={task.id}
+              task={task}
+              done={isDone}
+              coins={taskCoinValue(task, state.settings)}
+              onToggle={() => onToggle(task, isDone)}
+            />
+          );
+        })}
 
         {complete ? (
           <Card style={{ marginTop: 4, backgroundColor: theme.chip }}>

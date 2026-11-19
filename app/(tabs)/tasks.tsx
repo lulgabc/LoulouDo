@@ -5,6 +5,7 @@ import { useApp } from '@/store/AppStore';
 import { useTheme, heading, shadowStyle } from '@/theme/themes';
 import { todayISO, daysBetween } from '@/domain/date';
 import {
+  dayProgress,
   isTaskCompleted,
   isTaskDoneOn,
   taskAppliesOn,
@@ -25,6 +26,10 @@ export default function TasksScreen() {
   const today = todayISO();
   const holidays = state.settings.holidays;
   const [burst, setBurst] = useState(0);
+  const progress = useMemo(
+    () => dayProgress(tasks, entries, today, holidays),
+    [tasks, entries, today, holidays],
+  );
 
   const grouped = useMemo(
     () =>
@@ -39,7 +44,7 @@ export default function TasksScreen() {
     if (!enabled) return;
     toggleTask(taskId);
     tapFeedback(done ? 'light' : 'success');
-    if (!done) setBurst((b) => b + 1);
+    if (!done && progress.pending.length === 1) setBurst((b) => b + 1);
   };
 
   return (

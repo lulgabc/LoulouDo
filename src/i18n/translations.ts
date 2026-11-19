@@ -38,7 +38,7 @@ const zh = {
   'greeting.evening': '晚上好呀',
   'greeting.night': '该休息啦',
 
-  'home.subtitle': '今天也要开心呀',
+  'home.subtitle': '今天也要开心',
   'home.streak': '连续 {n} 天',
   'home.progress': '今日进度',
   'home.cheerEmpty': '今天没有任务，去添加一件想挑战的事吧！',
@@ -66,11 +66,12 @@ const zh = {
   'task.weekendOnly': '周末打卡',
   'task.holidayOnly': '假期专属',
   'task.ended': '已结束',
-  'task.editHint': '点任务名字可以修改或删除哦',
+  'task.editHint': '点铅笔可以编辑任务',
+  'task.a11yEdit': '编辑 {title}',
 
   'tasks.title': '任务清单',
   'tasks.subtitle': '固定任务会自动重复 · 单次挑战只出现一次',
-  'tasks.hint': '小提示：点任务名字可以修改或删除哦',
+  'tasks.hint': '点右侧铅笔可以编辑任务',
   'tasks.lessonTitle': '任务小课堂',
   'tasks.lessonBody':
     '「每日」天天出现，「周末」只在周六日出现，「假期」只在你设置的假期日期出现。特别挑战是单次的大任务，完成后会得到最多金币。',
@@ -371,11 +372,12 @@ const en: Dict = {
   'task.weekendOnly': 'Weekend',
   'task.holidayOnly': 'Holiday',
   'task.ended': 'Ended',
-  'task.editHint': 'Tap a task name to edit or delete it',
+  'task.editHint': 'Tap the pencil to edit',
+  'task.a11yEdit': 'Edit {title}',
 
   'tasks.title': 'Task list',
   'tasks.subtitle': 'Fixed tasks repeat automatically · one-time challenges appear once',
-  'tasks.hint': 'Tip: tap a task name to edit or delete it',
+  'tasks.hint': 'Tap the pencil to edit a task',
   'tasks.lessonTitle': 'Task tips',
   'tasks.lessonBody':
     '“Daily” appears every day, “Weekend” only on Saturdays and Sundays, “Holiday” only on your holiday dates. Special challenges are one-time big quests with the biggest reward.',
@@ -674,11 +676,12 @@ const fr: Dict = {
   'task.weekendOnly': 'Le week-end',
   'task.holidayOnly': 'Vacances',
   'task.ended': 'Terminé',
-  'task.editHint': 'Touche le nom d’une tâche pour la modifier ou la supprimer',
+  'task.editHint': 'Touche le crayon pour modifier',
+  'task.a11yEdit': 'Modifier {title}',
 
   'tasks.title': 'Mes tâches',
   'tasks.subtitle': 'Les tâches fixes se répètent · les défis uniques une seule fois',
-  'tasks.hint': 'Astuce : touche le nom d’une tâche pour la modifier',
+  'tasks.hint': 'Touche le crayon pour modifier une tâche',
   'tasks.lessonTitle': 'Le coin des tâches',
   'tasks.lessonBody':
     '« Jour » apparaît chaque jour, « Week-end » seulement le samedi et le dimanche, « Vacances » seulement pendant les dates choisies. Les défis spéciaux sont de grands défis uniques avec la plus grosse récompense.',
@@ -977,11 +980,12 @@ const de: Dict = {
   'task.weekendOnly': 'Am Wochenende',
   'task.holidayOnly': 'Ferien',
   'task.ended': 'Beendet',
-  'task.editHint': 'Tippe auf einen Aufgabennamen zum Bearbeiten oder Löschen',
+  'task.editHint': 'Tippe auf den Stift zum Bearbeiten',
+  'task.a11yEdit': 'Bearbeiten: {title}',
 
   'tasks.title': 'Aufgaben',
   'tasks.subtitle': 'Feste Aufgaben wiederholen sich · Einmal-Challenges nur einmal',
-  'tasks.hint': 'Tipp: Tippe auf einen Aufgabennamen zum Bearbeiten',
+  'tasks.hint': 'Tippe auf den Stift, um eine Aufgabe zu bearbeiten',
   'tasks.lessonTitle': 'Aufgaben-Tipps',
   'tasks.lessonBody':
     '„Tag“ erscheint täglich, „Wochenende“ nur samstags und sonntags, „Ferien“ nur an deinen Ferientagen. Spezial-Challenges sind einmalige große Aufgaben mit der größten Belohnung.',
@@ -1280,11 +1284,12 @@ const it: Dict = {
   'task.weekendOnly': 'Nel weekend',
   'task.holidayOnly': 'Vacanze',
   'task.ended': 'Finito',
-  'task.editHint': 'Tocca il nome di un compito per modificarlo o eliminarlo',
+  'task.editHint': 'Tocca la matita per modificare',
+  'task.a11yEdit': 'Modifica {title}',
 
   'tasks.title': 'I miei compiti',
   'tasks.subtitle': 'I compiti fissi si ripetono · le sfide uniche una volta',
-  'tasks.hint': 'Consiglio: tocca il nome di un compito per modificarlo',
+  'tasks.hint': 'Tocca la matita per modificare un compito',
   'tasks.lessonTitle': 'Consigli sui compiti',
   'tasks.lessonBody':
     '“Giorno” compare ogni giorno, “Weekend” solo sabato e domenica, “Vacanze” solo nei giorni scelti. Le sfide speciali sono grandi sfide una volta sola con il premio più alto.',
@@ -1583,11 +1588,12 @@ const es: Dict = {
   'task.weekendOnly': 'Fin de semana',
   'task.holidayOnly': 'Vacaciones',
   'task.ended': 'Terminado',
-  'task.editHint': 'Toca el nombre de una tarea para editarla o borrarla',
+  'task.editHint': 'Toca el lápiz para editar',
+  'task.a11yEdit': 'Editar {title}',
 
   'tasks.title': 'Mis tareas',
   'tasks.subtitle': 'Las tareas fijas se repiten · los retos únicos solo una vez',
-  'tasks.hint': 'Truco: toca el nombre de una tarea para editarla',
+  'tasks.hint': 'Toca el lápiz para editar una tarea',
   'tasks.lessonTitle': 'Trucos de tareas',
   'tasks.lessonBody':
     '“Diario” aparece cada día, “Finde” solo sábado y domingo, “Vacaciones” solo en tus fechas. Los retos especiales son grandes tareas de una vez con la mejor recompensa.',
@@ -1886,11 +1892,12 @@ const pt: Dict = {
   'task.weekendOnly': 'Fim de semana',
   'task.holidayOnly': 'Férias',
   'task.ended': 'Terminado',
-  'task.editHint': 'Toque no nome da tarefa para editar ou excluir',
+  'task.editHint': 'Toque no lápis para editar',
+  'task.a11yEdit': 'Editar {title}',
 
   'tasks.title': 'Minhas tarefas',
   'tasks.subtitle': 'Tarefas fixas se repetem · desafios únicos só uma vez',
-  'tasks.hint': 'Dica: toque no nome da tarefa para editar',
+  'tasks.hint': 'Toque no lápis para editar uma tarefa',
   'tasks.lessonTitle': 'Dicas de tarefas',
   'tasks.lessonBody':
     '“Diário” aparece todo dia, “Fim de semana” só aos sábados e domingos, “Férias” só nas datas escolhidas. Desafios especiais são grandes tarefas de uma vez com a maior recompensa.',

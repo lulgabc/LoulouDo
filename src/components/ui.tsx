@@ -250,15 +250,34 @@ export function Pill({
         paddingVertical: 7,
         paddingHorizontal: 12,
         borderRadius: 999,
-        backgroundColor: active ? (color ?? theme.primary) : theme.chip,
+        backgroundColor: active
+          ? (color ?? theme.primary)
+          : color
+            ? color + (theme.dark ? '2A' : '18')
+            : theme.chip,
         borderWidth: theme.borderWidth > 1 ? 2 : 1,
-        borderColor: active ? (color ?? theme.primary) : theme.border,
+        borderColor: active
+          ? (color ?? theme.primary)
+          : color
+            ? color + '66'
+            : theme.border,
       }}
     >
       {emoji ? <Text style={{ fontSize: 13 }}>{emoji}</Text> : null}
       <Text
         style={{
-          ...heading(13, active ? (color ? theme.text : theme.onPrimary) : theme.textSoft),
+          ...heading(
+            13,
+            active
+              ? color
+                ? theme.dark
+                  ? '#1A1338'
+                  : theme.text
+                : theme.onPrimary
+              : color
+                ? theme.text
+                : theme.textSoft,
+          ),
         }}
       >
         {label}
