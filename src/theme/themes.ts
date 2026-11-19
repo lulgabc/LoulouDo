@@ -29,6 +29,8 @@ export interface Theme {
   coin: string;
   border: string;
   borderWidth: number;
+  /** 大面板（Board/Card）使用的边框宽度；柔和的皮肤为 0 */
+  cardBorderWidth: number;
   radius: number;
   radiusSm: number;
   shadow: {
@@ -67,13 +69,14 @@ export const THEMES: Record<ThemeId, Theme> = {
     coin: '#FFC53D',
     border: 'rgba(255,111,165,0.16)',
     borderWidth: 1,
+    cardBorderWidth: 0,
     radius: 28,
     radiusSm: 16,
     shadow: {
-      color: '#FF6FA5',
-      opacity: 0.16,
-      radius: 18,
-      offset: { width: 0, height: 8 },
+      color: '#B0466F',
+      opacity: 0.1,
+      radius: 24,
+      offset: { width: 0, height: 10 },
       elevation: 4,
     },
     heroGradient: ['#FF9FC4', '#FFCFE1'],
@@ -103,6 +106,7 @@ export const THEMES: Record<ThemeId, Theme> = {
     coin: '#FFC800',
     border: '#1E1B4B',
     borderWidth: 3,
+    cardBorderWidth: 3,
     radius: 18,
     radiusSm: 12,
     shadow: {
@@ -139,13 +143,14 @@ export const THEMES: Record<ThemeId, Theme> = {
     coin: '#E3A82C',
     border: '#DCC3A0',
     borderWidth: 2,
+    cardBorderWidth: 0,
     radius: 14,
     radiusSm: 10,
     shadow: {
-      color: '#B99B74',
-      opacity: 0.3,
-      radius: 0,
-      offset: { width: 3, height: 3 },
+      color: '#8B735C',
+      opacity: 0.16,
+      radius: 10,
+      offset: { width: 0, height: 6 },
       elevation: 3,
     },
     heroGradient: ['#F7D9B8', '#EAC9A6'],
@@ -175,6 +180,7 @@ export const THEMES: Record<ThemeId, Theme> = {
     coin: '#FFD166',
     border: 'rgba(255,255,255,0.18)',
     borderWidth: 1,
+    cardBorderWidth: 1,
     radius: 24,
     radiusSm: 14,
     shadow: {

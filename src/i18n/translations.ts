@@ -185,6 +185,8 @@ const zh = {
   'settings.inHoliday': '正在放「{name}」',
   'settings.notHoliday': '现在不是假期',
   'settings.holidayCount': '共 {n} 段假期 · 假期任务只在假期日期出现',
+  'settings.looks': '语言与外观',
+  'settings.rules': '金币与假期',
   'settings.about': '关于与数据',
   'settings.aboutBody':
     '所有数据都只保存在这台设备上，不上传、不需要登录。用游戏化的小金币，陪孩子把好习惯慢慢养出来。',
@@ -492,6 +494,8 @@ const en: Dict = {
   'settings.inHoliday': 'On “{name}” now',
   'settings.notHoliday': 'Not on holiday now',
   'settings.holidayCount': 'Holidays: {n} · holiday tasks appear only on those dates',
+  'settings.looks': 'Language & look',
+  'settings.rules': 'Coins & holidays',
   'settings.about': 'About & data',
   'settings.aboutBody':
     'Everything stays on this device. No uploads, no account. Little coins and a lot of encouragement help good habits grow.',
@@ -796,6 +800,8 @@ const fr: Dict = {
   'settings.inHoliday': 'En « {name} »',
   'settings.notHoliday': 'Pas en vacances',
   'settings.holidayCount': 'Vacances : {n} · les tâches de vacances n’apparaissent qu’à ces dates',
+  'settings.looks': 'Langue et apparence',
+  'settings.rules': 'Pièces et vacances',
   'settings.about': 'À propos et données',
   'settings.aboutBody':
     'Tout reste sur cet appareil. Aucun envoi, aucun compte. Des petites pièces et beaucoup d’encouragement font grandir les bonnes habitudes.',
@@ -1100,6 +1106,8 @@ const de: Dict = {
   'settings.inHoliday': 'Gerade „{name}“',
   'settings.notHoliday': 'Gerade keine Ferien',
   'settings.holidayCount': 'Ferien: {n} · Ferienaufgaben erscheinen nur dann',
+  'settings.looks': 'Sprache & Aussehen',
+  'settings.rules': 'Münzen & Ferien',
   'settings.about': 'Über die App & Daten',
   'settings.aboutBody':
     'Alles bleibt auf diesem Gerät. Kein Upload, kein Konto. Kleine Münzen und viel Ermutigung lassen gute Gewohnheiten wachsen.',
@@ -1404,6 +1412,8 @@ const it: Dict = {
   'settings.inHoliday': 'Ora è “{name}”',
   'settings.notHoliday': 'Non è periodo di vacanza',
   'settings.holidayCount': 'Vacanze: {n} · le attività compaiono solo in quelle date',
+  'settings.looks': 'Lingua e aspetto',
+  'settings.rules': 'Monete e vacanze',
   'settings.about': 'Info e dati',
   'settings.aboutBody':
     'Tutto resta su questo dispositivo. Nessun caricamento, nessun account. Piccole monete e tanti incoraggiamenti fanno crescere le buone abitudini.',
@@ -1708,6 +1718,8 @@ const es: Dict = {
   'settings.inHoliday': 'Ahora en “{name}”',
   'settings.notHoliday': 'Ahora no hay vacaciones',
   'settings.holidayCount': 'Vacaciones: {n} · las tareas solo aparecen en esas fechas',
+  'settings.looks': 'Idioma y aspecto',
+  'settings.rules': 'Monedas y vacaciones',
   'settings.about': 'Acerca de y datos',
   'settings.aboutBody':
     'Todo se queda en este dispositivo. Sin subidas ni cuentas. Pequeñas monedas y mucho ánimo hacen crecer los buenos hábitos.',
@@ -2012,6 +2024,8 @@ const pt: Dict = {
   'settings.inHoliday': 'Agora em “{name}”',
   'settings.notHoliday': 'Agora não é férias',
   'settings.holidayCount': 'Férias: {n} · as tarefas só aparecem nessas datas',
+  'settings.looks': 'Idioma e aparência',
+  'settings.rules': 'Moedas e férias',
   'settings.about': 'Sobre e dados',
   'settings.aboutBody':
     'Tudo fica neste aparelho. Sem envio, sem conta. Moedinhas e muito incentivo fazem bons hábitos crescerem.',

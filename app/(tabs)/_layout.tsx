@@ -38,7 +38,7 @@ function TabBar({ state, navigateToTab }: TabBarProps) {
           {
             backgroundColor: theme.tabBg,
             borderColor: theme.border,
-            borderWidth: theme.borderWidth,
+            borderWidth: theme.cardBorderWidth,
           },
           shadowStyle(theme),
         ]}

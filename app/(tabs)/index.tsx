@@ -14,15 +14,17 @@ import {
 } from '@/domain/logic';
 import { CATEGORIES } from '@/domain/constants';
 import type { Category, Task } from '@/types';
-import { Btn, Card, Empty, Pill, ProgressBar, Row, Screen, SectionTitle } from '@/components/ui';
+import { Card, Empty, ProgressBar, Row, Screen, SectionTitle, Segmented } from '@/components/ui';
 import { Mascot } from '@/components/Mascot';
-import { TaskCard, colorForCategory } from '@/components/TaskCard';
+import { colorForCategory } from '@/components/TaskCard';
+import { TaskBoard } from '@/components/TaskBoard';
 import { Confetti } from '@/components/Confetti';
 import { Coin } from '@/components/Coin';
 import { greetingKey, useI18n } from '@/i18n';
 import { tapFeedback } from '@/utils/feedback';
 
 type Filter = 'all' | Category;
+
 
 export default function HomeScreen() {
   const theme = useTheme();
@@ -50,15 +52,13 @@ export default function HomeScreen() {
   const visibleTasks =
     filter === 'all' ? todayTasks : todayTasks.filter((t) => t.category === filter);
   const visibleDone = visibleTasks.filter((t) => doneTasks.some((d) => d.id === t.id));
-
-  const counts = useMemo(() => {
-    const map = {} as Record<Filter, number>;
-    map.all = pending.length;
-    for (const cat of CATEGORIES) {
-      map[cat.id] = pending.filter((t) => t.category === cat.id).length;
-    }
-    return map;
-  }, [pending]);
+  const groups = CATEGORIES.map((cat) => ({
+    category: cat.id,
+    tasks: visibleTasks.filter((task) => task.category === cat.id),
+  })).filter((group) => group.tasks.length > 0);
+  const doneIds = new Set(
+    visibleTasks.filter((task) => doneTasks.some((d) => d.id === task.id)).map((t) => t.id),
+  );
 
   const complete = progressFull.allClear;
   const streak = useMemo(() => currentStreak(entries, today), [entries, today]);
@@ -178,21 +178,12 @@ export default function HomeScreen() {
               </Text>
             </Row>
 
-            <Row style={{ alignItems: 'center', gap: 12, marginTop: 6 }}>
+            <Row style={{ alignItems: 'flex-start', gap: 10, marginTop: 8 }}>
               <Mascot size={96} mood={complete ? 'cheer' : 'happy'} />
-              <View
-                style={{
-                  flex: 1,
-                  backgroundColor: theme.dark ? 'rgba(0,0,0,0.32)' : 'rgba(255,255,255,0.78)',
-                  borderRadius: 18,
-                  padding: 12,
-                  borderTopLeftRadius: 4,
-                }}
-              >
-                <Text style={{ ...heading(14, theme.text), lineHeight: 21 }}>{cheer}</Text>
+              <View style={{ flex: 1, paddingTop: 4, paddingRight: 4 }}>
+                <Text style={{ ...heading(15, heroInk), lineHeight: 23 }}>{cheer}</Text>
               </View>
             </Row>
-
             <View style={{ marginTop: 10 }}>
               <Row style={{ justifyContent: 'space-between', marginBottom: 6 }}>
                 <Text style={heading(12, heroSoft)}>{t('home.progress')}</Text>
@@ -203,24 +194,19 @@ export default function HomeScreen() {
           </LinearGradient>
         </View>
 
-        <View style={{ flexDirection: 'row', gap: 8, marginBottom: 15, flexWrap: 'wrap' }}>
-          <Pill
-            label={`${t('home.all')} ${counts.all}`}
-            emoji="✨"
-            active={filter === 'all'}
-            onPress={() => setFilter('all')}
-          />
-          {CATEGORIES.map((cat) => (
-            <Pill
-              key={cat.id}
-              label={`${t(`category.${cat.id}.short`)}${counts[cat.id] > 0 ? ` ${counts[cat.id]}` : ''}`}
-              emoji={cat.emoji}
-              active={filter === cat.id}
-              color={colorForCategory(cat.id, theme)}
-              onPress={() => setFilter(cat.id)}
-            />
-          ))}
-        </View>
+        <Segmented
+          value={filter}
+          onChange={setFilter}
+          items={[
+            { id: 'all' as Filter, label: t('home.all'), color: theme.primary },
+            ...CATEGORIES.map((cat) => ({
+              id: cat.id as Filter,
+              label: t(`category.${cat.id}.short`),
+              color: colorForCategory(cat.id, theme),
+            })),
+          ]}
+          style={{ marginBottom: 16 }}
+        />
 
         <SectionTitle
           emoji="🌈"
@@ -236,28 +222,19 @@ export default function HomeScreen() {
         />
 
         {visibleTasks.length === 0 ? (
-          <Card>
-            <Empty
-              emoji="🌱"
-              title={t('home.emptyTitle')}
-              hint={t('home.emptyHint')}
-            />
-            <Btn label={t('home.emptyAdd')} emoji="＋" variant="soft" onPress={() => router.push('/task-editor')} />
+          <Card style={{ marginBottom: 12 }}>
+            <Empty emoji="🌱" title={t('home.emptyTitle')} hint={t('home.emptyHint')} />
           </Card>
-        ) : null}
-
-        {visibleTasks.map((task) => {
-          const isDone = doneTasks.some((d) => d.id === task.id);
-          return (
-            <TaskCard
-              key={task.id}
-              task={task}
-              done={isDone}
-              coins={taskCoinValue(task, state.settings)}
-              onToggle={() => onToggle(task, isDone)}
-            />
-          );
-        })}
+        ) : (
+          <TaskBoard
+            groups={groups}
+            doneIds={doneIds}
+            coinsFor={(task) => taskCoinValue(task, state.settings)}
+            onToggle={(task, done) => onToggle(task, done)}
+            onAdd={() => router.push('/task-editor')}
+            addLabel={t('home.addTask')}
+          />
+        )}
 
         {complete ? (
           <Card style={{ marginTop: 4, backgroundColor: theme.chip }}>
@@ -273,13 +250,6 @@ export default function HomeScreen() {
           </Card>
         ) : null}
 
-        <Btn
-          label={t('home.addTask')}
-          emoji="＋"
-          variant="ghost"
-          onPress={() => router.push('/task-editor')}
-          style={{ marginTop: 8 }}
-        />
       </Screen>
 
       <Confetti key={burst} visible={burst > 0} onDone={() => setBurst(0)} />

@@ -25,20 +25,19 @@ export function Screen({
   contentStyle?: ViewStyle;
 }) {
   const theme = useTheme();
-  const stickers = useMemo(
-    () =>
-      [
-        { top: '6%', left: '4%', size: 40, rotate: '-14deg' },
-        { top: '18%', right: '5%', size: 34, rotate: '12deg' },
-        { top: '46%', left: '2%', size: 28, rotate: '8deg' },
-        { top: '62%', right: '3%', size: 44, rotate: '-10deg' },
-        { top: '82%', left: '7%', size: 30, rotate: '16deg' },
-      ].map((pos, i) => ({
-        ...pos,
-        emoji: theme.stickers[i % theme.stickers.length],
-      })),
-    [theme],
-  );
+  const blobs: {
+    top?: string;
+    left?: string;
+    right?: string;
+    bottom?: string;
+    size: number;
+    color: string;
+    opacity: number;
+  }[] = [
+    { top: '-9%', left: '-20%', size: 250, color: theme.primary, opacity: 0.07 },
+    { top: '26%', right: '-24%', size: 280, color: theme.secondary, opacity: 0.06 },
+    { bottom: '-10%', left: '-8%', size: 240, color: theme.accent, opacity: 0.05 },
+  ];
 
   const inner = (
     <View style={[styles.content, { width: '100%', maxWidth: 560, alignSelf: 'center' }, contentStyle]}>
@@ -47,24 +46,25 @@ export function Screen({
   );
 
   return (
-    <View style={[styles.root, { backgroundColor: theme.bg }]}>
+    <View style={[styles.root, { backgroundColor: theme.bg, overflow: 'hidden' }]}>
       <LinearGradient colors={theme.bgGradient} style={StyleSheet.absoluteFill} />
       <View pointerEvents="none" style={StyleSheet.absoluteFill}>
-        {stickers.map((s, i) => (
-          <Text
+        {blobs.map((b, i) => (
+          <View
             key={i}
             style={{
               position: 'absolute',
-              top: s.top as never,
-              left: (s as { left?: string }).left as never,
-              right: (s as { right?: string }).right as never,
-              fontSize: s.size,
-              opacity: theme.stickerOpacity,
-              transform: [{ rotate: s.rotate }],
+              top: b.top as never,
+              left: b.left as never,
+              right: b.right as never,
+              bottom: b.bottom as never,
+              width: b.size,
+              height: b.size,
+              borderRadius: b.size / 2,
+              backgroundColor: b.color,
+              opacity: b.opacity,
             }}
-          >
-            {s.emoji}
-          </Text>
+          />
         ))}
       </View>
       <SafeAreaView style={styles.safe} edges={['top']}>
@@ -98,7 +98,7 @@ export function Card({
   const base: ViewStyle = {
     backgroundColor: tone === 'soft' ? theme.cardSoft : theme.card,
     borderRadius: theme.radius,
-    borderWidth: theme.borderWidth,
+    borderWidth: theme.cardBorderWidth,
     borderColor: theme.border,
     padding: 16,
     ...shadowStyle(theme),
@@ -115,6 +115,39 @@ export function Card({
     );
   }
   return <View style={[base, style as ViewStyle]}>{children}</View>;
+}
+
+export function Board({
+  children,
+  style,
+}: {
+  children: React.ReactNode;
+  style?: ViewStyle | ViewStyle[];
+}) {
+  const theme = useTheme();
+  return (
+    <View
+      style={[
+        {
+          backgroundColor: theme.card,
+          borderRadius: theme.radius + 2,
+          borderWidth: theme.cardBorderWidth,
+          borderColor: theme.border,
+          ...shadowStyle(theme),
+        },
+        style as ViewStyle,
+      ]}
+    >
+      <View
+        style={{
+          borderRadius: theme.radius + 2 - theme.cardBorderWidth,
+          overflow: 'hidden',
+        }}
+      >
+        {children}
+      </View>
+    </View>
+  );
 }
 
 type BtnVariant = 'primary' | 'soft' | 'ghost' | 'accent';
@@ -294,6 +327,79 @@ export function Pill({
     >
       {content}
     </Pressable>
+  );
+}
+
+export function readableOn(hex: string): string {
+  const value = hex.replace('#', '');
+  if (value.length !== 6) return '#FFFFFF';
+  const r = parseInt(value.slice(0, 2), 16);
+  const g = parseInt(value.slice(2, 4), 16);
+  const b = parseInt(value.slice(4, 6), 16);
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.65 ? '#3A2A33' : '#FFFFFF';
+}
+
+export function Segmented<T extends string>({
+  items,
+  value,
+  onChange,
+  style,
+}: {
+  items: { id: T; label: string; emoji?: string; color?: string }[];
+  value: T;
+  onChange: (id: T) => void;
+  style?: ViewStyle;
+}) {
+  const theme = useTheme();
+  return (
+    <View
+      style={[
+        {
+          backgroundColor: theme.card,
+          borderRadius: 24,
+          padding: 4,
+          ...shadowStyle(theme),
+        },
+        style,
+      ]}
+    >
+      <View
+        style={{
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          gap: 2,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        {items.map((item) => {
+          const active = item.id === value;
+          const color = item.color ?? theme.primary;
+          return (
+            <Pressable
+              key={item.id}
+              onPress={() => onChange(item.id)}
+              accessibilityRole="button"
+              accessibilityState={{ selected: active }}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 3,
+                paddingVertical: 8,
+                paddingHorizontal: 9,
+                borderRadius: 999,
+                backgroundColor: active ? color : 'transparent',
+              }}
+            >
+              {item.emoji ? <Text style={{ fontSize: 11 }}>{item.emoji}</Text> : null}
+              <Text style={heading(11, active ? readableOn(color) : theme.textSoft)}>
+                {item.label}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
   );
 }
 

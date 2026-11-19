@@ -8,7 +8,7 @@ import { todayISO } from '@/domain/date';
 import { CATEGORIES } from '@/domain/constants';
 import type { ThemeId } from '@/types';
 import { AVATARS } from '@/domain/constants';
-import { Btn, Card, IconBtn, Label, Pill, Row, Screen, SectionTitle, Stepper } from '@/components/ui';
+import { Board, Btn, Card, IconBtn, Label, Pill, Row, Screen, SectionTitle, Stepper } from '@/components/ui';
 import { SkinPicker } from '@/components/SkinPicker';
 import { LanguagePicker } from '@/components/LanguagePicker';
 import { useI18n } from '@/i18n';
@@ -228,89 +228,108 @@ export default function SettingsScreen() {
         )}
       </Card>
 
-      <SectionTitle emoji="🌐" title={t('settings.language')} />
-      <Card style={{ marginBottom: 14 }}>
-        <LanguagePicker />
-        <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 9 }}>
-          {t('settings.languageNote')}
-        </Text>
-      </Card>
+      <SectionTitle emoji="🌐" title={t('settings.looks')} />
+      <Board style={{ marginBottom: 14 }}>
+        <View style={{ padding: 16 }}>
+          <Text style={{ ...heading(12.5, theme.text), marginBottom: 8 }}>
+            {t('settings.language')}
+          </Text>
+          <LanguagePicker />
+          <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 9 }}>
+            {t('settings.languageNote')}
+          </Text>
+        </View>
+        <View style={{ height: 1, backgroundColor: theme.border, marginHorizontal: 16 }} />
+        <View style={{ padding: 16 }}>
+          <Text style={{ ...heading(12.5, theme.text), marginBottom: 8 }}>
+            {t('settings.skins')}
+          </Text>
+          <SkinPicker value={state.settings.themeId} onChange={(id: ThemeId) => setTheme(id)} />
+          <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 9 }}>
+            {t('settings.skinsNote')}
+          </Text>
+        </View>
+      </Board>
 
-      <SectionTitle emoji="🎨" title={t('settings.skins')} />
-      <Card style={{ marginBottom: 14 }}>
-        <SkinPicker value={state.settings.themeId} onChange={(id: ThemeId) => setTheme(id)} />
-        <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 9 }}>
-          {t('settings.skinsNote')}
-        </Text>
-      </Card>
-
-      <SectionTitle emoji="💰" title={t('settings.coinsRules')} />
-      <Card style={{ marginBottom: 14 }}>
-        <Row style={{ justifyContent: 'space-between', marginBottom: 10 }}>
-          <View style={{ flex: 1 }}>
-            <Text style={heading(14, theme.text)}>{t('settings.rate')}</Text>
-            <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 2 }}>
-              {t('settings.rateValue', { rate: state.settings.rate })}
-            </Text>
-          </View>
-          <Stepper
-            value={state.settings.rate}
-            onChange={setRate}
-            step={10}
-            min={10}
-            max={2000}
-            suffix=":1"
-          />
-        </Row>
-        <View style={{ height: 1, backgroundColor: theme.border, marginBottom: 4 }} />
-        {CATEGORIES.map((cat) => (
-          <Row key={cat.id} style={{ justifyContent: 'space-between', paddingVertical: 7, gap: 8 }}>
-            <Row style={{ gap: 7, flex: 1, minWidth: 0 }}>
-              <Text style={{ fontSize: 16 }}>{cat.emoji}</Text>
-              <View style={{ flex: 1, minWidth: 0 }}>
-                <Text
-                  style={{ ...heading(12.5, theme.text), lineHeight: 15 }}
-                  numberOfLines={2}
-                >
-                  {t(`category.${cat.id}.name`)}
-                </Text>
-                <Text style={{ fontSize: 9, color: theme.textSoft }} numberOfLines={1}>
-                  {t('settings.categoryDefault')}
-                </Text>
-              </View>
-            </Row>
+      <SectionTitle emoji="💰" title={t('settings.rules')} />
+      <Board style={{ marginBottom: 14 }}>
+        <View style={{ padding: 16 }}>
+          <Text style={{ ...heading(12.5, theme.text), marginBottom: 8 }}>
+            {t('settings.coinsRules')}
+          </Text>
+          <Row style={{ justifyContent: 'space-between', marginBottom: 10 }}>
+            <View style={{ flex: 1 }}>
+              <Text style={heading(14, theme.text)}>{t('settings.rate')}</Text>
+              <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 2 }}>
+                {t('settings.rateValue', { rate: state.settings.rate })}
+              </Text>
+            </View>
             <Stepper
-              value={state.settings.categoryCoins[cat.id]}
-              onChange={(v) => setCategoryCoins(cat.id, v)}
-              min={1}
-              max={99}
-              compact
+              value={state.settings.rate}
+              onChange={setRate}
+              step={10}
+              min={10}
+              max={2000}
+              suffix=":1"
             />
           </Row>
-        ))}
-        <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 4 }}>
-          {t('settings.rateHint')}
-        </Text>
-      </Card>
+          <View style={{ height: 1, backgroundColor: theme.border, marginBottom: 4 }} />
+          {CATEGORIES.map((cat) => (
+            <Row key={cat.id} style={{ justifyContent: 'space-between', paddingVertical: 7, gap: 8 }}>
+              <Row style={{ gap: 7, flex: 1, minWidth: 0 }}>
+                <Text style={{ fontSize: 16 }}>{cat.emoji}</Text>
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  <Text
+                    style={{ ...heading(12.5, theme.text), lineHeight: 15 }}
+                    numberOfLines={2}
+                  >
+                    {t(`category.${cat.id}.name`)}
+                  </Text>
+                  <Text style={{ fontSize: 9, color: theme.textSoft }} numberOfLines={1}>
+                    {t('settings.categoryDefault')}
+                  </Text>
+                </View>
+              </Row>
+              <Stepper
+                value={state.settings.categoryCoins[cat.id]}
+                onChange={(v) => setCategoryCoins(cat.id, v)}
+                min={1}
+                max={99}
+                compact
+              />
+            </Row>
+          ))}
+          <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 4 }}>
+            {t('settings.rateHint')}
+          </Text>
+        </View>
 
-      <SectionTitle emoji="🏖️" title={t('settings.holidays')} />
-      <Card onPress={() => router.push('/holidays')} style={{ marginBottom: 14 }}>
-        <Row style={{ justifyContent: 'space-between' }}>
-          <View style={{ flex: 1 }}>
-            <Text style={heading(14, theme.text)}>
-              {activeHoliday
-                ? t('settings.inHoliday', {
-                    name: activeHoliday.nameKey ? t(activeHoliday.nameKey) : activeHoliday.name,
-                  })
-                : t('settings.notHoliday')}
-            </Text>
-            <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 3 }}>
-              {t('settings.holidayCount', { n: state.settings.holidays.length })}
-            </Text>
-          </View>
-          <Text style={{ fontSize: 20 }}>→</Text>
-        </Row>
-      </Card>
+        <View style={{ height: 1, backgroundColor: theme.border, marginHorizontal: 16 }} />
+        <Pressable
+          onPress={() => router.push('/holidays')}
+          accessibilityRole="button"
+          style={{ padding: 16 }}
+        >
+          <Text style={{ ...heading(12.5, theme.text), marginBottom: 6 }}>
+            {t('settings.holidays')}
+          </Text>
+          <Row style={{ justifyContent: 'space-between' }}>
+            <View style={{ flex: 1 }}>
+              <Text style={heading(14, theme.text)}>
+                {activeHoliday
+                  ? t('settings.inHoliday', {
+                      name: activeHoliday.nameKey ? t(activeHoliday.nameKey) : activeHoliday.name,
+                    })
+                  : t('settings.notHoliday')}
+              </Text>
+              <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 3 }}>
+                {t('settings.holidayCount', { n: state.settings.holidays.length })}
+              </Text>
+            </View>
+            <Text style={{ fontSize: 20 }}>→</Text>
+          </Row>
+        </Pressable>
+      </Board>
 
       <SectionTitle emoji="🧸" title={t('settings.about')} />
       <Card>

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useApp } from '@/store/AppStore';
@@ -7,11 +7,11 @@ import { useTheme, heading, numberStyle, shadowStyle } from '@/theme/themes';
 import { todayISO } from '@/domain/date';
 import { coinsToMoney } from '@/domain/logic';
 import { CATEGORY_MAP } from '@/domain/constants';
-import { Btn, Card, Empty, ProgressBar, Row, Screen, SectionTitle } from '@/components/ui';
+import { Board, Btn, Card, Empty, ProgressBar, Row, Screen, SectionTitle } from '@/components/ui';
 import { Ring } from '@/components/charts';
+import { Coin, CoinValue } from '@/components/Coin';
 import { Mascot } from '@/components/Mascot';
 import { useI18n } from '@/i18n';
-import { Coin, CoinValue } from '@/components/Coin';
 
 export default function WalletScreen() {
   const theme = useTheme();
@@ -56,21 +56,33 @@ export default function WalletScreen() {
         {t('wallet.rateNote', { rate })}
       </Text>
 
-      <View style={{ borderRadius: theme.radius + 6, overflow: 'hidden', marginBottom: 16, ...shadowStyle(theme) }}>
+      <View
+        style={{
+          borderRadius: theme.radius + 2,
+          overflow: 'hidden',
+          marginBottom: 14,
+          ...shadowStyle(theme),
+        }}
+      >
         <LinearGradient
           colors={theme.heroGradient}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={{
             padding: 18,
-            borderRadius: theme.radius + 6,
-            borderWidth: theme.borderWidth,
+            borderWidth: theme.cardBorderWidth,
             borderColor: theme.border,
+            borderRadius: theme.radius + 2,
           }}
         >
-          <Row style={{ justifyContent: 'space-between' }}>
+          <Row style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <View>
-              <Text style={{ fontSize: 11, color: theme.dark ? 'rgba(255,255,255,0.75)' : 'rgba(74,42,60,0.7)' }}>
+              <Text
+                style={{
+                  fontSize: 11,
+                  color: theme.dark ? 'rgba(255,255,255,0.75)' : 'rgba(74,42,60,0.7)',
+                }}
+              >
                 {t('wallet.myCoins')}
               </Text>
               <Row style={{ alignItems: 'flex-end', gap: 8 }}>
@@ -83,9 +95,7 @@ export default function WalletScreen() {
                 {t('wallet.worth', { money: formatMoney(value) })}
               </Text>
             </View>
-            <View style={{ opacity: 0.98 }}>
-              <Mascot size={92} mood={balance > 0 ? 'cheer' : 'happy'} />
-            </View>
+            <Mascot size={78} mood={balance > 0 ? 'cheer' : 'happy'} />
           </Row>
 
           <Btn
@@ -98,77 +108,72 @@ export default function WalletScreen() {
         </LinearGradient>
       </View>
 
-      <Card style={{ marginBottom: 14 }}>
-        <Row style={{ gap: 14 }}>
-          <Ring
-            value={Math.min(1, wishPct)}
-            size={88}
-            thickness={9}
-            color={theme.candy}
-            center={
-              <View style={{ alignItems: 'center' }}>
-                <Text style={{ fontSize: 18 }}>🎁</Text>
-                <Text style={numberStyle(12, theme.text)}>{Math.round(Math.min(1, wishPct) * 100)}%</Text>
-              </View>
-            }
-          />
-          <View style={{ flex: 1, gap: 4 }}>
-            <Text style={{ fontSize: 10, color: theme.textSoft }}>{t('wallet.wish')}</Text>
-            <Text style={heading(16, theme.text)} numberOfLines={1}>
-              {activeProfile.wish.titleKey ? t(activeProfile.wish.titleKey) : activeProfile.wish.title}
-            </Text>
-            <ProgressBar value={wishPct} color={theme.candy} height={7} />
-            <Text style={{ fontSize: 10, color: theme.textSoft }}>
-              {t('wallet.saved', {
-                saved: formatMoney(value),
-                target: formatMoney(activeProfile.wish.target),
-              })}{' '}
-              ·{' '}
-              {wishPct >= 1
-                ? t('wallet.targetDone')
-                : t('wallet.needMore', {
-                    amount: formatMoney(Math.max(0, activeProfile.wish.target - value)),
-                  })}
-            </Text>
+      <Board style={{ marginBottom: 14 }}>
+        <View style={{ padding: 16 }}>
+          <Row style={{ gap: 14 }}>
+            <Ring
+              value={Math.min(1, wishPct)}
+              size={82}
+              thickness={8}
+              color={theme.candy}
+              center={
+                <View style={{ alignItems: 'center' }}>
+                  <Text style={{ fontSize: 17 }}>🎁</Text>
+                  <Text style={numberStyle(11, theme.text)}>
+                    {Math.round(Math.min(1, wishPct) * 100)}%
+                  </Text>
+                </View>
+              }
+            />
+            <View style={{ flex: 1, gap: 3 }}>
+              <Text style={{ fontSize: 10, color: theme.textSoft }}>{t('wallet.wish')}</Text>
+              <Text style={heading(15, theme.text)} numberOfLines={1}>
+                {activeProfile.wish.titleKey ? t(activeProfile.wish.titleKey) : activeProfile.wish.title}
+              </Text>
+              <ProgressBar value={wishPct} color={theme.candy} height={6} />
+              <Text style={{ fontSize: 9.5, color: theme.textSoft }}>
+                {t('wallet.saved', {
+                  saved: formatMoney(value),
+                  target: formatMoney(activeProfile.wish.target),
+                })}{' '}
+                ·{' '}
+                {wishPct >= 1
+                  ? t('wallet.targetDone')
+                  : t('wallet.needMore', {
+                      amount: formatMoney(Math.max(0, activeProfile.wish.target - value)),
+                    })}
+              </Text>
+            </View>
+          </Row>
+          <Pressable
+            onPress={() => router.push('/settings')}
+            accessibilityRole="button"
+            accessibilityLabel={t('wallet.editWish')}
+            style={{ marginTop: 10, alignSelf: 'flex-start' }}
+          >
+            <Text style={{ fontSize: 10.5, color: theme.primary }}>{t('wallet.editWish')} →</Text>
+          </Pressable>
+        </View>
+
+        <View style={{ height: 1, backgroundColor: theme.border, marginHorizontal: 16 }} />
+        <Row style={{ padding: 16 }}>
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 9.5, color: theme.textSoft }}>{t('wallet.earnedTotal')}</Text>
+            <CoinValue
+              value={totals.earned}
+              size={13}
+              color={theme.text}
+              prefix=""
+              style={{ marginTop: 2 }}
+            />
+          </View>
+          <View style={{ width: 1, backgroundColor: theme.border, marginHorizontal: 14 }} />
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 9.5, color: theme.textSoft }}>{t('wallet.redeemedTotal')}</Text>
+            <Text style={numberStyle(18, theme.text)}>¥ {formatMoney(totals.spentMoney)}</Text>
           </View>
         </Row>
-        <Btn
-          label={t('wallet.editWish')}
-          variant="ghost"
-          small
-          onPress={() => router.push('/settings')}
-          style={{ marginTop: 10 }}
-        />
-      </Card>
-
-      <Row style={{ gap: 10, marginBottom: 16 }}>
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: theme.card,
-            borderRadius: theme.radiusSm + 4,
-            padding: 12,
-            borderWidth: theme.borderWidth,
-            borderColor: theme.border,
-          }}
-        >
-          <Text style={{ fontSize: 10, color: theme.textSoft }}>{t('wallet.earnedTotal')}</Text>
-          <CoinValue value={totals.earned} size={14} color={theme.text} prefix="" style={{ marginTop: 3 }} />
-        </View>
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: theme.card,
-            borderRadius: theme.radiusSm + 4,
-            padding: 12,
-            borderWidth: theme.borderWidth,
-            borderColor: theme.border,
-          }}
-        >
-          <Text style={{ fontSize: 10, color: theme.textSoft }}>{t('wallet.redeemedTotal')}</Text>
-          <Text style={numberStyle(20, theme.text)}>¥ {formatMoney(totals.spentMoney)}</Text>
-        </View>
-      </Row>
+      </Board>
 
       <SectionTitle
         emoji="📒"
@@ -181,22 +186,45 @@ export default function WalletScreen() {
           <Empty emoji="💰" title={t('wallet.emptyTitle')} hint={t('wallet.emptyHint')} />
         </Card>
       ) : (
-        groups.map(([date, list]) => (
-          <View key={date} style={{ marginBottom: 10 }}>
-            <Text style={{ fontSize: 10, color: theme.textSoft, marginBottom: 5, marginLeft: 4 }}>
-              {formatDate(date)}
-              {date === todayISO() ? ` · ${t('common.today')}` : ''}
-            </Text>
-            <Card style={{ paddingVertical: 4, paddingHorizontal: 14 }}>
+        <Board>
+          {groups.map(([date, list], groupIndex) => (
+            <View key={date}>
+              {groupIndex > 0 ? (
+                <View style={{ height: 1, backgroundColor: theme.border }} />
+              ) : null}
+              <Text
+                style={{
+                  fontSize: 10,
+                  color: theme.textSoft,
+                  paddingHorizontal: 16,
+                  paddingTop: 12,
+                  paddingBottom: 4,
+                }}
+              >
+                {formatDate(date)}
+                {date === todayISO() ? ` · ${t('common.today')}` : ''}
+              </Text>
               {list.map((entry, idx) => (
                 <View key={entry.id}>
-                  {idx > 0 ? <View style={{ height: 1, backgroundColor: theme.border }} /> : null}
-                  <Row style={{ paddingVertical: 10, gap: 10 }}>
-                    <Text style={{ fontSize: 22 }}>
-                      {entry.type === 'redeem' ? '💰' : entry.type === 'bonus' ? (entry.emoji ?? '🎁') : (entry.emoji ?? '⭐')}
+                  {idx > 0 ? (
+                    <View
+                      style={{
+                        height: 1,
+                        backgroundColor: theme.border,
+                        marginHorizontal: 16,
+                      }}
+                    />
+                  ) : null}
+                  <Row style={{ paddingHorizontal: 16, paddingVertical: 10, gap: 10 }}>
+                    <Text style={{ fontSize: 20 }}>
+                      {entry.type === 'redeem'
+                        ? '💰'
+                        : entry.type === 'bonus'
+                          ? (entry.emoji ?? '🎁')
+                          : (entry.emoji ?? '⭐')}
                     </Text>
-                    <View style={{ flex: 1 }}>
-                      <Text style={{ ...heading(12.5, theme.text) }}>
+                    <View style={{ flex: 1, minWidth: 0 }}>
+                      <Text style={{ ...heading(12, theme.text) }} numberOfLines={1}>
                         {entry.type === 'redeem'
                           ? t('wallet.redeemEntry', { money: formatMoney(entry.money ?? 0) })
                           : entry.type === 'bonus'
@@ -207,9 +235,12 @@ export default function WalletScreen() {
                               ? t(entry.taskKey)
                               : entry.taskTitle ?? t('wallet.taskFallback')}
                       </Text>
-                      <Text style={{ fontSize: 9.5, color: theme.textSoft, marginTop: 1 }}>
+                      <Text style={{ fontSize: 9, color: theme.textSoft, marginTop: 1 }}>
                         {entry.type === 'redeem'
-                          ? t('wallet.rateSnapshot', { coins: entry.coins, rate: entry.rate ?? rate })
+                          ? t('wallet.rateSnapshot', {
+                              coins: entry.coins,
+                              rate: entry.rate ?? rate,
+                            })
                           : entry.type === 'bonus'
                             ? t('wallet.bonus')
                             : entry.category
@@ -221,7 +252,7 @@ export default function WalletScreen() {
                     </View>
                     <Text
                       style={numberStyle(
-                        15,
+                        14,
                         entry.type === 'redeem' ? theme.danger : theme.secondary,
                       )}
                     >
@@ -231,12 +262,12 @@ export default function WalletScreen() {
                   </Row>
                 </View>
               ))}
-            </Card>
-          </View>
-        ))
+            </View>
+          ))}
+        </Board>
       )}
 
-      <Text style={{ fontSize: 10, color: theme.textSoft, textAlign: 'center', marginTop: 6 }}>
+      <Text style={{ fontSize: 10, color: theme.textSoft, textAlign: 'center', marginTop: 12 }}>
         {t('wallet.footer')}
       </Text>
     </Screen>
