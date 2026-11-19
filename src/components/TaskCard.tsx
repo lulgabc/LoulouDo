@@ -203,7 +203,6 @@ export function TaskCard({
 
   const borderStyle =
     task.category === 'weekend' ? ('dashed' as const) : ('solid' as const);
-  const accentWidth = task.category === 'special' || task.category === 'holiday' ? 6 : 5;
 
   return (
     <Card
@@ -213,6 +212,8 @@ export function TaskCard({
         borderColor: color,
         borderWidth: Math.max(theme.borderWidth, 2),
         borderStyle,
+        borderLeftWidth: 8,
+        borderLeftColor: color,
       }}
     >
       <View style={{ borderRadius: theme.radius, overflow: 'hidden' }}>
@@ -226,17 +227,6 @@ export function TaskCard({
             bottom: 0,
             backgroundColor: color,
             opacity: task.category === 'special' ? 0.12 : 0.07,
-          }}
-        />
-        <View
-          pointerEvents="none"
-          style={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            bottom: 0,
-            width: accentWidth,
-            backgroundColor: color,
           }}
         />
         {task.category === 'special' ? (
@@ -265,7 +255,7 @@ export function TaskCard({
             alignItems: 'center',
             gap: 12,
             padding: 12,
-            paddingLeft: 15,
+            paddingLeft: 12,
           }}
         >
           <View
