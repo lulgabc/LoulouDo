@@ -6,6 +6,12 @@ LoulouDo 是一款面向 4–10 岁孩子的**跨平台（iOS / Android / Web）
 
 整个 App 离线运行，数据只保存在本机，不登录、无广告。
 
+## 🔗 在线体验
+
+**<https://lulgabc.github.io/LoulouDo/>**
+
+> GitHub Pages 版本；首次打开是引导页，数据保存在浏览器 localStorage 中。
+
 ---
 
 ## ✨ 核心功能
@@ -128,6 +134,19 @@ npm run export:web   # 输出到 dist/
 npm run typecheck    # TypeScript 严格模式
 npm test             # Vitest 领域逻辑测试
 ```
+
+### 部署到 GitHub Pages
+
+项目使用 `app.config.js` 读取 `EXPO_BASE_URL`，把资源前缀设为仓库子路径：
+
+```bash
+EXPO_BASE_URL=/LoulouDo npx expo export -p web --output-dir dist-pages
+cp dist-pages/index.html dist-pages/404.html   # SPA 深链回退
+touch dist-pages/.nojekyll                    # 保留 _expo 目录
+# 将 dist-pages 推到 gh-pages 分支即可
+```
+
+当前线上版本：<https://lulgabc.github.io/LoulouDo/>
 
 ### 重新生成图标 / 演示截图
 
