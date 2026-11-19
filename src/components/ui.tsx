@@ -344,21 +344,23 @@ export function Segmented<T extends string>({
   value,
   onChange,
   style,
+  inline = false,
 }: {
   items: { id: T; label: string; emoji?: string; color?: string }[];
   value: T;
   onChange: (id: T) => void;
   style?: ViewStyle;
+  inline?: boolean;
 }) {
   const theme = useTheme();
   return (
     <View
       style={[
         {
-          backgroundColor: theme.card,
+          backgroundColor: inline ? 'transparent' : theme.card,
           borderRadius: 24,
-          padding: 4,
-          ...shadowStyle(theme),
+          padding: inline ? 0 : 4,
+          ...(inline ? {} : shadowStyle(theme)),
         },
         style,
       ]}
@@ -388,11 +390,19 @@ export function Segmented<T extends string>({
                 paddingVertical: 8,
                 paddingHorizontal: 9,
                 borderRadius: 999,
-                backgroundColor: active ? color : 'transparent',
+                backgroundColor: active
+                  ? inline
+                    ? color + (theme.dark ? '33' : '1F')
+                    : color
+                  : 'transparent',
+                borderWidth: inline && active ? 1 : 0,
+                borderColor: inline && active ? color + '66' : 'transparent',
               }}
             >
               {item.emoji ? <Text style={{ fontSize: 11 }}>{item.emoji}</Text> : null}
-              <Text style={heading(11, active ? readableOn(color) : theme.textSoft)}>
+              <Text
+                style={heading(11, active ? (inline ? color : readableOn(color)) : theme.textSoft)}
+              >
                 {item.label}
               </Text>
             </Pressable>

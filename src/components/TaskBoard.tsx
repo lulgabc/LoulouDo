@@ -23,6 +23,8 @@ export function TaskBoard({
   addLabel,
   onAddCategory,
   emptyLabel,
+  header,
+  emptyNode,
 }: {
   groups: TaskGroup[];
   doneIds: Set<string>;
@@ -34,12 +36,23 @@ export function TaskBoard({
   addLabel?: string;
   onAddCategory?: (category: Category) => void;
   emptyLabel?: string;
+  header?: React.ReactNode;
+  emptyNode?: React.ReactNode;
 }) {
   const theme = useTheme();
   const { t } = useI18n();
 
   return (
     <Board>
+      {header ? (
+        <>
+          <View style={{ paddingHorizontal: 12, paddingTop: 10, paddingBottom: 8 }}>
+            {header}
+          </View>
+          <View style={{ height: 1, backgroundColor: theme.border }} />
+        </>
+      ) : null}
+      {groups.length === 0 && emptyNode ? emptyNode : null}
       {groups.map((group) => {
         const color = colorForCategory(group.category, theme);
         const meta = CATEGORY_MAP[group.category];

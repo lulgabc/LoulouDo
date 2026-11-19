@@ -172,41 +172,26 @@ export default function HomeScreen() {
                 <Text style={{ fontSize: 12 }}>🔥</Text>
                 <Text style={heading(12, heroInk)}>{t('home.streak', { n: streak })}</Text>
               </View>
-              <Text style={numberStyle(16, heroInk)}>
-                {progressFull.done}
-                <Text style={{ opacity: 0.65 }}>/{progressFull.total}</Text>
-              </Text>
             </Row>
 
-            <Row style={{ alignItems: 'flex-start', gap: 10, marginTop: 8 }}>
+            <Row style={{ alignItems: 'center', gap: 10, marginTop: 8 }}>
               <Mascot size={96} mood={complete ? 'cheer' : 'happy'} />
-              <View style={{ flex: 1, paddingTop: 4, paddingRight: 4 }}>
+              <View style={{ flex: 1, paddingRight: 4 }}>
                 <Text style={{ ...heading(15, heroInk), lineHeight: 23 }}>{cheer}</Text>
               </View>
             </Row>
             <View style={{ marginTop: 10 }}>
-              <Row style={{ justifyContent: 'space-between', marginBottom: 6 }}>
-                <Text style={heading(12, heroSoft)}>{t('home.progress')}</Text>
-                <Text style={numberStyle(13, heroInk)}>{Math.round(percent * 100)}%</Text>
+              <Row style={{ justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 6 }}>
+                <Text style={heading(11, heroSoft)}>{t('home.progress')}</Text>
+                <Text style={numberStyle(13, heroInk)}>
+                  {progressFull.done}
+                  <Text style={{ opacity: 0.6 }}> / {progressFull.total}</Text>
+                </Text>
               </Row>
               <ProgressBar value={percent} track={heroTrack} color={heroFill} height={12} />
             </View>
           </LinearGradient>
         </View>
-
-        <Segmented
-          value={filter}
-          onChange={setFilter}
-          items={[
-            { id: 'all' as Filter, label: t('home.all'), color: theme.primary },
-            ...CATEGORIES.map((cat) => ({
-              id: cat.id as Filter,
-              label: t(`category.${cat.id}.short`),
-              color: colorForCategory(cat.id, theme),
-            })),
-          ]}
-          style={{ marginBottom: 16 }}
-        />
 
         <SectionTitle
           emoji="🌈"
@@ -221,20 +206,34 @@ export default function HomeScreen() {
           }
         />
 
-        {visibleTasks.length === 0 ? (
-          <Card style={{ marginBottom: 12 }}>
-            <Empty emoji="🌱" title={t('home.emptyTitle')} hint={t('home.emptyHint')} />
-          </Card>
-        ) : (
-          <TaskBoard
-            groups={groups}
-            doneIds={doneIds}
-            coinsFor={(task) => taskCoinValue(task, state.settings)}
-            onToggle={(task, done) => onToggle(task, done)}
-            onAdd={() => router.push('/task-editor')}
-            addLabel={t('home.addTask')}
-          />
-        )}
+        <TaskBoard
+          groups={groups}
+          doneIds={doneIds}
+          coinsFor={(task) => taskCoinValue(task, state.settings)}
+          onToggle={(task, done) => onToggle(task, done)}
+          onAdd={() => router.push('/task-editor')}
+          addLabel={t('home.addTask')}
+          header={
+            <Segmented
+              inline
+              value={filter}
+              onChange={setFilter}
+              items={[
+                { id: 'all' as Filter, label: t('home.all'), color: theme.primary },
+                ...CATEGORIES.map((cat) => ({
+                  id: cat.id as Filter,
+                  label: t(`category.${cat.id}.short`),
+                  color: colorForCategory(cat.id, theme),
+                })),
+              ]}
+            />
+          }
+          emptyNode={
+            <View style={{ paddingHorizontal: 16, paddingVertical: 10 }}>
+              <Empty emoji="🌱" title={t('home.emptyTitle')} hint={t('home.emptyHint')} />
+            </View>
+          }
+        />
 
         {complete ? (
           <Card style={{ marginTop: 4, backgroundColor: theme.chip }}>

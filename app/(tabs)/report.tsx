@@ -116,20 +116,22 @@ export default function ReportScreen() {
         {t('report.subtitle')}
       </Text>
 
-      <Segmented
-        value={mode}
-        onChange={setMode}
-        items={(['week', 'month', 'all'] as Mode[]).map((m) => ({
-          id: m,
-          label: t(`report.range.${m}`),
-        }))}
-        style={{ marginBottom: 6 }}
-      />
-      <Text style={{ fontSize: 10, color: theme.textSoft, marginBottom: 12 }}>
-        {formatShort(stats.start)} - {formatShort(stats.end)}
-      </Text>
-
       <Board style={{ marginBottom: 14 }}>
+        <View style={{ padding: 16, paddingBottom: 12 }}>
+          <Segmented
+            inline
+            value={mode}
+            onChange={setMode}
+            items={(['week', 'month', 'all'] as Mode[]).map((m) => ({
+              id: m,
+              label: t(`report.range.${m}`),
+            }))}
+          />
+          <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 9 }}>
+            {formatShort(stats.start)} - {formatShort(stats.end)}
+          </Text>
+        </View>
+        <View style={{ height: 1, backgroundColor: theme.border, marginHorizontal: 16 }} />
         <View style={{ padding: 16 }}>
           <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
             <View style={{ gap: 2 }}>

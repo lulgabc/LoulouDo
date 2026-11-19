@@ -211,15 +211,6 @@ export function TaskCard({
       >
         <View
           style={{
-            width: 4,
-            height: 32,
-            borderRadius: 2,
-            backgroundColor: color,
-            opacity: done ? 0.45 : 1,
-          }}
-        />
-        <View
-          style={{
             width: 44,
             height: 44,
             borderRadius: 15,
