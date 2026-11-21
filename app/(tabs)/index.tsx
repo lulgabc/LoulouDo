@@ -214,14 +214,14 @@ export default function HomeScreen() {
                   <Text style={{ opacity: 0.6 }}> / {progressFull.total}</Text>
                 </Text>
               </Row>
-              <View style={{ paddingTop: 7 }}>
+              <View style={{ height: 22, justifyContent: 'center', marginTop: 2 }}>
                 <ProgressBar value={percent} track={heroTrack} color={heroFill} height={12} />
                 <View
                   pointerEvents="none"
                   style={{
                     position: 'absolute',
                     left: `${Math.max(5, Math.min(95, percent * 100))}%`,
-                    top: -4,
+                    top: 0,
                     marginLeft: -11,
                     width: 22,
                     height: 22,
