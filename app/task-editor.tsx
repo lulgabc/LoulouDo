@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { Pressable, Text, TextInput, useWindowDimensions, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useApp } from '@/store/AppStore';
 import { useTheme, heading, numberStyle } from '@/theme/themes';
@@ -18,6 +18,8 @@ type OnceMode = 'day' | 'range';
 export default function TaskEditorScreen() {
   const theme = useTheme();
   const { t } = useI18n();
+  const { width } = useWindowDimensions();
+  const iconSize = width < 360 ? 17 : 21;
   const params = useLocalSearchParams<{ id?: string; category?: string }>();
   const { tasks, state, saveTask, deleteTask } = useApp();
   const editing = useMemo(
@@ -195,7 +197,7 @@ export default function TaskEditorScreen() {
       />
 
       <Label>{t('editor.emojiLabel')}</Label>
-      <Card style={{ padding: 10, marginBottom: 13 }}>
+      <Card style={{ padding: 8, marginBottom: 13 }}>
         <View
           style={{
             flexDirection: 'row',
@@ -208,21 +210,22 @@ export default function TaskEditorScreen() {
             <Pressable
               key={id}
               onPress={() => setEmoji(id)}
+              hitSlop={3}
               accessibilityRole="button"
               accessibilityState={{ selected: emoji === id }}
               accessibilityLabel={t('editor.iconOption', { n: index + 1 })}
               style={{
-                width: '12%',
+                width: '8%',
                 aspectRatio: 1,
                 alignItems: 'center',
                 justifyContent: 'center',
-                borderRadius: 12,
+                borderRadius: 9,
                 backgroundColor: emoji === id ? theme.chip : 'transparent',
                 borderWidth: emoji === id ? 2 : 0,
                 borderColor: theme.primary,
               }}
             >
-              <TaskIcon id={id} size={24} />
+              <TaskIcon id={id} size={iconSize} />
             </Pressable>
           ))}
         </View>
