@@ -59,10 +59,12 @@ function CoinChip({
   coins,
   done,
   compact = false,
+  align,
 }: {
   coins: number;
   done: boolean;
   compact?: boolean;
+  align?: 'flex-start' | 'center';
 }) {
   const theme = useTheme();
   return (
@@ -77,7 +79,7 @@ function CoinChip({
         backgroundColor: done ? theme.coin + '22' : theme.chip,
         borderWidth: 1,
         borderColor: done ? theme.coin + '66' : theme.border,
-        alignSelf: compact ? 'center' : 'flex-start',
+        alignSelf: align ?? (compact ? 'center' : 'flex-start'),
         marginTop: compact ? 0 : 3,
       }}
     >
@@ -278,7 +280,7 @@ function ChallengeTicket({
     <Animated.View
       style={{
         width: lastOdd ? '100%' : '48%',
-        minHeight: 78,
+        height: 66,
         borderRadius: 14,
         borderWidth: 1.5,
         borderStyle: 'dashed',
@@ -299,30 +301,46 @@ function ChallengeTicket({
         }
         style={({ pressed }) => ({
           flex: 1,
-          paddingHorizontal: 9,
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 7,
+          paddingHorizontal: 8,
           paddingVertical: 7,
           zIndex: 1,
           opacity: pressed ? 0.82 : 1,
         })}
       >
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text style={{ fontSize: 20 }}>{task.emoji}</Text>
-          {done ? <CheckStamp size={15} /> : <Text style={{ fontSize: 11 }}>⭐</Text>}
-        </View>
-        <Text
+        <View
           style={{
-            ...heading(10.5, done ? theme.textSoft : theme.text),
-            lineHeight: 13,
-            marginTop: 4,
-            textDecorationLine: done ? 'line-through' : 'none',
+            width: 28,
+            height: 28,
+            borderRadius: 10,
+            backgroundColor: done ? theme.card + 'CC' : color + (theme.dark ? '2E' : '20'),
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
           }}
-          numberOfLines={2}
         >
-          {title}
-        </Text>
-        <View style={{ marginTop: 4 }}>
-          <CoinChip coins={coins} done={done} compact />
+          <Text style={{ fontSize: 16 }}>{task.emoji}</Text>
         </View>
+
+        <View style={{ flex: 1, minWidth: 0, justifyContent: 'center' }}>
+          <Text
+            style={{
+              ...heading(10.5, done ? theme.textSoft : theme.text),
+              lineHeight: 13,
+              textDecorationLine: done ? 'line-through' : 'none',
+            }}
+            numberOfLines={2}
+          >
+            {title}
+          </Text>
+          <View style={{ marginTop: 3 }}>
+            <CoinChip coins={coins} done={done} compact align="flex-start" />
+          </View>
+        </View>
+
+        {done ? <CheckStamp size={14} /> : null}
       </Pressable>
     </Animated.View>
   );
