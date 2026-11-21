@@ -117,7 +117,7 @@ await page.waitForTimeout(500);
 await shot('11b-language-menu');
 await page.locator('[aria-label="中文"]').last().click();
 await page.waitForTimeout(500);
-await click('奇幻贴纸', { wait: 700 });
+await click('奇幻', { wait: 700 });
 await shot('12-settings-fantasy', 500);
 
 await tab('今日');

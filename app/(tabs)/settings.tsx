@@ -355,16 +355,17 @@ export default function SettingsScreen() {
             </Row>
           </Pressable>
 
-          <View style={{ height: 1, backgroundColor: theme.border, marginVertical: 12 }} />
+          <View style={{ height: 1, backgroundColor: theme.border, marginVertical: 9 }} />
 
           <SkinPicker
             compact
+            columns={4}
             value={state.settings.themeId}
             onChange={(id: ThemeId) => setTheme(id)}
           />
         </View>
 
-        {/* 金币与假期 */}
+        {/* 任务金币 */}
         <View style={{ height: 1, backgroundColor: theme.border }} />
         <View style={{ padding: 16 }}>
           {sectionLabel('💰', t('settings.rules'))}
@@ -407,25 +408,41 @@ export default function SettingsScreen() {
             </Row>
           ))}
 
-          <View style={{ height: 1, backgroundColor: theme.border, marginVertical: 10 }} />
+        </View>
+
+        {/* 假期：独立模块 */}
+        <View style={{ height: 1, backgroundColor: theme.border }} />
+        <View style={{ padding: 16 }}>
+          {sectionLabel('🏖️', t('settings.holidayModule'))}
 
           <Pressable
             onPress={() => router.push('/holidays')}
             accessibilityRole="button"
+            accessibilityLabel={t('settings.holidays')}
             style={({ pressed }) => ({
               flexDirection: 'row',
               alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingVertical: 4,
-              opacity: pressed ? 0.7 : 1,
+              gap: 10,
+              padding: 12,
+              borderRadius: theme.radiusSm,
+              backgroundColor: activeHoliday ? theme.chip : theme.cardSoft,
+              borderWidth: theme.borderWidth,
+              borderColor: activeHoliday ? theme.secondary : theme.border,
+              opacity: pressed ? 0.75 : 1,
             })}
           >
+            <View
+              style={{
+                width: 9,
+                height: 9,
+                borderRadius: 5,
+                backgroundColor: activeHoliday ? theme.secondary : theme.textSoft,
+                opacity: activeHoliday ? 1 : 0.45,
+              }}
+            />
             <View style={{ flex: 1, minWidth: 0 }}>
-              <Text style={heading(13, theme.text)}>{t('settings.holidays')}</Text>
-              <Text
-                style={{ fontSize: 10.5, color: theme.textSoft, marginTop: 2 }}
-                numberOfLines={1}
-              >
+              <Text style={heading(12.5, theme.text)}>{t('settings.holidays')}</Text>
+              <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 2 }} numberOfLines={1}>
                 {activeHoliday
                   ? t('settings.inHoliday', {
                       name: activeHoliday.nameKey ? t(activeHoliday.nameKey) : activeHoliday.name,
@@ -433,7 +450,22 @@ export default function SettingsScreen() {
                   : t('settings.notHoliday')}
               </Text>
             </View>
-            <Text style={{ fontSize: 16, color: theme.textSoft }}>›</Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 3,
+                paddingVertical: 4,
+                paddingHorizontal: 9,
+                borderRadius: 999,
+                backgroundColor: theme.card,
+                borderWidth: 1,
+                borderColor: theme.border,
+              }}
+            >
+              <Text style={{ ...heading(9.5, theme.primary) }}>{t('settings.manage')}</Text>
+              <Text style={{ fontSize: 11, color: theme.primary }}>›</Text>
+            </View>
           </Pressable>
         </View>
 

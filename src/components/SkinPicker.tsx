@@ -17,9 +17,18 @@ export function SkinPicker({
   compact?: boolean;
 }) {
   const { t } = useI18n();
-  const width = columns === 2 ? '48%' : '100%';
+  const four = columns >= 4;
+  const width = four ? '22%' : columns === 2 ? '48%' : '100%';
   return (
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+    <View
+      style={{
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: four ? 'space-between' : 'flex-start',
+        gap: four ? 0 : 8,
+        rowGap: four ? 6 : 0,
+      }}
+    >
       {THEME_LIST.map((th) => {
         const active = value === th.id;
         return (
@@ -28,9 +37,9 @@ export function SkinPicker({
             onPress={() => onChange(th.id)}
             style={({ pressed }) => ({
               width,
-              borderRadius: 18,
+              borderRadius: four ? 14 : 18,
               overflow: 'hidden',
-              borderWidth: active ? 3 : 1.5,
+              borderWidth: four ? (active ? 2 : 1) : active ? 3 : 1.5,
               borderColor: active ? th.primary : th.border,
               transform: [{ scale: pressed ? 0.97 : 1 }],
               backgroundColor: th.card,
@@ -38,23 +47,27 @@ export function SkinPicker({
           >
             <LinearGradient
               colors={th.bgGradient}
-              style={{ padding: compact ? 9 : 10, minHeight: compact ? 70 : 100 }}
+              style={{
+                paddingVertical: four ? 7 : compact ? 9 : 10,
+                paddingHorizontal: four ? 5 : compact ? 9 : 10,
+                minHeight: four ? 54 : compact ? 70 : 100,
+              }}
             >
               <View
                 style={{
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  minHeight: 20,
+                  minHeight: four ? 16 : 20,
                 }}
               >
-                <Text style={{ fontSize: 18 }}>{th.emoji}</Text>
+                <Text style={{ fontSize: four ? 15 : 18 }}>{th.emoji}</Text>
                 {active ? (
                   <View
                     style={{
-                      width: compact ? 18 : undefined,
-                      height: compact ? 18 : undefined,
-                      borderRadius: 9,
+                      width: four ? 14 : compact ? 18 : undefined,
+                      height: four ? 14 : compact ? 18 : undefined,
+                      borderRadius: four ? 7 : 9,
                       backgroundColor: th.primary,
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -62,26 +75,41 @@ export function SkinPicker({
                       paddingVertical: compact ? 0 : 2,
                     }}
                   >
-                    <Text style={{ fontSize: compact ? 10 : 8, color: '#FFFFFF', fontWeight: '700' }}>
-                      {compact ? '✓' : t('skin.active')}
+                    <Text
+                      style={{
+                        fontSize: four ? 8 : compact ? 10 : 8,
+                        color: '#FFFFFF',
+                        fontWeight: '700',
+                      }}
+                    >
+                      {four || compact ? '✓' : t('skin.active')}
                     </Text>
                   </View>
                 ) : (
-                  <View style={{ flexDirection: 'row', gap: 3 }}>
+                  <View style={{ flexDirection: 'row', gap: four ? 2 : 3 }}>
                     {[th.primary, th.accent, th.secondary].map((c, i) => (
                       <View
                         key={i}
-                        style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: c }}
+                        style={{
+                          width: four ? 5 : 8,
+                          height: four ? 5 : 8,
+                          borderRadius: four ? 3 : 4,
+                          backgroundColor: c,
+                        }}
                       />
                     ))}
                   </View>
                 )}
               </View>
               <Text
-                style={{ ...heading(compact ? 11.5 : 14, th.text), marginTop: compact ? 5 : 8 }}
-                numberOfLines={2}
+                style={{
+                  ...heading(four ? 9.5 : compact ? 11.5 : 14, th.text),
+                  lineHeight: four ? 12 : undefined,
+                  marginTop: four ? 3 : compact ? 5 : 8,
+                }}
+                numberOfLines={four ? 1 : 2}
               >
-                {t(`theme.${th.id}.name`)}
+                {t(`theme.${th.id}.${four ? 'short' : 'name'}`)}
               </Text>
               {compact ? null : (
                 <Text style={{ fontSize: 9, color: th.textSoft, marginTop: 1 }} numberOfLines={2}>

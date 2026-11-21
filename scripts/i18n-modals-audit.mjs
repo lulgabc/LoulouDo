@@ -7,19 +7,19 @@ const OUT = 'docs/i18n';
 const LANGS = {
   en: {
     name: 'English', settings: 'Settings', wallet: 'Wallet', tasks: 'Tasks',
-    redeem: 'Redeem pocket money', add: 'Add', holiday: /^Holidays$/,
+    redeem: 'Redeem pocket money', add: 'Add', holiday: /^Holiday settings$/,
   },
   de: {
     name: 'Deutsch', settings: 'Mehr', wallet: 'Geld', tasks: 'Plan',
-    redeem: 'Taschengeld abholen', add: 'Hinzufügen', holiday: /^Ferien$/,
+    redeem: 'Taschengeld abholen', add: 'Hinzufügen', holiday: /^Ferien-Einstellungen$/,
   },
   fr: {
     name: 'Français', settings: 'Réglages', wallet: 'Argent', tasks: 'Tâches',
-    redeem: 'Retirer de l’argent de poche', add: 'Ajouter', holiday: /^Vacances$/,
+    redeem: 'Retirer de l’argent de poche', add: 'Ajouter', holiday: /^Réglages des vacances$/,
   },
   pt: {
     name: 'Português', settings: 'Ajustes', wallet: 'Carteira', tasks: 'Tarefas',
-    redeem: 'Resgatar mesada', add: 'Adicionar', holiday: /^Férias$/,
+    redeem: 'Resgatar mesada', add: 'Adicionar', holiday: /^Configurações de férias$/,
   },
 };
 
