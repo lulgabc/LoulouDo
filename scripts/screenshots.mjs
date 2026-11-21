@@ -42,12 +42,12 @@ await shot('01-welcome-candy');
 
 await page.locator('input[placeholder*="昵称"]').fill('朵朵');
 await page.getByText('🦄', { exact: true }).first().click();
-await click('撞色波普');
-await shot('02-welcome-pop');
+await click('森林贴纸');
+await shot('02-welcome-forest');
 
 await page.getByRole('button', { name: '开始我的打卡之旅' }).click();
 await page.waitForTimeout(1200);
-await shot('03-home-pop', 700);
+await shot('03-home-forest', 700);
 
 const homeText = await page.locator('body').innerText();
 if (!homeText.includes('今天的任务')) throw new Error('首页没有渲染任务区');
@@ -111,17 +111,17 @@ const afterRedeem = await page.locator('body').innerText();
 if (!afterRedeem.includes(String(expectedBalance - 50))) throw new Error(`兑换后余额不是 ${expectedBalance - 50}`);
 
 await tab('设置');
-await shot('11-settings-pop');
+await shot('11-settings-forest');
 await page.locator('[aria-label="语言"]').first().click();
 await page.waitForTimeout(500);
 await shot('11b-language-menu');
 await page.locator('[aria-label="中文"]').last().click();
 await page.waitForTimeout(500);
-await click('星空梦想', { wait: 700 });
-await shot('12-settings-galaxy', 500);
+await click('奇幻贴纸', { wait: 700 });
+await shot('12-settings-fantasy', 500);
 
 await tab('今日');
-await shot('13-home-galaxy');
+await shot('13-home-fantasy');
 
 await tab('设置');
 await click('正在放「秋假」', { wait: 800 });

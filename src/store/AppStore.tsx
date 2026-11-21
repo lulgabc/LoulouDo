@@ -338,7 +338,20 @@ function normalize(raw: unknown): AppState {
     const value = parsed.settings?.categoryCoins?.[cat.id];
     if (typeof value === 'number' && value > 0) categoryCoins[cat.id] = value;
   }
-  const themeId = parsed.settings?.themeId;
+  const rawThemeId = parsed.settings?.themeId as string | undefined;
+  const themeId: ThemeId =
+    rawThemeId === 'pop'
+      ? 'forest'
+      : rawThemeId === 'sticker'
+        ? 'cute'
+        : rawThemeId === 'galaxy'
+          ? 'fantasy'
+          : rawThemeId === 'candy' ||
+              rawThemeId === 'forest' ||
+              rawThemeId === 'fantasy' ||
+              rawThemeId === 'cute'
+            ? rawThemeId
+            : base.settings.themeId;
 
   // 旧版本数据迁移：把内置中文示例标题补上翻译 key
   const legacyTaskKeys: Record<string, string> = {
@@ -413,9 +426,7 @@ function normalize(raw: unknown): AppState {
     entries,
     settings: {
       locale: isLocale(parsed.settings?.locale) ? parsed.settings.locale : detectLocale(),
-      themeId: themeId === 'pop' || themeId === 'sticker' || themeId === 'galaxy' || themeId === 'candy'
-        ? themeId
-        : base.settings.themeId,
+      themeId,
       rate: typeof parsed.settings?.rate === 'number' && parsed.settings.rate > 0
         ? parsed.settings.rate
         : base.settings.rate,

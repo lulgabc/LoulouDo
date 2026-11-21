@@ -65,7 +65,7 @@ export const TASK_EMOJIS = [
 
 export const STICKER_EMOJIS = ['🍓', '🍭', '🌈', '⭐', '🍬', '🎈', '🌻', '🧁', '🍉', '☁️', '🫧', '🦋'];
 
-export const THEME_IDS: ThemeId[] = ['candy', 'pop', 'sticker', 'galaxy'];
+export const THEME_IDS: ThemeId[] = ['candy', 'forest', 'fantasy', 'cute'];
 
 export const STORAGE_KEY = 'louloudou.state.v1';
 export const ALL_CLEAR_BONUS = 5;

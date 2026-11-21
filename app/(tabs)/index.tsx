@@ -19,7 +19,7 @@ import { colorForCategory } from '@/components/TaskCard';
 import { TaskBoard } from '@/components/TaskBoard';
 import { Confetti } from '@/components/Confetti';
 import { Avatar } from '@/components/Avatar';
-import { PiggyBankButton } from '@/components/PiggyBank';
+import { Coin } from '@/components/Coin';
 import { greetingKey, useI18n } from '@/i18n';
 import { tapFeedback } from '@/utils/feedback';
 
@@ -123,7 +123,30 @@ export default function HomeScreen() {
             </View>
           </Pressable>
 
-          <PiggyBankButton balance={balance} onPress={() => router.push('/wallet')} />
+          <Pressable
+            onPress={() => router.push('/wallet')}
+            accessibilityRole="button"
+            accessibilityLabel={`${t('wallet.title')} ${balance}`}
+            style={({ pressed }) => [
+              {
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 5,
+                flexShrink: 0,
+                backgroundColor: theme.card,
+                paddingVertical: 8,
+                paddingHorizontal: 12,
+                borderRadius: 999,
+                borderWidth: theme.cardBorderWidth,
+                borderColor: theme.border,
+                transform: [{ scale: pressed ? 0.95 : 1 }],
+              },
+              shadowStyle(theme),
+            ]}
+          >
+            <Coin size={18} />
+            <Text style={numberStyle(18, theme.text)}>{balance}</Text>
+          </Pressable>
         </Row>
 
         <View style={{ borderRadius: theme.radius + 6, overflow: 'hidden', ...shadowStyle(theme), marginBottom: 16 }}>

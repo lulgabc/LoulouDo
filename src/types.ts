@@ -7,7 +7,7 @@ import type { Locale } from '@/i18n/locales';
 
 export type Category = 'daily' | 'weekend' | 'holiday' | 'special';
 export type TaskKind = 'fixed' | 'once';
-export type ThemeId = 'candy' | 'pop' | 'sticker' | 'galaxy';
+export type ThemeId = 'candy' | 'forest' | 'fantasy' | 'cute';
 export type EntryType = 'earn' | 'bonus' | 'redeem';
 
 export interface Task {

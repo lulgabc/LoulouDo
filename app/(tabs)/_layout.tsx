@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '@/store/AppStore';
 import { useTheme, heading } from '@/theme/themes';
 import { useI18n } from '@/i18n';
+import { TabIcon, type TabIconName } from '@/components/TabIcons';
 
 type TabBarProps = {
   state: {
@@ -14,12 +15,12 @@ type TabBarProps = {
   navigateToTab: (routeKey: string) => void;
 };
 
-const META: Record<string, { icon: string; key: string }> = {
-  index: { icon: '🏡', key: 'today' },
-  tasks: { icon: '🗂️', key: 'tasks' },
-  report: { icon: '📊', key: 'report' },
-  wallet: { icon: '👛', key: 'wallet' },
-  settings: { icon: '⚙️', key: 'settings' },
+const META: Record<string, { key: TabIconName }> = {
+  index: { key: 'today' },
+  tasks: { key: 'tasks' },
+  report: { key: 'report' },
+  wallet: { key: 'wallet' },
+  settings: { key: 'settings' },
 };
 
 function TabBar({ state, navigateToTab }: TabBarProps) {
@@ -42,7 +43,7 @@ function TabBar({ state, navigateToTab }: TabBarProps) {
       <View style={styles.bar}>
         {state.routes.map((route, index) => {
         const focused = state.index === index;
-        const meta = META[route.name] ?? { icon: '⭐', key: route.name };
+        const meta = META[route.name] ?? { key: 'today' as TabIconName };
         const label = t(`tab.${meta.key}`);
         const onPress = () => {
           if (!focused) navigateToTab(route.key);
@@ -58,21 +59,28 @@ function TabBar({ state, navigateToTab }: TabBarProps) {
           >
             <View
               style={{
-                width: 42,
-                height: 30,
-                borderRadius: 999,
+                width: 46,
+                height: 34,
+                borderRadius: 14,
                 alignItems: 'center',
                 justifyContent: 'center',
                 backgroundColor: focused ? theme.chip : 'transparent',
-                borderWidth: focused && theme.borderWidth > 1 ? 2 : 0,
-                borderColor: theme.border,
+                borderWidth: focused ? 2 : 0,
+                borderColor: theme.primary,
+                transform: [{ rotate: focused ? '-3deg' : '0deg' }],
               }}
             >
-              <Text style={{ fontSize: 19, opacity: focused ? 1 : 0.7 }}>{meta.icon}</Text>
+              <TabIcon
+                name={meta.key}
+                size={26}
+                color={focused ? theme.primary : theme.textSoft}
+                accent={focused ? theme.accent : theme.textSoft}
+                cutout={theme.tabBg}
+              />
             </View>
             <Text
               style={{
-                ...heading(9.5, focused ? theme.text : theme.textSoft),
+                ...heading(10, focused ? theme.primary : theme.textSoft),
                 marginTop: 2,
                 opacity: focused ? 1 : 0.9,
               }}
@@ -118,7 +126,7 @@ const styles = StyleSheet.create({
   bar: {
     width: '100%',
     maxWidth: 560,
-    height: 60,
+    height: 64,
     alignSelf: 'center',
     flexDirection: 'row',
     alignItems: 'center',

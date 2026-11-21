@@ -123,7 +123,7 @@ describe('源码中的字面量 key', () => {
   });
 
   it('皮肤名称和描述都有翻译', () => {
-    for (const id of ['candy', 'pop', 'sticker', 'galaxy']) {
+    for (const id of ['candy', 'forest', 'fantasy', 'cute']) {
       for (const field of ['name', 'tagline']) {
         for (const locale of LOCALES) {
           expect(DICTS[locale][`theme.${id}.${field}` as keyof typeof DICTS.zh]).toBeTruthy();
