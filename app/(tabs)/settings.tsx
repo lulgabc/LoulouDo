@@ -4,7 +4,6 @@ import Constants from 'expo-constants';
 import { router } from 'expo-router';
 import { useApp } from '@/store/AppStore';
 import { useTheme, heading } from '@/theme/themes';
-import { todayISO } from '@/domain/date';
 import { CATEGORIES } from '@/domain/constants';
 import type { ThemeId } from '@/types';
 import { AVATARS } from '@/domain/constants';
@@ -40,8 +39,7 @@ export default function SettingsScreen() {
   const [confirmRemoveProfile, setConfirmRemoveProfile] = useState(false);
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
 
-  const today = todayISO();
-  const activeHoliday = state.settings.holidays.find((h) => today >= h.start && today <= h.end);
+  const activeHoliday = state.settings.holidays.find((h) => h.active);
 
   const startEdit = () => {
     setName(activeProfile.name);

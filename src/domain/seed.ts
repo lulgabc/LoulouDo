@@ -28,9 +28,9 @@ function task(
 }
 
 export const DEFAULT_HOLIDAYS: HolidayRange[] = [
-  { id: 'holiday-autumn', name: '秋假', nameKey: 'seed.holiday.autumn', start: '2026-11-14', end: '2026-11-30' },
-  { id: 'holiday-winter', name: '寒假', nameKey: 'seed.holiday.winter', start: '2027-01-25', end: '2027-02-20' },
-  { id: 'holiday-summer', name: '暑假', nameKey: 'seed.holiday.summer', start: '2026-07-01', end: '2026-08-31' },
+  { id: 'holiday-autumn', name: '秋假', nameKey: 'seed.holiday.autumn', start: '2026-11-14', end: '2026-11-30', active: false },
+  { id: 'holiday-winter', name: '寒假', nameKey: 'seed.holiday.winter', start: '2027-01-25', end: '2027-02-20', active: false },
+  { id: 'holiday-summer', name: '暑假', nameKey: 'seed.holiday.summer', start: '2026-07-01', end: '2026-08-31', active: false },
 ];
 
 const SEED_TASKS: Task[] = [

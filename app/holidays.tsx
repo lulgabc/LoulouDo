@@ -10,7 +10,7 @@ import { useI18n } from '@/i18n';
 export default function HolidaysScreen() {
   const theme = useTheme();
   const { t } = useI18n();
-  const { state, addHoliday, removeHoliday } = useApp();
+  const { state, addHoliday, setHolidayActive, removeHoliday } = useApp();
   const today = todayISO();
   const [name, setName] = useState('');
   const [start, setStart] = useState(today);
@@ -19,6 +19,7 @@ export default function HolidaysScreen() {
   const [confirmId, setConfirmId] = useState<string | null>(null);
 
   const holidays = [...state.settings.holidays].sort((a, b) => (a.start < b.start ? -1 : 1));
+  const activeHoliday = holidays.find((h) => h.active);
 
   const submit = () => {
     if (!name.trim()) {
@@ -83,6 +84,28 @@ export default function HolidaysScreen() {
         </View>
       </Row>
 
+      {activeHoliday ? (
+        <Card style={{ marginBottom: 14, backgroundColor: theme.chip }}>
+          <Row style={{ gap: 10 }}>
+            <Text style={{ fontSize: 28 }}>🏖️</Text>
+            <View style={{ flex: 1, minWidth: 0 }}>
+              <Text style={heading(13.5, theme.text)}>
+                {t('holidays.modeOn', {
+                  name: activeHoliday.nameKey ? t(activeHoliday.nameKey) : activeHoliday.name,
+                })}
+              </Text>
+              <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 2 }}>
+                {t('holidays.modeOnHint')}
+              </Text>
+            </View>
+          </Row>
+        </Card>
+      ) : (
+        <Text style={{ fontSize: 10.5, color: theme.textSoft, marginBottom: 12, lineHeight: 16 }}>
+          {t('holidays.modeOffHint')}
+        </Text>
+      )}
+
       <SectionTitle emoji="📅" title={t('holidays.mine')} />
       {holidays.length === 0 ? (
         <Card style={{ marginBottom: 14 }}>
@@ -106,42 +129,90 @@ export default function HolidaysScreen() {
             return (
               <View key={h.id}>
                 {idx > 0 ? <View style={{ height: 1, backgroundColor: theme.border }} /> : null}
-                <Row style={{ paddingVertical: 11, justifyContent: 'space-between' }}>
-                  <View style={{ flex: 1 }}>
-                    <Row style={{ gap: 6 }}>
-                      <Text style={heading(14, theme.text)}>
+                <Row style={{ paddingVertical: 11, justifyContent: 'space-between', gap: 10 }}>
+                  <View style={{ flex: 1, minWidth: 0 }}>
+                    <Row style={{ gap: 6, flexWrap: 'wrap' }}>
+                      <Text style={heading(14, theme.text)} numberOfLines={1}>
                         {h.nameKey ? t(h.nameKey) : h.name}
                       </Text>
-                      <View
-                        style={{
-                          backgroundColor: color + '22',
-                          borderRadius: 999,
-                          paddingHorizontal: 7,
-                          paddingVertical: 1,
-                        }}
-                      >
-                        <Text style={{ fontSize: 8.5, color }}>{t(statusKey)}</Text>
-                      </View>
+                      {!h.active ? (
+                        <View
+                          style={{
+                            backgroundColor: color + '22',
+                            borderRadius: 999,
+                            paddingHorizontal: 7,
+                            paddingVertical: 1,
+                          }}
+                        >
+                          <Text style={{ fontSize: 8.5, color }}>{t(statusKey)}</Text>
+                        </View>
+                      ) : null}
                     </Row>
                     <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 2 }}>
                       {h.start} → {h.end}
                     </Text>
+                    {h.active ? (
+                      <Text style={{ fontSize: 9.5, color: theme.primary, marginTop: 3 }}>
+                        {t('holidays.rowActiveHint')}
+                      </Text>
+                    ) : null}
                   </View>
-                  <Pressable
-                    onPress={() => {
-                      if (confirmId === h.id) {
-                        removeHoliday(h.id);
-                        setConfirmId(null);
-                      } else {
-                        setConfirmId(h.id);
-                      }
-                    }}
-                    hitSlop={8}
-                  >
-                    <Text style={{ fontSize: 10, color: confirmId === h.id ? theme.danger : theme.textSoft }}>
-                      {confirmId === h.id ? t('holidays.confirmDelete') : t('holidays.delete')}
-                    </Text>
-                  </Pressable>
+                  <View style={{ alignItems: 'flex-end', gap: 5, flexShrink: 0 }}>
+                    <Pressable
+                      onPress={() => setHolidayActive(h.id, !h.active)}
+                      accessibilityRole="switch"
+                      accessibilityState={{ checked: Boolean(h.active) }}
+                      accessibilityLabel={`${h.nameKey ? t(h.nameKey) : h.name} · ${t('holidays.modeLabel')}`}
+                      style={({ pressed }) => ({
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 5,
+                        paddingVertical: 5,
+                        paddingHorizontal: 9,
+                        borderRadius: 999,
+                        backgroundColor: h.active ? theme.primary : theme.cardSoft,
+                        borderWidth: h.active ? 0 : theme.borderWidth,
+                        borderColor: theme.border,
+                        opacity: pressed ? 0.75 : 1,
+                      })}
+                    >
+                      <View
+                        style={{
+                          width: 7,
+                          height: 7,
+                          borderRadius: 4,
+                          backgroundColor: h.active ? theme.onPrimary : theme.textSoft,
+                        }}
+                      />
+                      <Text
+                        style={{
+                          ...heading(9.5, h.active ? theme.onPrimary : theme.textSoft),
+                        }}
+                      >
+                        {h.active ? t('holidays.enabled') : t('holidays.enable')}
+                      </Text>
+                    </Pressable>
+                    <Pressable
+                      onPress={() => {
+                        if (confirmId === h.id) {
+                          removeHoliday(h.id);
+                          setConfirmId(null);
+                        } else {
+                          setConfirmId(h.id);
+                        }
+                      }}
+                      hitSlop={8}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 9,
+                          color: confirmId === h.id ? theme.danger : theme.textSoft,
+                        }}
+                      >
+                        {confirmId === h.id ? t('holidays.confirmDelete') : t('holidays.delete')}
+                      </Text>
+                    </Pressable>
+                  </View>
                 </Row>
               </View>
             );

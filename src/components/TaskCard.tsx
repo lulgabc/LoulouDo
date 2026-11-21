@@ -91,8 +91,9 @@ function DotFill({ color, id }: { color: string; id: string }) {
       style={{ position: 'absolute', left: 0, top: 0, right: 0, bottom: 0 }}
     >
       <Defs>
-        <Pattern id={id} width={13} height={13} patternUnits="userSpaceOnUse">
-          <Circle cx={3.5} cy={3.5} r={1.6} fill={color} opacity={0.26} />
+        {/* 完成后的圆点放大 3 倍：1.6 → 4.8 */}
+        <Pattern id={id} width={16} height={16} patternUnits="userSpaceOnUse">
+          <Circle cx={8} cy={8} r={4.8} fill={color} opacity={0.2} />
         </Pattern>
       </Defs>
       <Rect width="100%" height="100%" fill={`url(#${id})`} />

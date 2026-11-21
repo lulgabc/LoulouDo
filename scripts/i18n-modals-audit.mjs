@@ -7,24 +7,37 @@ const OUT = 'docs/i18n';
 const LANGS = {
   en: {
     name: 'English', settings: 'Settings', wallet: 'Wallet', tasks: 'Tasks',
-    redeem: 'Redeem pocket money', add: 'Add', holiday: /On “/,
+    redeem: 'Redeem pocket money', add: 'Add', holiday: /^Holidays$/,
   },
   de: {
     name: 'Deutsch', settings: 'Mehr', wallet: 'Geld', tasks: 'Plan',
-    redeem: 'Taschengeld abholen', add: 'Hinzufügen', holiday: /Gerade „/,
+    redeem: 'Taschengeld abholen', add: 'Hinzufügen', holiday: /^Ferien$/,
   },
   fr: {
     name: 'Français', settings: 'Réglages', wallet: 'Argent', tasks: 'Tâches',
-    redeem: 'Retirer de l’argent de poche', add: 'Ajouter', holiday: /En «/,
+    redeem: 'Retirer de l’argent de poche', add: 'Ajouter', holiday: /^Vacances$/,
   },
   pt: {
     name: 'Português', settings: 'Ajustes', wallet: 'Carteira', tasks: 'Tarefas',
-    redeem: 'Resgatar mesada', add: 'Adicionar', holiday: /Agora em/,
+    redeem: 'Resgatar mesada', add: 'Adicionar', holiday: /^Férias$/,
   },
 };
 
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 const results = [];
+
+const clickNonInert = async (locator) => {
+  const count = await locator.count();
+  for (let i = 0; i < count; i += 1) {
+    const el = locator.nth(i);
+    const inert = await el.evaluate((node) => Boolean(node.closest('[inert]')));
+    if (!inert) {
+      await el.click();
+      return;
+    }
+  }
+  await locator.first().click({ force: true });
+};
 
 const measure = (page) =>
   page.evaluate(() => {
@@ -103,7 +116,7 @@ for (const [locale, meta] of Object.entries(LANGS)) {
   await page.mouse.move(160, 400);
   await page.mouse.wheel(0, 1400);
   await page.waitForTimeout(400);
-  await page.getByText(meta.holiday).first().click();
+  await clickNonInert(page.getByText(meta.holiday));
   await page.waitForTimeout(800);
   const holidays = await measure(page);
   await page.screenshot({ path: `${OUT}/${locale}-holidays-320.jpg`, type: 'jpeg', quality: 82 });

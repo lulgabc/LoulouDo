@@ -11,6 +11,8 @@ import { tapFeedback } from '@/utils/feedback';
 import { Coin, CoinValue } from '@/components/Coin';
 import { useI18n } from '@/i18n';
 
+type OnceMode = 'day' | 'range';
+
 export default function TaskEditorScreen() {
   const theme = useTheme();
   const { t } = useI18n();
@@ -37,6 +39,16 @@ export default function TaskEditorScreen() {
   const [endDate, setEndDate] = useState(
     editing?.endDate ?? (editing?.kind === 'once' ? editing.endDate ?? addDays(todayISO(), 7) : addDays(todayISO(), 7)),
   );
+  const [onceMode, setOnceMode] = useState<OnceMode>(
+    editing?.kind === 'once' &&
+      !!editing.startDate &&
+      !!editing.endDate &&
+      editing.startDate !== editing.endDate
+      ? 'range'
+      : editing?.kind === 'once'
+        ? 'day'
+        : 'range',
+  );
   const [error, setError] = useState('');
   const [confirmDelete, setConfirmDelete] = useState(false);
 
@@ -50,6 +62,7 @@ export default function TaskEditorScreen() {
       if (!editing) {
         setStartDate(todayISO());
         setEndDate(addDays(todayISO(), 30));
+        setOnceMode('range');
       }
     }
   };
@@ -60,7 +73,18 @@ export default function TaskEditorScreen() {
     if (next === 'once' && !editing) {
       setStartDate(todayISO());
       setEndDate(addDays(todayISO(), 7));
+      setOnceMode('range');
     }
+  };
+
+  const pickOnceMode = (next: OnceMode) => {
+    setOnceMode(next);
+    if (next === 'day') {
+      setEndDate(startDate);
+    } else if (endDate <= startDate) {
+      setEndDate(addDays(startDate, 7));
+    }
+    setError('');
   };
 
   const submit = () => {
@@ -68,12 +92,13 @@ export default function TaskEditorScreen() {
       setError(t('editor.errorTitle'));
       return;
     }
+    const finalEnd = kind === 'once' && onceMode === 'day' ? startDate : endDate;
     if (kind === 'once') {
-      if (!isISODate(startDate) || !isISODate(endDate)) {
+      if (!isISODate(startDate) || !isISODate(finalEnd)) {
         setError(t('editor.errorDate'));
         return;
       }
-      if (startDate > endDate) {
+      if (startDate > finalEnd) {
         setError(t('editor.errorOrder'));
         return;
       }
@@ -86,7 +111,7 @@ export default function TaskEditorScreen() {
       kind,
       coins: customCoins ?? undefined,
       startDate: kind === 'once' ? startDate : undefined,
-      endDate: kind === 'once' ? endDate : undefined,
+      endDate: kind === 'once' ? finalEnd : undefined,
     });
     tapFeedback('success');
     router.back();
@@ -247,54 +272,112 @@ export default function TaskEditorScreen() {
       {kind === 'once' ? (
         <>
           <Label>{t('editor.timeLabel')}</Label>
-          <Row style={{ gap: 8, marginBottom: 6 }}>
-            <TextInput
-              value={startDate}
-              onChangeText={(t) => {
-                setStartDate(t);
-                setError('');
-              }}
-              placeholder={t('editor.startPlaceholder')}
-              placeholderTextColor={theme.textSoft}
-              autoCapitalize="none"
-              style={{
-                flex: 1,
-                ...heading(13, theme.text),
-                backgroundColor: theme.card,
-                borderRadius: theme.radiusSm,
-                paddingHorizontal: 12,
-                paddingVertical: 10,
-                borderWidth: theme.borderWidth,
-                borderColor: theme.border,
-              }}
+          <Row style={{ gap: 7, marginBottom: 8, flexWrap: 'wrap' }}>
+            <Pill
+              emoji="📅"
+              label={t('editor.singleDay')}
+              active={onceMode === 'day'}
+              onPress={() => pickOnceMode('day')}
             />
-            <Text style={{ color: theme.textSoft, alignSelf: 'center' }}>{t('holidays.to')}</Text>
-            <TextInput
-              value={endDate}
-              onChangeText={(t) => {
-                setEndDate(t);
-                setError('');
-              }}
-              placeholder={t('editor.endPlaceholder')}
-              placeholderTextColor={theme.textSoft}
-              autoCapitalize="none"
-              style={{
-                flex: 1,
-                ...heading(13, theme.text),
-                backgroundColor: theme.card,
-                borderRadius: theme.radiusSm,
-                paddingHorizontal: 12,
-                paddingVertical: 10,
-                borderWidth: theme.borderWidth,
-                borderColor: theme.border,
-              }}
+            <Pill
+              emoji="🗓️"
+              label={t('editor.dateRange')}
+              active={onceMode === 'range'}
+              onPress={() => pickOnceMode('range')}
             />
           </Row>
-          <Row style={{ gap: 7, marginBottom: 13 }}>
-            <Pill label={t('editor.startToday')} onPress={() => setStartDate(todayISO())} />
-            <Pill label={t('editor.end7')} onPress={() => setEndDate(addDays(startDate, 7))} />
-            <Pill label={t('editor.end30')} onPress={() => setEndDate(addDays(startDate, 30))} />
-          </Row>
+
+          {onceMode === 'day' ? (
+            <>
+              <TextInput
+                value={startDate}
+                onChangeText={(value) => {
+                  setStartDate(value);
+                  setEndDate(value);
+                  setError('');
+                }}
+                placeholder={t('editor.startPlaceholder')}
+                placeholderTextColor={theme.textSoft}
+                autoCapitalize="none"
+                style={{
+                  ...heading(13, theme.text),
+                  backgroundColor: theme.card,
+                  borderRadius: theme.radiusSm,
+                  paddingHorizontal: 12,
+                  paddingVertical: 10,
+                  borderWidth: theme.borderWidth,
+                  borderColor: theme.border,
+                  marginBottom: 6,
+                }}
+              />
+              <Row style={{ gap: 7, marginBottom: 6 }}>
+                <Pill label={t('editor.dayToday')} onPress={() => {
+                  const value = todayISO();
+                  setStartDate(value);
+                  setEndDate(value);
+                }} />
+                <Pill label={t('editor.dayTomorrow')} onPress={() => {
+                  const value = addDays(todayISO(), 1);
+                  setStartDate(value);
+                  setEndDate(value);
+                }} />
+              </Row>
+            </>
+          ) : (
+            <>
+              <Row style={{ gap: 8, marginBottom: 6 }}>
+                <TextInput
+                  value={startDate}
+                  onChangeText={(value) => {
+                    setStartDate(value);
+                    setError('');
+                  }}
+                  placeholder={t('editor.startPlaceholder')}
+                  placeholderTextColor={theme.textSoft}
+                  autoCapitalize="none"
+                  style={{
+                    flex: 1,
+                    ...heading(13, theme.text),
+                    backgroundColor: theme.card,
+                    borderRadius: theme.radiusSm,
+                    paddingHorizontal: 12,
+                    paddingVertical: 10,
+                    borderWidth: theme.borderWidth,
+                    borderColor: theme.border,
+                  }}
+                />
+                <Text style={{ color: theme.textSoft, alignSelf: 'center' }}>{t('holidays.to')}</Text>
+                <TextInput
+                  value={endDate}
+                  onChangeText={(value) => {
+                    setEndDate(value);
+                    setError('');
+                  }}
+                  placeholder={t('editor.endPlaceholder')}
+                  placeholderTextColor={theme.textSoft}
+                  autoCapitalize="none"
+                  style={{
+                    flex: 1,
+                    ...heading(13, theme.text),
+                    backgroundColor: theme.card,
+                    borderRadius: theme.radiusSm,
+                    paddingHorizontal: 12,
+                    paddingVertical: 10,
+                    borderWidth: theme.borderWidth,
+                    borderColor: theme.border,
+                  }}
+                />
+              </Row>
+              <Row style={{ gap: 7, marginBottom: 6 }}>
+                <Pill label={t('editor.startToday')} onPress={() => setStartDate(todayISO())} />
+                <Pill label={t('editor.end7')} onPress={() => setEndDate(addDays(startDate, 7))} />
+                <Pill label={t('editor.end30')} onPress={() => setEndDate(addDays(startDate, 30))} />
+              </Row>
+            </>
+          )}
+          <Text style={{ fontSize: 9.5, color: theme.textSoft, marginBottom: 13 }}>
+            {t('editor.timeHint')}
+          </Text>
         </>
       ) : null}
 

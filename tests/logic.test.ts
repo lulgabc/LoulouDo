@@ -28,7 +28,7 @@ import { createInitialState } from '@/domain/seed';
 const TODAY = '2026-11-19'; // 周四
 
 const HOLIDAYS: HolidayRange[] = [
-  { id: 'h1', name: '秋假', start: '2026-11-14', end: '2026-11-30' },
+  { id: 'h1', name: '秋假', start: '2026-11-14', end: '2026-11-30', active: true },
 ];
 
 const settings: AppState['settings'] = {
@@ -135,10 +135,37 @@ describe('任务出现规则', () => {
     expect(taskAppliesOn(weekendTask, '2026-11-22', HOLIDAYS)).toBe(true);
   });
 
-  it('假期任务只在假期区间出现', () => {
-    expect(taskAppliesOn(holidayTask, '2026-11-13', HOLIDAYS)).toBe(false);
-    expect(taskAppliesOn(holidayTask, '2026-11-14', HOLIDAYS)).toBe(true);
-    expect(taskAppliesOn(holidayTask, '2026-12-01', HOLIDAYS)).toBe(false);
+  it('报表按假期的日期区间统计', () => {
+    expect(taskAppliesOn(holidayTask, '2026-11-13', HOLIDAYS, 'schedule')).toBe(false);
+    expect(taskAppliesOn(holidayTask, '2026-11-14', HOLIDAYS, 'schedule')).toBe(true);
+    expect(taskAppliesOn(holidayTask, '2026-12-01', HOLIDAYS, 'schedule')).toBe(false);
+  });
+
+  it('假期必须手动开启：开启时首页任何日期都显示，关闭时完全不显示', () => {
+    const off = HOLIDAYS.map((h) => ({ ...h, active: false }));
+    const on = HOLIDAYS.map((h) => ({ ...h, active: true }));
+    expect(taskAppliesOn(holidayTask, '2026-11-19', off)).toBe(false);
+    expect(taskAppliesOn(holidayTask, '2026-12-20', off)).toBe(false);
+    expect(taskAppliesOn(holidayTask, '2026-11-19', on)).toBe(true);
+    // 即使不在日期区间，只要假期模式开启，首页也显示
+    expect(taskAppliesOn(holidayTask, '2026-12-20', on)).toBe(true);
+    // 报表期望次数仍按日期区间统计，避免激活后历史全变成假期
+    expect(taskAppliesOn(holidayTask, '2026-12-20', on, 'schedule')).toBe(false);
+    expect(taskAppliesOn(holidayTask, '2026-11-19', on, 'schedule')).toBe(true);
+  });
+
+  it('挑战任务支持单日：开始和结束同一天时只在当天出现', () => {
+    const singleDay = makeTask({
+      id: 'once-day',
+      title: '单日挑战',
+      category: 'special',
+      kind: 'once',
+      startDate: '2026-11-20',
+      endDate: '2026-11-20',
+    });
+    expect(taskAppliesOn(singleDay, '2026-11-19', HOLIDAYS)).toBe(false);
+    expect(taskAppliesOn(singleDay, '2026-11-20', HOLIDAYS)).toBe(true);
+    expect(taskAppliesOn(singleDay, '2026-11-21', HOLIDAYS)).toBe(false);
   });
 
   it('单次挑战只在时间窗内出现，完成后不再出现', () => {

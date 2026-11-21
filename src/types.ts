@@ -84,6 +84,8 @@ export interface HolidayRange {
   nameKey?: string;
   start: string;
   end: string;
+  /** 手动开启的假期模式：开启后首页才显示假期任务 */
+  active?: boolean;
 }
 
 export interface Settings {

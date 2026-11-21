@@ -174,9 +174,11 @@ for (const viewport of VIEWPORTS) {
 
   await tab(page, '设置');
   await scrollToBottom(page);
-  await clickVisible(page.getByText('正在放「秋假」'));
+  await clickVisible(page.getByText('假期设置'));
   await page.waitForTimeout(700);
-  pages.holidays = await measure(page, viewport, 'holidays');
+  await page.locator('[role="switch"]').nth(1).click();
+  await page.waitForTimeout(500);
+  pages.holidays = await measure(page, viewport, 'holidays', { scroll: true });
   await clickVisible(page.getByText('✕'));
 
   const issues = [];

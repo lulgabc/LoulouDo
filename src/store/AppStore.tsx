@@ -41,6 +41,7 @@ type Action =
     }
   | { type: 'removeProfile'; id: string }
   | { type: 'addHoliday'; name: string; start: string; end: string }
+  | { type: 'setHolidayActive'; id: string; active: boolean }
   | { type: 'removeHoliday'; id: string }
   | { type: 'reset' };
 
@@ -269,8 +270,28 @@ function reducer(state: AppState, action: Action): AppState {
           ...state.settings,
           holidays: [
             ...state.settings.holidays,
-            { id: makeId('holiday'), name: action.name, start: action.start, end: action.end },
+            {
+              id: makeId('holiday'),
+              name: action.name,
+              start: action.start,
+              end: action.end,
+              active: false,
+            },
           ],
+        },
+      };
+
+    case 'setHolidayActive':
+      return {
+        ...state,
+        settings: {
+          ...state.settings,
+          // 同一时间只开启一段假期，切换时自动关闭其它假期
+          holidays: state.settings.holidays.map((h) =>
+            h.id === action.id
+              ? { ...h, active: action.active }
+              : { ...h, active: action.active ? false : h.active },
+          ),
         },
       };
 
@@ -322,6 +343,7 @@ interface StoreValue {
   ) => void;
   removeProfile: (id: string) => void;
   addHoliday: (name: string, start: string, end: string) => void;
+  setHolidayActive: (id: string, active: boolean) => void;
   removeHoliday: (id: string) => void;
   reset: () => void;
 }
@@ -406,6 +428,7 @@ function normalize(raw: unknown): AppState {
     : DEFAULT_HOLIDAYS
   ).map((holiday) => ({
     ...holiday,
+    active: holiday.active === true,
     nameKey: holiday.nameKey ?? legacyHolidayKeys[holiday.name],
   }));
   const entries = (Array.isArray(parsed.entries) ? parsed.entries : []).map((entry) => ({
@@ -533,6 +556,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       dispatch({ type: 'addHoliday', name, start, end }),
     [],
   );
+  const setHolidayActive = useCallback(
+    (id: string, active: boolean) => dispatch({ type: 'setHolidayActive', id, active }),
+    [],
+  );
   const removeHoliday = useCallback((id: string) => dispatch({ type: 'removeHoliday', id }), []);
   const reset = useCallback(() => dispatch({ type: 'reset' }), []);
 
@@ -558,6 +585,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     updateProfile,
     removeProfile,
     addHoliday,
+    setHolidayActive,
     removeHoliday,
     reset,
   };

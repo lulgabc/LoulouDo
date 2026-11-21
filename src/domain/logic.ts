@@ -19,15 +19,31 @@ import {
 } from '@/domain/date';
 
 export function holidayFor(date: string, holidays: HolidayRange[]): HolidayRange | null {
-  return holidays.find((h) => date >= h.start && date <= h.end) ?? null;
+  return holidays.find((h) => h.active && date >= h.start && date <= h.end) ?? null;
 }
 
+/** 是否处于手动开启的假期模式（首页是否显示假期任务以它为准）。 */
+export function holidayModeOn(holidays: HolidayRange[]): boolean {
+  return holidays.some((h) => h.active);
+}
+
+/** 当前开启的假期（用于设置页展示）。 */
+export function activeHoliday(holidays: HolidayRange[]): HolidayRange | null {
+  return holidays.find((h) => h.active) ?? null;
+}
+
+/** 指定日期是否落在已开启假期的日期范围内（报表期望次数使用）。 */
 export function isHoliday(date: string, holidays: HolidayRange[]): boolean {
   return holidayFor(date, holidays) !== null;
 }
 
 /** 任务在指定日期是否“应该出现”（不含完成状态）。 */
-export function taskAppliesOn(task: Task, date: string, holidays: HolidayRange[]): boolean {
+export function taskAppliesOn(
+  task: Task,
+  date: string,
+  holidays: HolidayRange[],
+  scope: 'display' | 'schedule' = 'display',
+): boolean {
   if (task.archived) return false;
   if (task.kind === 'once') {
     const start = task.startDate ?? task.createdAt;
@@ -40,7 +56,8 @@ export function taskAppliesOn(task: Task, date: string, holidays: HolidayRange[]
     case 'weekend':
       return isWeekend(date);
     case 'holiday':
-      return isHoliday(date, holidays);
+      // 首页只看「假期模式」开关；报表期望次数按日期范围统计，避免激活后历史全被算作假期
+      return scope === 'schedule' ? isHoliday(date, holidays) : holidayModeOn(holidays);
     case 'special':
       return false;
     default:
@@ -271,7 +288,7 @@ export function statsForRange(
     if (day > today) continue;
     for (const task of tasks) {
       if (task.kind !== 'fixed') continue;
-      if (!taskAppliesOn(task, day, settings.holidays)) continue;
+      if (!taskAppliesOn(task, day, settings.holidays, 'schedule')) continue;
       if (task.createdAt > day) continue;
       expectedChecks += 1;
     }
@@ -285,7 +302,7 @@ export function statsForRange(
         : tasks.filter(
             (task) =>
               task.kind === 'fixed' &&
-              taskAppliesOn(task, date, settings.holidays) &&
+              taskAppliesOn(task, date, settings.holidays, 'schedule') &&
               task.createdAt <= date,
           ).length;
     return {
@@ -349,7 +366,8 @@ export function fixedDayCompletion(
   holidays: HolidayRange[],
 ): { expected: number; done: number } {
   const expected = tasks.filter(
-    (t) => t.kind === 'fixed' && taskAppliesOn(t, date, holidays) && t.createdAt <= date,
+    (t) =>
+      t.kind === 'fixed' && taskAppliesOn(t, date, holidays, 'schedule') && t.createdAt <= date,
   );
   const done = expected.filter((t) => isTaskDoneOn(entries, t.id, date)).length;
   return { expected: expected.length, done };

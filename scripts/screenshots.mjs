@@ -124,8 +124,12 @@ await tab('今日');
 await shot('13-home-fantasy');
 
 await tab('设置');
-await click('正在放「秋假」', { wait: 800 });
+await click('假期设置', { wait: 800 });
+await page.locator('[role="switch"]').nth(1).click();
+await page.waitForTimeout(600);
 await shot('14-holidays', 600);
+await page.locator('[role="switch"]').nth(1).click();
+await page.waitForTimeout(300);
 await page.getByText('✕').first().click();
 await page.waitForTimeout(800);
 

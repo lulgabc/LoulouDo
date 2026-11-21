@@ -1,6 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { setAudioModeAsync, useAudioPlayer } from 'expo-audio';
 import { router } from 'expo-router';
 import { useApp } from '@/store/AppStore';
 import { useTheme, heading, numberStyle, shadowStyle } from '@/theme/themes';
@@ -34,6 +35,24 @@ export default function HomeScreen() {
   const [burst, setBurst] = useState(0);
   const today = todayISO();
   const holidays = state.settings.holidays;
+  const cheerPlayer = useAudioPlayer(require('../../assets/sounds/task-complete.wav'));
+
+  useEffect(() => {
+    setAudioModeAsync({ playsInSilentMode: true, interruptionMode: 'mixWithOthers' }).catch(
+      () => {},
+    );
+  }, []);
+
+  const playCheer = () => {
+    try {
+      cheerPlayer.seekTo(0).then(
+        () => cheerPlayer.play(),
+        () => cheerPlayer.play(),
+      );
+    } catch {
+      // 音频不可用时不影响打卡
+    }
+  };
 
   const progressFull = useMemo(
     () => dayProgress(tasks, entries, today, holidays),
@@ -74,6 +93,7 @@ export default function HomeScreen() {
     }
     toggleTask(task.id);
     tapFeedback(done ? 'light' : 'success');
+    if (!done) playCheer();
     if (!done && progressFull.pending.length === 1) setBurst((b) => b + 1);
   };
 
@@ -194,7 +214,28 @@ export default function HomeScreen() {
                   <Text style={{ opacity: 0.6 }}> / {progressFull.total}</Text>
                 </Text>
               </Row>
-              <ProgressBar value={percent} track={heroTrack} color={heroFill} height={12} />
+              <View style={{ paddingTop: 7 }}>
+                <ProgressBar value={percent} track={heroTrack} color={heroFill} height={12} />
+                <View
+                  pointerEvents="none"
+                  style={{
+                    position: 'absolute',
+                    left: `${Math.max(5, Math.min(95, percent * 100))}%`,
+                    top: -4,
+                    marginLeft: -11,
+                    width: 22,
+                    height: 22,
+                    borderRadius: 11,
+                    backgroundColor: theme.card,
+                    borderWidth: 1.5,
+                    borderColor: theme.coin,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Text style={{ fontSize: 13, color: theme.coin, marginTop: -1 }}>★</Text>
+                </View>
+              </View>
             </View>
           </LinearGradient>
         </View>
