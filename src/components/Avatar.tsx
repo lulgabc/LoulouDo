@@ -1,8 +1,10 @@
 import React from 'react';
 import { Image, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { useTheme } from '@/theme/themes';
+import { builtInAvatarId } from '@/domain/avatars';
+import { BuiltInAvatar } from '@/components/BuiltInAvatar';
 
-/** 圆形头像：优先显示自定义图片，否则回退到 Emoji。 */
+/** 圆形头像：自定义图片 > 内置插画头像 > 旧数据 Emoji 兜底。 */
 export function Avatar({
   uri,
   emoji,
@@ -49,6 +51,8 @@ export function Avatar({
           style={{ width: inner, height: inner, borderRadius: inner / 2 }}
           resizeMode="cover"
         />
+      ) : builtInAvatarId(emoji) ? (
+        <BuiltInAvatar id={builtInAvatarId(emoji)!} size={inner} />
       ) : (
         <Text style={[{ fontSize: size * 0.52 }, textColor ? { color: textColor } : null, textStyle]}>
           {emoji}

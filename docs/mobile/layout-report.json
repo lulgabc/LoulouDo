@@ -3,30 +3,40 @@
     "viewport": "iphone-15 393x852",
     "errors": [],
     "welcomeOverflow": [],
+    "welcomeAvatarOverflow": [],
+    "welcomeSkinOverflow": [],
     "issues": []
   },
   {
     "viewport": "iphone-se 375x667",
     "errors": [],
     "welcomeOverflow": [],
+    "welcomeAvatarOverflow": [],
+    "welcomeSkinOverflow": [],
     "issues": []
   },
   {
     "viewport": "android-small 360x740",
     "errors": [],
     "welcomeOverflow": [],
+    "welcomeAvatarOverflow": [],
+    "welcomeSkinOverflow": [],
     "issues": []
   },
   {
     "viewport": "tiny-320 320x568",
     "errors": [],
     "welcomeOverflow": [],
+    "welcomeAvatarOverflow": [],
+    "welcomeSkinOverflow": [],
     "issues": []
   },
   {
     "viewport": "ipad-768 768x1024",
     "errors": [],
     "welcomeOverflow": [],
+    "welcomeAvatarOverflow": [],
+    "welcomeSkinOverflow": [],
     "issues": []
   }
 ]

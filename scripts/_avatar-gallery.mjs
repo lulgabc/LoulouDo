@@ -1,0 +1,10 @@
+import { chromium } from 'playwright-core';
+const browser = await chromium.launch({ channel: 'chrome', headless: true });
+const page = await browser.newPage({ viewport: { width: 393, height: 852 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, locale: 'zh-CN' });
+const errors=[]; page.on('console',m=>m.type()==='error'&&errors.push(m.text())); page.on('pageerror',e=>errors.push(String(e)));
+await page.goto('http://localhost:4173/', { waitUntil: 'networkidle' });
+await page.getByText('GALLERY').click();
+await page.waitForTimeout(700);
+await page.screenshot({ path: '/tmp/avatar-gallery.jpg', type: 'jpeg', quality: 92, fullPage: true });
+console.log(JSON.stringify({ errors, url: page.url() }));
+await browser.close();

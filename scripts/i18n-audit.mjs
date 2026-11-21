@@ -10,13 +10,13 @@ const OUT = 'docs/i18n';
 fs.mkdirSync(OUT, { recursive: true });
 
 const LANG = {
-  zh: { name: '中文', home: '今日', tasks: '任务', report: '报表', wallet: '钱包', settings: '设置', start: true },
-  en: { name: 'English', home: 'Today', tasks: 'Tasks', report: 'Report', wallet: 'Wallet', settings: 'Settings' },
-  fr: { name: 'Français', home: 'Accueil', tasks: 'Tâches', report: 'Progrès', wallet: 'Argent', settings: 'Réglages' },
-  de: { name: 'Deutsch', home: 'Start', tasks: 'Plan', report: 'Bericht', wallet: 'Geld', settings: 'Mehr' },
-  it: { name: 'Italiano', home: 'Oggi', tasks: 'Attività', report: 'Report', wallet: 'Soldi', settings: 'Altro' },
-  es: { name: 'Español', home: 'Hoy', tasks: 'Tareas', report: 'Informe', wallet: 'Dinero', settings: 'Ajustes' },
-  pt: { name: 'Português', home: 'Hoje', tasks: 'Tarefas', report: 'Relatório', wallet: 'Carteira', settings: 'Ajustes' },
+  zh: { name: '中文', home: '今日', tasks: '任务', report: '报表', wallet: '钱包', settings: '设置', startSetup: '开始设置', next: '下一步', start: '开始我的打卡之旅' },
+  en: { name: 'English', home: 'Today', tasks: 'Tasks', report: 'Report', wallet: 'Wallet', settings: 'Settings', startSetup: 'Start setup', next: 'Next', start: 'Start my adventure' },
+  fr: { name: 'Français', home: 'Accueil', tasks: 'Tâches', report: 'Progrès', wallet: 'Argent', settings: 'Réglages', startSetup: 'Commencer', next: 'Suivant', start: 'Commencer l’aventure' },
+  de: { name: 'Deutsch', home: 'Start', tasks: 'Plan', report: 'Bericht', wallet: 'Geld', settings: 'Mehr', startSetup: 'Einrichtung starten', next: 'Weiter', start: 'Abenteuer starten' },
+  it: { name: 'Italiano', home: 'Oggi', tasks: 'Attività', report: 'Report', wallet: 'Soldi', settings: 'Altro', startSetup: 'Inizia', next: 'Avanti', start: 'Inizia l’avventura' },
+  es: { name: 'Español', home: 'Hoy', tasks: 'Tareas', report: 'Informe', wallet: 'Dinero', settings: 'Ajustes', startSetup: 'Empezar', next: 'Siguiente', start: 'Empezar la aventura' },
+  pt: { name: 'Português', home: 'Hoje', tasks: 'Tarefas', report: 'Relatório', wallet: 'Carteira', settings: 'Ajustes', startSetup: 'Começar', next: 'Próximo', start: 'Começar a aventura' },
 };
 
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
@@ -82,7 +82,7 @@ for (const width of [393, 320]) {
     page.on('pageerror', (e) => errors.push(String(e)));
 
     await page.goto(BASE, { waitUntil: 'networkidle' });
-    await page.getByText('开始我的打卡之旅').waitFor({ timeout: 20000 });
+    await page.getByText('开始设置').waitFor({ timeout: 20000 });
 
     // 直接点语言胶囊（带 aria-label），不用依赖当前语言
     if (locale !== 'zh') {
@@ -93,8 +93,11 @@ for (const width of [393, 320]) {
     const welcomeM = await measure(page);
     if (width === 393) await save(page, `${locale}-01-welcome`);
 
-    // 最后一个带 role 的按钮就是开始按钮（语言胶囊在前）
-    await page.locator('button[role="button"]').last().click();
+    await page.getByText(meta.startSetup, { exact: true }).first().click();
+    await page.waitForTimeout(400);
+    await page.getByText(meta.next, { exact: true }).first().click();
+    await page.waitForTimeout(400);
+    await page.getByText(meta.start, { exact: true }).first().click();
     await page.waitForTimeout(1200);
     await page.getByText(meta.home, { exact: true }).first().waitFor();
 
@@ -153,10 +156,14 @@ for (const width of [393, 320]) {
   });
   const page = await context.newPage();
   await page.goto(BASE, { waitUntil: 'networkidle' });
-  await page.getByText('开始我的打卡之旅').waitFor();
+  await page.getByText('开始设置').waitFor();
   await page.locator('[aria-label="Deutsch"]').first().click();
   await page.waitForTimeout(300);
-  await page.locator('button[role="button"]').last().click();
+  await page.getByText('Einrichtung starten', { exact: true }).first().click();
+  await page.waitForTimeout(400);
+  await page.getByText('Weiter', { exact: true }).first().click();
+  await page.waitForTimeout(400);
+  await page.getByText('Abenteuer starten', { exact: true }).first().click();
   await page.waitForTimeout(1200);
   const before = await page.locator('body').innerText();
   await page.locator('[aria-label="Mehr"]').first().click();

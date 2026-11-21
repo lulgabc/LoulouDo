@@ -121,11 +121,17 @@ for (const viewport of VIEWPORTS) {
   page.on('pageerror', (e) => errors.push(String(e)));
 
   await page.goto(BASE, { waitUntil: 'networkidle' });
-  await page.getByText('开始我的打卡之旅').waitFor({ timeout: 20000 });
+  await page.getByText('开始设置').waitFor({ timeout: 20000 });
   const welcome = await measure(page, viewport, 'welcome');
 
+  await page.getByText('开始设置').click();
+  await page.waitForTimeout(400);
+  const welcomeAvatar = await measure(page, viewport, 'welcome-avatar');
   await page.locator('input[placeholder*="昵称"]').fill('朵朵');
-  await page.getByRole('button', { name: '开始我的打卡之旅' }).click();
+  await page.getByText('下一步').click();
+  await page.waitForTimeout(400);
+  const welcomeSkin = await measure(page, viewport, 'welcome-skin');
+  await page.getByText('开始我的打卡之旅').click();
   await page.waitForTimeout(1200);
 
   const pages = {};
@@ -205,6 +211,8 @@ for (const viewport of VIEWPORTS) {
     viewport: `${viewport.name} ${viewport.width}x${viewport.height}`,
     errors,
     welcomeOverflow: welcome.textOverflow,
+    welcomeAvatarOverflow: welcomeAvatar.textOverflow,
+    welcomeSkinOverflow: welcomeSkin.textOverflow,
     issues,
   });
   await context.close();

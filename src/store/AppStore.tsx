@@ -11,6 +11,7 @@ import React, {
 } from 'react';
 import { AppState, Category, LedgerEntry, Profile, Task, TaskDraft, ThemeId } from '@/types';
 import { createInitialState, DEFAULT_HOLIDAYS } from '@/domain/seed';
+import { normalizeAvatar } from '@/domain/avatars';
 import { CATEGORIES, ONBOARDING_BONUS, STORAGE_KEY } from '@/domain/constants';
 import { balanceOf, computeAllClearBonus, coinsToMoney, isTaskCompleted, taskCoinValue } from '@/domain/logic';
 import { todayISO } from '@/domain/date';

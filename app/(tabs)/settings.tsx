@@ -6,12 +6,13 @@ import { useApp } from '@/store/AppStore';
 import { useTheme, heading } from '@/theme/themes';
 import { CATEGORIES } from '@/domain/constants';
 import type { ThemeId } from '@/types';
-import { AVATARS } from '@/domain/constants';
+import { DEFAULT_AVATAR } from '@/domain/avatars';
 import { Btn, IconBtn, Label, Pill, Row, Screen, Stepper } from '@/components/ui';
 import { BentoPanel } from '@/components/BentoPanel';
 import { SkinPicker } from '@/components/SkinPicker';
 import { LanguageMenu } from '@/components/LanguageMenu';
 import { Avatar } from '@/components/Avatar';
+import { AvatarPicker } from '@/components/AvatarPicker';
 import { useI18n } from '@/i18n';
 
 export default function SettingsScreen() {
@@ -53,7 +54,7 @@ export default function SettingsScreen() {
 
   const startAdd = () => {
     setName(t('welcome.defaultName'));
-    setAvatar('🐰');
+    setAvatar(DEFAULT_AVATAR);
     setConfirmRemoveProfile(false);
     setMode('add');
   };
@@ -75,31 +76,18 @@ export default function SettingsScreen() {
   };
 
   const avatarRow = (
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
-      {AVATARS.map((a) => (
-        <Pressable
-          key={a}
-          onPress={() => {
-            setAvatar(a);
-            if (activeProfile.avatarUri) {
-              updateProfile(activeProfile.id, { avatarUri: undefined });
-            }
-          }}
-          style={{
-            width: 38,
-            height: 38,
-            borderRadius: 12,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: avatar === a ? theme.chip : 'transparent',
-            borderWidth: avatar === a ? 2 : 0,
-            borderColor: theme.primary,
-          }}
-        >
-          <Text style={{ fontSize: 21 }}>{a}</Text>
-        </Pressable>
-      ))}
-    </View>
+    <AvatarPicker
+      value={avatar}
+      uri={mode === 'edit' ? activeProfile.avatarUri : undefined}
+      size={44}
+      onSelect={(value) => {
+        setAvatar(value);
+        if (mode === 'edit' && activeProfile.avatarUri) {
+          updateProfile(activeProfile.id, { avatarUri: undefined });
+        }
+      }}
+      onCustom={mode === 'edit' ? () => router.push('/avatar') : undefined}
+    />
   );
 
   const input = (value: string, onChange: (v: string) => void, placeholder: string) => (
@@ -247,36 +235,6 @@ export default function SettingsScreen() {
                 </Pressable>
               </Row>
               {input(name, setName, t('settings.name'))}
-              <Pressable
-                onPress={() => router.push('/avatar')}
-                accessibilityRole="button"
-                accessibilityLabel={t('avatar.custom')}
-                style={({ pressed }) => ({
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 10,
-                  paddingVertical: 4,
-                  opacity: pressed ? 0.7 : 1,
-                })}
-              >
-                <Avatar
-                  uri={activeProfile.avatarUri}
-                  emoji={avatar}
-                  size={42}
-                  bg={theme.chip}
-                  borderWidth={1}
-                  borderColor={theme.border}
-                />
-                <View>
-                  <Text style={{ ...heading(12.5, theme.text) }}>{t('avatar.change')}</Text>
-                  <Text style={{ fontSize: 9.5, color: theme.textSoft, marginTop: 1 }}>
-                    {t('avatar.custom')}
-                  </Text>
-                </View>
-                <View style={{ flex: 1 }} />
-                <Text style={{ fontSize: 14, color: theme.textSoft }}>›</Text>
-              </Pressable>
-              <View style={{ height: 1, backgroundColor: theme.border, marginVertical: 10 }} />
               {avatarRow}
               {mode === 'edit' ? (
                 <View style={{ marginTop: 12 }}>

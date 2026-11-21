@@ -6,19 +6,19 @@ const BASE = 'http://localhost:4173';
 const OUT = 'docs/i18n';
 const LANGS = {
   en: {
-    name: 'English', settings: 'Settings', wallet: 'Wallet', tasks: 'Tasks', today: 'Today', quickAdd: 'Add special task',
+    name: 'English', settings: 'Settings', wallet: 'Wallet', tasks: 'Tasks', today: 'Today', quickAdd: 'Add special task', startSetup: 'Start setup', next: 'Next', start: 'Start my adventure',
     redeem: 'Redeem pocket money', add: 'Add', addTask: 'Add a new task', holiday: 'Holiday settings',
   },
   de: {
-    name: 'Deutsch', settings: 'Mehr', wallet: 'Geld', tasks: 'Plan', today: 'Start', quickAdd: 'Spezialaufgabe hinzufügen',
+    name: 'Deutsch', settings: 'Mehr', wallet: 'Geld', tasks: 'Plan', today: 'Start', quickAdd: 'Spezialaufgabe hinzufügen', startSetup: 'Einrichtung starten', next: 'Weiter', start: 'Abenteuer starten',
     redeem: 'Taschengeld abholen', add: 'Hinzufügen', addTask: 'Neue Aufgabe hinzufügen', holiday: 'Ferien-Einstellungen',
   },
   fr: {
-    name: 'Français', settings: 'Réglages', wallet: 'Argent', tasks: 'Tâches', today: 'Accueil', quickAdd: 'Ajouter une tâche spéciale',
+    name: 'Français', settings: 'Réglages', wallet: 'Argent', tasks: 'Tâches', today: 'Accueil', quickAdd: 'Ajouter une tâche spéciale', startSetup: 'Commencer', next: 'Suivant', start: 'Commencer l’aventure',
     redeem: 'Retirer de l’argent de poche', add: 'Ajouter', addTask: 'Ajouter une nouvelle tâche', holiday: 'Réglages des vacances',
   },
   pt: {
-    name: 'Português', settings: 'Ajustes', wallet: 'Carteira', tasks: 'Tarefas', today: 'Hoje', quickAdd: 'Adicionar tarefa especial',
+    name: 'Português', settings: 'Ajustes', wallet: 'Carteira', tasks: 'Tarefas', today: 'Hoje', quickAdd: 'Adicionar tarefa especial', startSetup: 'Começar', next: 'Próximo', start: 'Começar a aventura',
     redeem: 'Resgatar mesada', add: 'Adicionar', addTask: 'Adicionar uma nova tarefa', holiday: 'Configurações de férias',
   },
 };
@@ -84,10 +84,14 @@ for (const [locale, meta] of Object.entries(LANGS)) {
   page.on('pageerror', (e) => errors.push(String(e)));
 
   await page.goto(BASE, { waitUntil: 'networkidle' });
-  await page.getByText('开始我的打卡之旅').waitFor();
+  await page.getByText('开始设置').waitFor();
   await page.locator(`[aria-label="${meta.name}"]`).first().click();
   await page.waitForTimeout(400);
-  await page.locator('button[role="button"]').last().click();
+  await page.getByText(meta.startSetup, { exact: true }).first().click();
+  await page.waitForTimeout(400);
+  await page.getByText(meta.next, { exact: true }).first().click();
+  await page.waitForTimeout(400);
+  await page.getByText(meta.start, { exact: true }).first().click();
   await page.waitForTimeout(1200);
 
   // 兑换

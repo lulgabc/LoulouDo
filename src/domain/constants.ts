@@ -54,16 +54,11 @@ export const CATEGORY_MAP: Record<Category, CategoryMeta> = Object.fromEntries(
   CATEGORIES.map((c) => [c.id, c]),
 ) as Record<Category, CategoryMeta>;
 
-export const AVATARS = ['🦌', '🐰', '🐼', '🦊', '🐯', '🐸', '🦄', '🐨', '🐙', '🐳', '🦖', '🐝'];
-export const PROFILE_COLORS = ['#FF6FA5', '#FFB020', '#5BC8AF', '#7C6CFF', '#FF7A59', '#38B6FF'];
-
 export const TASK_EMOJIS = [
   '🪥', '🛏️', '📚', '✏️', '🎹', '🎨', '🏃', '🚴', '🏊', '🧹', '🧸', '🍎',
   '🥕', '💧', '🧦', '🎒', '🌱', '🐶', '🧩', '🎯', '🧘', '🍽️', '🪴', '🪄',
   '🦷', '🧼', '📖', '🗣️', '🎻', '⚽', '🏀', '🤸', '🚀', '🌟', '🏆', '🎁',
 ];
-
-export const STICKER_EMOJIS = ['🍓', '🍭', '🌈', '⭐', '🍬', '🎈', '🌻', '🧁', '🍉', '☁️', '🫧', '🦋'];
 
 export const THEME_IDS: ThemeId[] = ['candy', 'forest', 'fantasy', 'cute'];
 

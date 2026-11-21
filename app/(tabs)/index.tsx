@@ -117,16 +117,14 @@ export default function HomeScreen() {
               opacity: pressed ? 0.75 : 1,
             })}
           >
-            {activeProfile.avatarUri ? (
-              <Avatar
-                uri={activeProfile.avatarUri}
-                emoji={activeProfile.avatar}
-                size={42}
-                bg={theme.primary}
-                borderWidth={theme.borderWidth}
-                borderColor={theme.border}
-              />
-            ) : null}
+            <Avatar
+              uri={activeProfile.avatarUri}
+              emoji={activeProfile.avatar}
+              size={42}
+              bg={theme.primary}
+              borderWidth={theme.borderWidth}
+              borderColor={theme.border}
+            />
             <View style={{ flex: 1, minWidth: 0 }}>
               <Text style={heading(21, theme.text)} numberOfLines={2}>
                 {t(greetingKey())}，{activeProfile.name}

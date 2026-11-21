@@ -49,11 +49,18 @@ const tab = async (name, wait = 1300) => {
 };
 
 await page.goto(BASE, { waitUntil: 'networkidle' });
-await page.getByText('开始我的打卡之旅').waitFor({ timeout: 20000 });
+await page.getByText('开始设置').waitFor({ timeout: 20000 });
 await shot('01-welcome-candy');
 
+await page.getByText('开始设置').click();
+await page.waitForTimeout(400);
 await page.locator('input[placeholder*="昵称"]').fill('朵朵');
-await page.getByText('🦄', { exact: true }).first().click();
+await page.locator('[aria-label="小鹿"]').click();
+await page.waitForTimeout(300);
+await shot('01b-welcome-avatar', 200);
+
+await page.getByText('下一步').click();
+await page.waitForTimeout(400);
 await click('森林贴纸');
 await shot('02-welcome-forest');
 

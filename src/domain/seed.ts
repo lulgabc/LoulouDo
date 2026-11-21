@@ -1,6 +1,7 @@
 import type { AppState, Category, HolidayRange, Task } from '@/types';
 import { CATEGORIES } from '@/domain/constants';
 import { DEFAULT_LOCALE, type Locale } from '@/i18n/locales';
+import { DEFAULT_AVATAR } from '@/domain/avatars';
 
 const CREATED = '2026-01-01';
 
@@ -78,7 +79,7 @@ export function createInitialState(locale: Locale = DEFAULT_LOCALE): AppState {
       {
         id: 'kid-1',
         name: '小鹿',
-        avatar: '🦌',
+        avatar: DEFAULT_AVATAR,
         wish: { title: '乐高小城堡', titleKey: 'seed.wish.castle', target: 199 },
       },
     ],
