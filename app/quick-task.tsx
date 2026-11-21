@@ -31,7 +31,7 @@ export default function QuickTaskScreen() {
     }
     saveTask({
       title,
-      emoji: '🎯',
+      emoji: 'rocket',
       category: 'special',
       kind: 'once',
       coins,

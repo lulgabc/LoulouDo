@@ -6,6 +6,7 @@ import { BentoPanel } from '@/components/BentoPanel';
 import { colorForCategory } from '@/theme/categoryColors';
 import { DotFill } from '@/components/DotFill';
 import { Coin } from '@/components/Coin';
+import { TaskIconOrEmoji } from '@/components/TaskIcon';
 import { useTheme, heading, numberStyle } from '@/theme/themes';
 import { useI18n } from '@/i18n';
 
@@ -158,7 +159,7 @@ function BentoTaskTile({
             flexShrink: 0,
           }}
         >
-          <Text style={{ fontSize: 17 }}>{task.emoji}</Text>
+          <TaskIconOrEmoji value={task.emoji} size={20} />
         </View>
         <View style={{ flex: 1, minWidth: 0 }}>
           <Text
@@ -237,7 +238,7 @@ function BentoTaskRow({
             flexShrink: 0,
           }}
         >
-          <Text style={{ fontSize: 14 }}>{task.emoji}</Text>
+          <TaskIconOrEmoji value={task.emoji} size={16} />
         </View>
         <Text
           style={{
@@ -321,7 +322,7 @@ function ChallengeTicket({
             flexShrink: 0,
           }}
         >
-          <Text style={{ fontSize: 16 }}>{task.emoji}</Text>
+          <TaskIconOrEmoji value={task.emoji} size={18} />
         </View>
 
         <View style={{ flex: 1, minWidth: 0, justifyContent: 'center' }}>

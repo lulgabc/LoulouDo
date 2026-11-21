@@ -12,6 +12,7 @@ import { BentoPanel } from '@/components/BentoPanel';
 import { Ring } from '@/components/charts';
 import { Coin } from '@/components/Coin';
 import { Avatar } from '@/components/Avatar';
+import { TaskIconOrEmoji } from '@/components/TaskIcon';
 import { useI18n } from '@/i18n';
 
 export default function WalletScreen() {
@@ -243,13 +244,11 @@ export default function WalletScreen() {
                     />
                   ) : null}
                   <Row style={{ paddingHorizontal: 16, paddingVertical: 10, gap: 10 }}>
-                    <Text style={{ fontSize: 20 }}>
-                      {entry.type === 'redeem'
-                        ? '💰'
-                        : entry.type === 'bonus'
-                          ? (entry.emoji ?? '🎁')
-                          : (entry.emoji ?? '⭐')}
-                    </Text>
+                    {entry.type === 'redeem' ? (
+                      <Text style={{ fontSize: 20 }}>💰</Text>
+                    ) : (
+                      <TaskIconOrEmoji value={entry.emoji ?? '⭐'} size={21} />
+                    )}
                     <View style={{ flex: 1, minWidth: 0 }}>
                       <Text style={{ ...heading(12, theme.text) }} numberOfLines={1}>
                         {entry.type === 'redeem'

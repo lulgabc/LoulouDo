@@ -12,6 +12,7 @@ import React, {
 import { AppState, Category, LedgerEntry, Profile, Task, TaskDraft, ThemeId } from '@/types';
 import { createInitialState, DEFAULT_HOLIDAYS } from '@/domain/seed';
 import { normalizeAvatar } from '@/domain/avatars';
+import { normalizeTaskIcon } from '@/domain/taskIcons';
 import { CATEGORIES, ONBOARDING_BONUS, STORAGE_KEY } from '@/domain/constants';
 import { balanceOf, computeAllClearBonus, coinsToMoney, isTaskCompleted, taskCoinValue } from '@/domain/logic';
 import { todayISO } from '@/domain/date';
@@ -411,6 +412,7 @@ function normalize(raw: unknown): AppState {
 
   const tasks = (Array.isArray(parsed.tasks) ? parsed.tasks : base.tasks).map((task) => ({
     ...task,
+    emoji: normalizeTaskIcon(task.emoji),
     titleKey: task.titleKey ?? legacyTaskKeys[task.title],
   }));
   const taskKeyById = new Map(tasks.map((task) => [task.id, task.titleKey]));
@@ -434,6 +436,7 @@ function normalize(raw: unknown): AppState {
   }));
   const entries = (Array.isArray(parsed.entries) ? parsed.entries : []).map((entry) => ({
     ...entry,
+    emoji: entry.emoji ? normalizeTaskIcon(entry.emoji) : entry.emoji,
     taskKey: entry.taskKey ?? taskKeyById.get(entry.taskId ?? ''),
     labelKey: entry.labelKey ?? legacyLabelKeys[entry.label ?? ''],
   }));

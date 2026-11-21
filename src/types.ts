@@ -16,6 +16,7 @@ export interface Task {
   title: string;
   /** 示例任务的翻译 key；用户编辑后清空，显示用户自己写的标题 */
   titleKey?: string;
+  /** 内置任务图标 ID（例如 toothbrush）；旧数据可能仍保存 Emoji */
   emoji: string;
   category: Category;
   /** fixed: 按类别重复；once: 在 startDate~endDate 内可完成一次 */
@@ -66,6 +67,7 @@ export interface LedgerEntry {
   taskId?: string;
   taskTitle?: string;
   taskKey?: string;
+  /** 内置任务图标 ID 或旧 Emoji */
   emoji?: string;
   category?: Category;
   taskKind?: TaskKind;
@@ -112,6 +114,7 @@ export interface TaskDraft {
   title: string;
   /** 示例任务的翻译 key；用户编辑后清空，显示用户自己写的标题 */
   titleKey?: string;
+  /** 内置任务图标 ID，例如 toothbrush */
   emoji: string;
   category: Category;
   kind: TaskKind;

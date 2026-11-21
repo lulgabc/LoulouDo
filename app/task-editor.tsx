@@ -4,11 +4,13 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useApp } from '@/store/AppStore';
 import { useTheme, heading, numberStyle } from '@/theme/themes';
 import { addDays, isISODate, todayISO } from '@/domain/date';
-import { CATEGORIES, CATEGORY_MAP, TASK_EMOJIS } from '@/domain/constants';
+import { CATEGORIES, CATEGORY_MAP } from '@/domain/constants';
+import { TASK_ICON_IDS, DEFAULT_TASK_ICON } from '@/domain/taskIcons';
 import type { Category, TaskKind } from '@/types';
 import { Btn, Card, IconBtn, Label, Pill, Row, Screen, Stepper } from '@/components/ui';
 import { tapFeedback } from '@/utils/feedback';
 import { Coin, CoinValue } from '@/components/Coin';
+import { TaskIcon, TaskIconOrEmoji } from '@/components/TaskIcon';
 import { useI18n } from '@/i18n';
 
 type OnceMode = 'day' | 'range';
@@ -29,7 +31,7 @@ export default function TaskEditorScreen() {
   const [title, setTitle] = useState(
     editing ? (editing.titleKey ? t(editing.titleKey) : editing.title) : '',
   );
-  const [emoji, setEmoji] = useState(editing?.emoji ?? '🌟');
+  const [emoji, setEmoji] = useState(editing?.emoji ?? DEFAULT_TASK_ICON);
   const [category, setCategory] = useState<Category>(initialCategory);
   const [kind, setKind] = useState<TaskKind>(editing?.kind ?? 'fixed');
   const [customCoins, setCustomCoins] = useState<number | null>(editing?.coins ?? null);
@@ -153,7 +155,7 @@ export default function TaskEditorScreen() {
               justifyContent: 'center',
             }}
           >
-            <Text style={{ fontSize: 28 }}>{emoji}</Text>
+            <TaskIconOrEmoji value={emoji} size={30} />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={heading(16, title ? theme.text : theme.textSoft)} numberOfLines={1}>
@@ -202,25 +204,25 @@ export default function TaskEditorScreen() {
             rowGap: 7,
           }}
         >
-          {TASK_EMOJIS.map((e) => (
+          {TASK_ICON_IDS.map((id, index) => (
             <Pressable
-              key={e}
-              onPress={() => setEmoji(e)}
+              key={id}
+              onPress={() => setEmoji(id)}
               accessibilityRole="button"
-              accessibilityState={{ selected: emoji === e }}
-              accessibilityLabel={e}
+              accessibilityState={{ selected: emoji === id }}
+              accessibilityLabel={t('editor.iconOption', { n: index + 1 })}
               style={{
                 width: '12%',
                 aspectRatio: 1,
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: 12,
-                backgroundColor: emoji === e ? theme.chip : 'transparent',
-                borderWidth: emoji === e ? 2 : 0,
+                backgroundColor: emoji === id ? theme.chip : 'transparent',
+                borderWidth: emoji === id ? 2 : 0,
                 borderColor: theme.primary,
               }}
             >
-              <Text style={{ fontSize: 20 }}>{e}</Text>
+              <TaskIcon id={id} size={24} />
             </Pressable>
           ))}
         </View>

@@ -11,6 +11,7 @@ import { Empty, Row, Screen, Segmented } from '@/components/ui';
 import { BentoPanel } from '@/components/BentoPanel';
 import { CoinBars, Donut, Ring } from '@/components/charts';
 import { Coin } from '@/components/Coin';
+import { TaskIconOrEmoji } from '@/components/TaskIcon';
 import { useI18n } from '@/i18n';
 
 type Mode = 'week' | 'month' | 'all';
@@ -79,7 +80,7 @@ export default function ReportScreen() {
     emoji: string,
     value: string,
     text: string,
-    sub?: string,
+    sub?: React.ReactNode,
     topBorder = false,
     smallValue = false,
   ) => (
@@ -102,7 +103,13 @@ export default function ReportScreen() {
       >
         {value}
       </Text>
-      {sub ? <Text style={{ fontSize: 9.5, color: theme.textSoft }}>{sub}</Text> : null}
+      {sub ? (
+        typeof sub === 'string' ? (
+          <Text style={{ fontSize: 9.5, color: theme.textSoft }}>{sub}</Text>
+        ) : (
+          sub
+        )
+      ) : null}
     </View>
   );
 
@@ -284,9 +291,14 @@ export default function ReportScreen() {
                   : stats.topTask.title
                 : t('report.none'),
               t('report.mostDone'),
-              stats.topTask
-                ? `${stats.topTask.emoji} ${t('report.times', { n: stats.topTask.count })}`
-                : undefined,
+              stats.topTask ? (
+                <Row style={{ gap: 3, alignItems: 'center', marginTop: 1 }}>
+                  <TaskIconOrEmoji value={stats.topTask.emoji} size={12} />
+                  <Text style={{ fontSize: 9.5, color: theme.textSoft }}>
+                    {t('report.times', { n: stats.topTask.count })}
+                  </Text>
+                </Row>
+              ) : undefined,
               true,
               true,
             )}

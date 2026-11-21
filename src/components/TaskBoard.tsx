@@ -4,6 +4,7 @@ import type { Category, Task } from '@/types';
 import { CATEGORY_MAP } from '@/domain/constants';
 import { BentoPanel } from '@/components/BentoPanel';
 import { Coin } from '@/components/Coin';
+import { TaskIconOrEmoji } from '@/components/TaskIcon';
 import { colorForCategory } from '@/theme/categoryColors';
 import { heading, numberStyle, useTheme } from '@/theme/themes';
 import { useI18n } from '@/i18n';
@@ -124,7 +125,7 @@ export function TaskBoard({
                           flexShrink: 0,
                         }}
                       >
-                        <Text style={{ fontSize: 18 }}>{task.emoji}</Text>
+                        <TaskIconOrEmoji value={task.emoji} size={20} />
                       </View>
                       <View style={{ flex: 1, minWidth: 0 }}>
                         <Text style={heading(12.5, theme.text)} numberOfLines={2}>
