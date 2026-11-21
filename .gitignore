@@ -42,3 +42,6 @@ yarn-error.*
 
 # GitHub Pages build output
 dist-pages/
+
+# local audit helpers
+scripts/_*.mjs
