@@ -31,7 +31,7 @@ export function TaskBoard({
   doneIds: Set<string>;
   coinsFor: (task: Task) => number;
   noteFor?: (task: Task) => string | undefined;
-  onToggle: (task: Task, done: boolean) => void;
+  onToggle?: (task: Task, done: boolean) => void;
   onEdit?: (task: Task) => void;
   onAdd?: () => void;
   addLabel?: string;
@@ -121,7 +121,8 @@ export function TaskBoard({
               </Text>
             ) : (
               group.tasks.map((task, index) => {
-                const done = doneIds.has(task.id);
+                // 管理页不承载打卡：所有任务一律按未完成展示
+                const done = completionEnabled && doneIds.has(task.id);
                 return (
                   <View key={task.id}>
                     {index > 0 ? (
@@ -139,7 +140,9 @@ export function TaskBoard({
                       done={done}
                       coins={coinsFor(task)}
                       note={noteFor?.(task)}
-                      onToggle={completionEnabled ? () => onToggle(task, done) : undefined}
+                      onToggle={
+                        completionEnabled && onToggle ? () => onToggle(task, done) : undefined
+                      }
                       onEdit={onEdit ? () => onEdit(task) : undefined}
                     />
                   </View>
