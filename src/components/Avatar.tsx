@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, Text, View, ViewStyle } from 'react-native';
+import { Image, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { useTheme } from '@/theme/themes';
 
 /** 圆形头像：优先显示自定义图片，否则回退到 Emoji。 */
@@ -10,6 +10,8 @@ export function Avatar({
   bg,
   borderColor,
   borderWidth = 0,
+  textColor,
+  textStyle,
   style,
 }: {
   uri?: string;
@@ -18,6 +20,8 @@ export function Avatar({
   bg?: string;
   borderColor?: string;
   borderWidth?: number;
+  textColor?: string;
+  textStyle?: TextStyle;
   style?: ViewStyle;
 }) {
   const theme = useTheme();
@@ -46,7 +50,9 @@ export function Avatar({
           resizeMode="cover"
         />
       ) : (
-        <Text style={{ fontSize: size * 0.52 }}>{emoji}</Text>
+        <Text style={[{ fontSize: size * 0.52 }, textColor ? { color: textColor } : null, textStyle]}>
+          {emoji}
+        </Text>
       )}
     </View>
   );

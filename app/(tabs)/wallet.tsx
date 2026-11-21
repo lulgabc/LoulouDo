@@ -54,6 +54,9 @@ export default function WalletScreen() {
 
   const wishPct = activeProfile.wish.target > 0 ? value / activeProfile.wish.target : 0;
   const heroInk = theme.dark ? '#F7F3FF' : theme.text;
+  // 还没设置自定义头像、且仍是默认小鹿时，用名字首字作为头像，避免钱包页又出现鹿
+  const usesDefaultAvatar = !activeProfile.avatarUri && activeProfile.avatar === '🦌';
+  const avatarInitial = (Array.from(activeProfile.name.trim())[0] ?? '?').toUpperCase();
 
   return (
     <Screen>
@@ -103,8 +106,10 @@ export default function WalletScreen() {
             </View>
             <Avatar
               uri={activeProfile.avatarUri}
-              emoji={activeProfile.avatar}
+              emoji={usesDefaultAvatar ? avatarInitial : activeProfile.avatar}
               size={78}
+              textColor={usesDefaultAvatar ? theme.primary : undefined}
+              textStyle={usesDefaultAvatar ? heading(36, theme.primary) : undefined}
               bg={theme.dark ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.62)'}
               borderWidth={2}
               borderColor={theme.card}
