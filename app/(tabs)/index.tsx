@@ -15,23 +15,18 @@ import {
 } from '@/domain/logic';
 import { CATEGORIES } from '@/domain/constants';
 import type { Category, Task } from '@/types';
-import { Card, Empty, ProgressBar, Row, Screen, SectionTitle, Segmented } from '@/components/ui';
-import { colorForCategory } from '@/components/TaskCard';
-import { TaskBoard } from '@/components/TaskBoard';
+import { Card, Empty, ProgressBar, Row, Screen, SectionTitle } from '@/components/ui';
+import { BentoBoard } from '@/components/BentoBoard';
 import { Confetti } from '@/components/Confetti';
 import { Avatar } from '@/components/Avatar';
 import { Coin } from '@/components/Coin';
 import { greetingKey, useI18n } from '@/i18n';
 import { tapFeedback } from '@/utils/feedback';
 
-type Filter = 'all' | Category;
-
-
 export default function HomeScreen() {
   const theme = useTheme();
   const { t, formatDate } = useI18n();
   const { activeProfile, tasks, entries, balance, toggleTask, state } = useApp();
-  const [filter, setFilter] = useState<Filter>('all');
   const [burst, setBurst] = useState(0);
   const today = todayISO();
   const holidays = state.settings.holidays;
@@ -63,21 +58,17 @@ export default function HomeScreen() {
     [tasks, entries, today, holidays],
   );
   const doneTasks = useMemo(() => tasksDoneOn(tasks, entries, today), [tasks, entries, today]);
-  const pending = useMemo(
-    () => todayTasks.filter((t) => !doneTasks.some((d) => d.id === t.id)),
-    [todayTasks, doneTasks],
+  const doneIds = useMemo(() => new Set(doneTasks.map((task) => task.id)), [doneTasks]);
+  const groups = useMemo(
+    () =>
+      CATEGORIES.map((cat) => ({
+        category: cat.id,
+        tasks: todayTasks.filter((task) => task.category === cat.id),
+      })),
+    [todayTasks],
   );
-
-  const visibleTasks =
-    filter === 'all' ? todayTasks : todayTasks.filter((t) => t.category === filter);
-  const visibleDone = visibleTasks.filter((t) => doneTasks.some((d) => d.id === t.id));
-  const groups = CATEGORIES.map((cat) => ({
-    category: cat.id,
-    tasks: visibleTasks.filter((task) => task.category === cat.id),
-  })).filter((group) => group.tasks.length > 0);
-  const doneIds = new Set(
-    visibleTasks.filter((task) => doneTasks.some((d) => d.id === task.id)).map((t) => t.id),
-  );
+  const holidayActive = holidays.some((holiday) => holiday.active);
+  const hasHolidayTasks = tasks.some((task) => task.category === 'holiday' && !task.archived);
 
   const complete = progressFull.allClear;
   const streak = useMemo(() => currentStreak(entries, today), [entries, today]);
@@ -242,39 +233,30 @@ export default function HomeScreen() {
 
         <SectionTitle
           emoji="🌈"
-          title={filter === 'all' ? t('home.todayTasks') : t(`category.${filter}.name`)}
+          title={t('home.todayTasks')}
           right={
             <Text style={{ fontSize: 11, color: theme.textSoft }}>
               {t('home.completedOf', {
-                done: visibleDone.length,
-                total: visibleTasks.length,
+                done: progressFull.done,
+                total: progressFull.total,
               })}
             </Text>
           }
         />
 
-        <TaskBoard
+        <BentoBoard
           groups={groups}
           doneIds={doneIds}
           coinsFor={(task) => taskCoinValue(task, state.settings)}
           onToggle={(task, done) => onToggle(task, done)}
+          onAddCategory={(category: Category) =>
+            router.push({ pathname: '/task-editor', params: { category } })
+          }
           onAdd={() => router.push('/task-editor')}
           addLabel={t('home.addTask')}
-          header={
-            <Segmented
-              inline
-              value={filter}
-              onChange={setFilter}
-              items={[
-                { id: 'all' as Filter, label: t('home.all'), color: theme.primary },
-                ...CATEGORIES.map((cat) => ({
-                  id: cat.id as Filter,
-                  label: t(`category.${cat.id}.short`),
-                  color: colorForCategory(cat.id, theme),
-                })),
-              ]}
-            />
-          }
+          holidayActive={holidayActive}
+          hasHolidayTasks={hasHolidayTasks}
+          onOpenHoliday={() => router.push('/holidays')}
           emptyNode={
             <View style={{ paddingHorizontal: 16, paddingVertical: 10 }}>
               <Empty emoji="🌱" title={t('home.emptyTitle')} hint={t('home.emptyHint')} />
