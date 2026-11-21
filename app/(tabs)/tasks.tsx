@@ -11,9 +11,6 @@ import { Row, Screen } from '@/components/ui';
 import { TaskBoard } from '@/components/TaskBoard';
 import { useI18n } from '@/i18n';
 
-/** 管理页不读取任何打卡记录，所有任务都按未完成展示 */
-const EMPTY_DONE = new Set<string>();
-
 export default function TasksScreen() {
   const theme = useTheme();
   const { t, tn } = useI18n();
@@ -76,7 +73,6 @@ export default function TasksScreen() {
 
       <TaskBoard
         groups={groups}
-        doneIds={EMPTY_DONE}
         coinsFor={(task) => taskCoinValue(task, state.settings)}
         noteFor={noteFor}
         onEdit={(task) => router.push({ pathname: '/task-editor', params: { id: task.id } })}
@@ -86,8 +82,7 @@ export default function TasksScreen() {
           router.push({ pathname: '/task-editor', params: { category } })
         }
         emptyLabel={t('tasks.emptyTitle')}
-        completionEnabled={false}
-        emphasizeGroups
+        holidayActive={state.settings.holidays.some((holiday) => holiday.active)}
       />
 
       <View

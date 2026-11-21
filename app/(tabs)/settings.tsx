@@ -7,7 +7,8 @@ import { useTheme, heading } from '@/theme/themes';
 import { CATEGORIES } from '@/domain/constants';
 import type { ThemeId } from '@/types';
 import { AVATARS } from '@/domain/constants';
-import { Board, Btn, IconBtn, Label, Pill, Row, Screen, Stepper } from '@/components/ui';
+import { Btn, IconBtn, Label, Pill, Row, Screen, Stepper } from '@/components/ui';
+import { BentoPanel } from '@/components/BentoPanel';
 import { SkinPicker } from '@/components/SkinPicker';
 import { LanguageMenu } from '@/components/LanguageMenu';
 import { Avatar } from '@/components/Avatar';
@@ -121,20 +122,19 @@ export default function SettingsScreen() {
     />
   );
 
-  const sectionLabel = (emoji: string, text: string) => (
-    <Row style={{ gap: 6, marginBottom: 10 }}>
-      <Text style={{ fontSize: 14 }}>{emoji}</Text>
-      <Text style={heading(13, theme.text)}>{text}</Text>
-    </Row>
-  );
-
   return (
     <Screen>
       <Text style={heading(24, theme.text)}>{t('settings.title')}</Text>
 
-      <Board style={{ marginTop: 14 }}>
+      <View style={{ gap: 10, marginTop: 14 }}>
         {/* 宝贝资料 */}
-        <View style={{ padding: 16, backgroundColor: theme.cardSoft }}>
+        <BentoPanel
+          color={theme.primary}
+          icon="🧸"
+          title={t('settings.profile')}
+          subtitle={t('settings.family')}
+        >
+          <View style={{ padding: 14 }}>
           {mode === 'view' ? (
             <>
               <Row style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -195,10 +195,7 @@ export default function SettingsScreen() {
                 />
               </Row>
 
-              <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 14, marginBottom: 7 }}>
-                {t('settings.family')}
-              </Text>
-              <Row style={{ gap: 7, flexWrap: 'wrap' }}>
+              <Row style={{ gap: 7, flexWrap: 'wrap', marginTop: 14 }}>
                 {profiles.map((p) => {
                   const active = p.id === activeProfile.id;
                   return (
@@ -328,12 +325,17 @@ export default function SettingsScreen() {
               ) : null}
             </View>
           )}
-        </View>
+          </View>
+        </BentoPanel>
 
         {/* 语言与外观 */}
-        <View style={{ height: 1, backgroundColor: theme.border }} />
-        <View style={{ padding: 16 }}>
-          {sectionLabel('🎨', t('settings.looks'))}
+        <BentoPanel
+          color={theme.secondary}
+          icon="🎨"
+          title={t('settings.looks')}
+          subtitle={localeName}
+        >
+          <View style={{ padding: 14 }}>
 
           <Pressable
             onPress={() => setLanguageMenuOpen(true)}
@@ -363,12 +365,17 @@ export default function SettingsScreen() {
             value={state.settings.themeId}
             onChange={(id: ThemeId) => setTheme(id)}
           />
-        </View>
+          </View>
+        </BentoPanel>
 
         {/* 任务金币 */}
-        <View style={{ height: 1, backgroundColor: theme.border }} />
-        <View style={{ padding: 16 }}>
-          {sectionLabel('💰', t('settings.rules'))}
+        <BentoPanel
+          color={theme.accent}
+          icon="💰"
+          title={t('settings.rules')}
+          subtitle={t('settings.rateValue', { rate: state.settings.rate })}
+        >
+          <View style={{ padding: 14 }}>
 
           <Row style={{ justifyContent: 'space-between', alignItems: 'center', paddingVertical: 4 }}>
             <Text style={heading(13, theme.text)}>{t('settings.rate')}</Text>
@@ -407,14 +414,23 @@ export default function SettingsScreen() {
               />
             </Row>
           ))}
-
-        </View>
+          </View>
+        </BentoPanel>
 
         {/* 假期：独立模块 */}
-        <View style={{ height: 1, backgroundColor: theme.border }} />
-        <View style={{ padding: 16 }}>
-          {sectionLabel('🏖️', t('settings.holidayModule'))}
-
+        <BentoPanel
+          color={theme.candy}
+          icon="🏖️"
+          title={t('settings.holidayModule')}
+          subtitle={
+            activeHoliday
+              ? t('settings.inHoliday', {
+                  name: activeHoliday.nameKey ? t(activeHoliday.nameKey) : activeHoliday.name,
+                })
+              : t('settings.notHoliday')
+          }
+        >
+          <View style={{ padding: 14 }}>
           <Pressable
             onPress={() => router.push('/holidays')}
             accessibilityRole="button"
@@ -422,8 +438,8 @@ export default function SettingsScreen() {
             style={({ pressed }) => ({
               flexDirection: 'row',
               alignItems: 'center',
-              gap: 10,
-              padding: 12,
+              gap: 9,
+              padding: 11,
               borderRadius: theme.radiusSm,
               backgroundColor: activeHoliday ? theme.chip : theme.cardSoft,
               borderWidth: theme.borderWidth,
@@ -440,16 +456,9 @@ export default function SettingsScreen() {
                 opacity: activeHoliday ? 1 : 0.45,
               }}
             />
-            <View style={{ flex: 1, minWidth: 0 }}>
-              <Text style={heading(12.5, theme.text)}>{t('settings.holidays')}</Text>
-              <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 2 }} numberOfLines={1}>
-                {activeHoliday
-                  ? t('settings.inHoliday', {
-                      name: activeHoliday.nameKey ? t(activeHoliday.nameKey) : activeHoliday.name,
-                    })
-                  : t('settings.notHoliday')}
-              </Text>
-            </View>
+            <Text style={{ flex: 1, fontSize: 10.5, color: theme.textSoft, lineHeight: 15 }}>
+              {activeHoliday ? t('holidays.modeOnHint') : t('holidays.modeOffHint')}
+            </Text>
             <View
               style={{
                 flexDirection: 'row',
@@ -467,21 +476,23 @@ export default function SettingsScreen() {
               <Text style={{ fontSize: 11, color: theme.primary }}>›</Text>
             </View>
           </Pressable>
-        </View>
+          </View>
+        </BentoPanel>
 
         {/* 数据 */}
-        <View style={{ height: 1, backgroundColor: theme.border }} />
-        <View style={{ padding: 16 }}>
-          {sectionLabel('🧸', t('settings.dataSection'))}
+        <BentoPanel
+          color={theme.textSoft}
+          icon="🧸"
+          title={t('settings.dataSection')}
+          subtitle={t('settings.localOnly')}
+        >
+          <View style={{ padding: 14 }}>
           <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
             <Text style={{ ...heading(12, theme.text) }}>LoulouDo</Text>
             <Text style={{ fontSize: 10, color: theme.textSoft }}>
               v{Constants.expoConfig?.version ?? '1.0.0'}
             </Text>
           </Row>
-          <Text style={{ fontSize: 9.5, color: theme.textSoft, marginTop: 3 }}>
-            {t('settings.localOnly')}
-          </Text>
 
           <View style={{ height: 1, backgroundColor: theme.border, marginVertical: 12 }} />
 
@@ -512,8 +523,9 @@ export default function SettingsScreen() {
               </Pressable>
             ) : null}
           </Pressable>
-        </View>
-      </Board>
+          </View>
+        </BentoPanel>
+      </View>
 
       <LanguageMenu
         visible={languageMenuOpen}

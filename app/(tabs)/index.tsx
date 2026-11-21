@@ -14,7 +14,7 @@ import {
   tasksForDate,
 } from '@/domain/logic';
 import { CATEGORIES } from '@/domain/constants';
-import type { Category, Task } from '@/types';
+import type { Task } from '@/types';
 import { Card, Empty, ProgressBar, Row, Screen, SectionTitle } from '@/components/ui';
 import { BentoBoard } from '@/components/BentoBoard';
 import { Confetti } from '@/components/Confetti';
@@ -235,12 +235,32 @@ export default function HomeScreen() {
           emoji="🌈"
           title={t('home.todayTasks')}
           right={
-            <Text style={{ fontSize: 11, color: theme.textSoft }}>
-              {t('home.completedOf', {
-                done: progressFull.done,
-                total: progressFull.total,
-              })}
-            </Text>
+            <Row style={{ alignItems: 'center', gap: 8 }}>
+              <Text style={{ fontSize: 11, color: theme.textSoft }}>
+                {t('home.completedOf', {
+                  done: progressFull.done,
+                  total: progressFull.total,
+                })}
+              </Text>
+              <Pressable
+                onPress={() => router.push('/quick-task')}
+                accessibilityRole="button"
+                accessibilityLabel={t('quickTask.add')}
+                style={({ pressed }) => ({
+                  width: 28,
+                  height: 28,
+                  borderRadius: 14,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: theme.card,
+                  borderWidth: 1.5,
+                  borderColor: theme.candy + '88',
+                  opacity: pressed ? 0.6 : 1,
+                })}
+              >
+                <Text style={{ fontSize: 17, color: theme.candy, marginTop: -2 }}>＋</Text>
+              </Pressable>
+            </Row>
           }
         />
 
@@ -249,11 +269,8 @@ export default function HomeScreen() {
           doneIds={doneIds}
           coinsFor={(task) => taskCoinValue(task, state.settings)}
           onToggle={(task, done) => onToggle(task, done)}
-          onAddCategory={(category: Category) =>
-            router.push({ pathname: '/task-editor', params: { category } })
-          }
-          onAdd={() => router.push('/task-editor')}
-          addLabel={t('home.addTask')}
+          onAdd={() => router.push('/quick-task')}
+          addLabel={t('quickTask.add')}
           holidayActive={holidayActive}
           hasHolidayTasks={hasHolidayTasks}
           onOpenHoliday={() => router.push('/holidays')}

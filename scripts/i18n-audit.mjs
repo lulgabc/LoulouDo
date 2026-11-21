@@ -10,13 +10,13 @@ const OUT = 'docs/i18n';
 fs.mkdirSync(OUT, { recursive: true });
 
 const LANG = {
-  zh: { name: '中文', home: '今日', report: '报表', settings: '设置', start: true },
-  en: { name: 'English', home: 'Today', report: 'Report', settings: 'Settings' },
-  fr: { name: 'Français', home: 'Accueil', report: 'Progrès', settings: 'Réglages' },
-  de: { name: 'Deutsch', home: 'Start', report: 'Bericht', settings: 'Mehr' },
-  it: { name: 'Italiano', home: 'Oggi', report: 'Report', settings: 'Altro' },
-  es: { name: 'Español', home: 'Hoy', report: 'Informe', settings: 'Ajustes' },
-  pt: { name: 'Português', home: 'Hoje', report: 'Relatório', settings: 'Ajustes' },
+  zh: { name: '中文', home: '今日', tasks: '任务', report: '报表', wallet: '钱包', settings: '设置', start: true },
+  en: { name: 'English', home: 'Today', tasks: 'Tasks', report: 'Report', wallet: 'Wallet', settings: 'Settings' },
+  fr: { name: 'Français', home: 'Accueil', tasks: 'Tâches', report: 'Progrès', wallet: 'Argent', settings: 'Réglages' },
+  de: { name: 'Deutsch', home: 'Start', tasks: 'Plan', report: 'Bericht', wallet: 'Geld', settings: 'Mehr' },
+  it: { name: 'Italiano', home: 'Oggi', tasks: 'Attività', report: 'Report', wallet: 'Soldi', settings: 'Altro' },
+  es: { name: 'Español', home: 'Hoy', tasks: 'Tareas', report: 'Informe', wallet: 'Dinero', settings: 'Ajustes' },
+  pt: { name: 'Português', home: 'Hoje', tasks: 'Tarefas', report: 'Relatório', wallet: 'Carteira', settings: 'Ajustes' },
 };
 
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
@@ -101,10 +101,20 @@ for (const width of [393, 320]) {
     const homeM = await measure(page);
     await save(page, `${locale}-02-home-${width}`);
 
+    await page.locator(`[aria-label="${meta.tasks}"]`).first().click();
+    await page.waitForTimeout(800);
+    const tasksM = await measure(page);
+    await save(page, `${locale}-02b-tasks-${width}`);
+
     await page.locator(`[aria-label="${meta.report}"]`).first().click();
     await page.waitForTimeout(900);
     const reportM = await measure(page);
     if (width === 393) await save(page, `${locale}-03-report`);
+
+    await page.locator(`[aria-label="${meta.wallet}"]`).first().click();
+    await page.waitForTimeout(900);
+    const walletM = await measure(page);
+    await save(page, `${locale}-03b-wallet-${width}`);
 
     await page.locator(`[aria-label="${meta.settings}"]`).first().click();
     await page.waitForTimeout(900);
@@ -124,7 +134,9 @@ for (const width of [393, 320]) {
       stored,
       welcome: welcomeM,
       home: homeM,
+      tasks: tasksM,
       report: reportM,
+      wallet: walletM,
       settings: settingsM,
     });
     await context.close();

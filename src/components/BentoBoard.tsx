@@ -2,10 +2,11 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, Platform, Pressable, Text, View } from 'react-native';
 import type { Category, Task } from '@/types';
 import { CATEGORY_MAP } from '@/domain/constants';
-import { colorForCategory } from '@/components/TaskCard';
+import { BentoPanel } from '@/components/BentoPanel';
+import { colorForCategory } from '@/theme/categoryColors';
 import { DotFill } from '@/components/DotFill';
 import { Coin } from '@/components/Coin';
-import { useTheme, heading, numberStyle, shadowStyle } from '@/theme/themes';
+import { useTheme, heading, numberStyle } from '@/theme/themes';
 import { useI18n } from '@/i18n';
 
 export interface BentoGroup {
@@ -82,82 +83,6 @@ function CoinChip({
     >
       <Coin size={compact ? 11 : 11.5} muted={!done} />
       <Text style={numberStyle(9.5, done ? theme.coin : theme.textSoft)}>+{coins}</Text>
-    </View>
-  );
-}
-
-function PanelHeader({
-  category,
-  count,
-  note,
-  onAdd,
-}: {
-  category: Category;
-  count: number;
-  note: string;
-  onAdd?: () => void;
-}) {
-  const theme = useTheme();
-  const { t } = useI18n();
-  const color = colorForCategory(category, theme);
-  const meta = CATEGORY_MAP[category];
-
-  return (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-        paddingHorizontal: 10,
-        paddingVertical: 8,
-        backgroundColor: color + (theme.dark ? '26' : '16'),
-        borderBottomWidth: 1,
-        borderBottomColor: color + '33',
-      }}
-    >
-      <View
-        style={{
-          width: 30,
-          height: 30,
-          borderRadius: 10,
-          backgroundColor: color,
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-        }}
-      >
-        <Text style={{ fontSize: 16 }}>{meta.emoji}</Text>
-      </View>
-      <View style={{ flex: 1, minWidth: 0 }}>
-        <Text style={heading(13, color)} numberOfLines={1}>
-          {t(`category.${category}.name`)}
-        </Text>
-        <Text style={{ fontSize: 9, color: theme.textSoft, marginTop: 1 }} numberOfLines={1}>
-          {t('tasks.taskCount', { n: count })} · {note}
-        </Text>
-      </View>
-      {onAdd ? (
-        <Pressable
-          onPress={onAdd}
-          hitSlop={8}
-          accessibilityRole="button"
-          accessibilityLabel={`${t('common.add')} ${t(`category.${category}.short`)}`}
-          style={({ pressed }) => ({
-            width: 28,
-            height: 28,
-            borderRadius: 14,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: theme.card,
-            borderWidth: 1.5,
-            borderColor: color + '66',
-            opacity: pressed ? 0.6 : 1,
-            flexShrink: 0,
-          })}
-        >
-          <Text style={{ fontSize: 17, color, marginTop: -2 }}>＋</Text>
-        </Pressable>
-      ) : null}
     </View>
   );
 }
@@ -446,13 +371,15 @@ export function BentoBoard({
   return (
     <View>
       {daily.length > 0 ? (
-        <View style={panelStyle(theme, 'daily')}>
-          <PanelHeader
-            category="daily"
-            count={daily.length}
-            note={t('bento.dailyNote')}
-            onAdd={onAddCategory ? () => onAddCategory('daily') : undefined}
-          />
+        <BentoPanel
+          color={colorForCategory('daily', theme)}
+          icon={CATEGORY_MAP.daily.emoji}
+          title={t('category.daily.name')}
+          subtitle={`${t('tasks.taskCount', { n: daily.length })} · ${t('bento.dailyNote')}`}
+          onAdd={onAddCategory ? () => onAddCategory('daily') : undefined}
+          addLabel={`${t('common.add')} ${t('category.daily.short')}`}
+          style={{ marginBottom: 10 }}
+        >
           <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
             {daily.map((task, index) => (
               <BentoTaskTile
@@ -467,17 +394,20 @@ export function BentoBoard({
               />
             ))}
           </View>
-        </View>
+        </BentoPanel>
       ) : null}
 
       {weekend.length > 0 ? (
-        <View style={panelStyle(theme, 'weekend')}>
-          <PanelHeader
-            category="weekend"
-            count={weekend.length}
-            note={t('bento.weekendNote')}
-            onAdd={onAddCategory ? () => onAddCategory('weekend') : undefined}
-          />
+        <BentoPanel
+          color={colorForCategory('weekend', theme)}
+          icon={CATEGORY_MAP.weekend.emoji}
+          title={t('category.weekend.name')}
+          subtitle={`${t('tasks.taskCount', { n: weekend.length })} · ${t('bento.weekendNote')}`}
+          onAdd={onAddCategory ? () => onAddCategory('weekend') : undefined}
+          addLabel={`${t('common.add')} ${t('category.weekend.short')}`}
+          dashed
+          style={{ marginBottom: 10 }}
+        >
           {weekend.map((task, index) => (
             <View key={task.id}>
               {index > 0 ? (
@@ -499,7 +429,7 @@ export function BentoBoard({
               />
             </View>
           ))}
-        </View>
+        </BentoPanel>
       ) : null}
 
       {showHolidayPrompt ? (
@@ -507,66 +437,45 @@ export function BentoBoard({
           onPress={onOpenHoliday}
           accessibilityRole="button"
           accessibilityLabel={`${t('category.holiday.name')} · ${t('bento.openHoliday')}`}
-          style={({ pressed }) => ({
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 8,
-            padding: 10,
-            borderRadius: 20,
-            borderWidth: 2,
-            borderColor: theme.secondary + '88',
-            backgroundColor: theme.secondary + (theme.dark ? '14' : '0C'),
-            marginBottom: 10,
-            opacity: pressed ? 0.8 : 1,
-          })}
+          style={{ marginBottom: 10 }}
         >
-          <View
-            style={{
-              width: 30,
-              height: 30,
-              borderRadius: 10,
-              backgroundColor: theme.secondary,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Text style={{ fontSize: 16 }}>🏖️</Text>
-          </View>
-          <View style={{ flex: 1, minWidth: 0 }}>
-            <Text style={heading(12.5, theme.secondary)} numberOfLines={1}>
-              {t('category.holiday.name')}
-            </Text>
-            <Text style={{ fontSize: 9, color: theme.textSoft, marginTop: 1 }} numberOfLines={1}>
-              {t('settings.notHoliday')}
-            </Text>
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 2,
-              paddingHorizontal: 9,
-              paddingVertical: 4,
-              borderRadius: 999,
-              backgroundColor: theme.card,
-              borderWidth: 1,
-              borderColor: theme.secondary + '66',
-            }}
-          >
-            <Text style={heading(9.5, theme.secondary)}>{t('bento.openHoliday')}</Text>
-            <Text style={{ fontSize: 11, color: theme.secondary }}>›</Text>
-          </View>
+          <BentoPanel
+            color={theme.secondary}
+            icon="🏖️"
+            title={t('category.holiday.name')}
+            subtitle={t('settings.notHoliday')}
+            right={
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 2,
+                  paddingHorizontal: 9,
+                  paddingVertical: 4,
+                  borderRadius: 999,
+                  backgroundColor: theme.card,
+                  borderWidth: 1,
+                  borderColor: theme.secondary + '66',
+                }}
+              >
+                <Text style={heading(9.5, theme.secondary)}>{t('bento.openHoliday')}</Text>
+                <Text style={{ fontSize: 11, color: theme.secondary }}>›</Text>
+              </View>
+            }
+          />
         </Pressable>
       ) : null}
 
       {holidayActive && holiday.length > 0 ? (
-        <View style={panelStyle(theme, 'holiday')}>
-          <PanelHeader
-            category="holiday"
-            count={holiday.length}
-            note={t('bento.holidayOn')}
-            onAdd={onAddCategory ? () => onAddCategory('holiday') : undefined}
-          />
+        <BentoPanel
+          color={colorForCategory('holiday', theme)}
+          icon={CATEGORY_MAP.holiday.emoji}
+          title={t('category.holiday.name')}
+          subtitle={`${t('tasks.taskCount', { n: holiday.length })} · ${t('bento.holidayOn')}`}
+          onAdd={onAddCategory ? () => onAddCategory('holiday') : undefined}
+          addLabel={`${t('common.add')} ${t('category.holiday.short')}`}
+          style={{ marginBottom: 10 }}
+        >
           {holiday.map((task, index) => (
             <View key={task.id}>
               {index > 0 ? (
@@ -588,17 +497,19 @@ export function BentoBoard({
               />
             </View>
           ))}
-        </View>
+        </BentoPanel>
       ) : null}
 
       {challenge.length > 0 ? (
-        <View style={panelStyle(theme, 'special')}>
-          <PanelHeader
-            category="special"
-            count={challenge.length}
-            note={t('bento.challengeNote')}
-            onAdd={onAddCategory ? () => onAddCategory('special') : undefined}
-          />
+        <BentoPanel
+          color={colorForCategory('special', theme)}
+          icon={CATEGORY_MAP.special.emoji}
+          title={t('category.special.name')}
+          subtitle={`${t('tasks.taskCount', { n: challenge.length })} · ${t('bento.challengeNote')}`}
+          onAdd={onAddCategory ? () => onAddCategory('special') : undefined}
+          addLabel={`${t('common.add')} ${t('category.special.short')}`}
+          style={{ marginBottom: 10 }}
+        >
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, padding: 8 }}>
             {challenge.map((task, index) => (
               <ChallengeTicket
@@ -612,7 +523,7 @@ export function BentoBoard({
               />
             ))}
           </View>
-        </View>
+        </BentoPanel>
       ) : null}
 
       {!hasAny && !showHolidayPrompt && emptyNode ? emptyNode : null}
@@ -643,17 +554,4 @@ export function BentoBoard({
       ) : null}
     </View>
   );
-}
-
-function panelStyle(theme: ReturnType<typeof useTheme>, category: Category) {
-  const color = colorForCategory(category, theme);
-  return {
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: color + '88',
-    backgroundColor: theme.card,
-    overflow: 'hidden' as const,
-    marginBottom: 10,
-    ...shadowStyle(theme),
-  };
 }

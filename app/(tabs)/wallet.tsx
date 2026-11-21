@@ -7,9 +7,10 @@ import { useTheme, heading, numberStyle, shadowStyle } from '@/theme/themes';
 import { todayISO } from '@/domain/date';
 import { coinsToMoney } from '@/domain/logic';
 import { CATEGORY_MAP } from '@/domain/constants';
-import { Board, Btn, Card, Empty, ProgressBar, Row, Screen, SectionTitle } from '@/components/ui';
+import { Btn, Empty, ProgressBar, Row, Screen } from '@/components/ui';
+import { BentoPanel } from '@/components/BentoPanel';
 import { Ring } from '@/components/charts';
-import { Coin, CoinValue } from '@/components/Coin';
+import { Coin } from '@/components/Coin';
 import { Avatar } from '@/components/Avatar';
 import { useI18n } from '@/i18n';
 
@@ -123,11 +124,49 @@ export default function WalletScreen() {
             disabled={balance <= 0}
             style={{ marginTop: 14 }}
           />
+
+          <Row
+            style={{
+              marginTop: 12,
+              paddingTop: 10,
+              borderTopWidth: 1,
+              borderTopColor: theme.dark ? 'rgba(255,255,255,0.18)' : 'rgba(74,42,60,0.12)',
+            }}
+          >
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 9.5, color: heroInk, opacity: 0.7 }}>
+                {t('wallet.earnedTotal')}
+              </Text>
+              <Row style={{ alignItems: 'center', gap: 4, marginTop: 2 }}>
+                <Coin size={13} />
+                <Text style={numberStyle(16, heroInk)}>{totals.earned}</Text>
+              </Row>
+            </View>
+            <View
+              style={{
+                width: 1,
+                backgroundColor: theme.dark ? 'rgba(255,255,255,0.18)' : 'rgba(74,42,60,0.12)',
+                marginHorizontal: 14,
+              }}
+            />
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 9.5, color: heroInk, opacity: 0.7 }}>
+                {t('wallet.redeemedTotal')}
+              </Text>
+              <Text style={numberStyle(16, heroInk)}>¥ {formatMoney(totals.spentMoney)}</Text>
+            </View>
+          </Row>
         </LinearGradient>
       </View>
 
-      <Board style={{ marginBottom: 14 }}>
-        <View style={{ padding: 16 }}>
+      <BentoPanel
+        color={theme.candy}
+        icon="🎁"
+        title={t('wallet.wish')}
+        subtitle={activeProfile.wish.titleKey ? t(activeProfile.wish.titleKey) : activeProfile.wish.title}
+        style={{ marginBottom: 10 }}
+      >
+        <View style={{ padding: 14 }}>
           <Row style={{ gap: 14 }}>
             <Ring
               value={Math.min(1, wishPct)}
@@ -143,11 +182,7 @@ export default function WalletScreen() {
                 </View>
               }
             />
-            <View style={{ flex: 1, gap: 3 }}>
-              <Text style={{ fontSize: 10, color: theme.textSoft }}>{t('wallet.wish')}</Text>
-              <Text style={heading(15, theme.text)} numberOfLines={1}>
-                {activeProfile.wish.titleKey ? t(activeProfile.wish.titleKey) : activeProfile.wish.title}
-              </Text>
+            <View style={{ flex: 1, gap: 6 }}>
               <ProgressBar value={wishPct} color={theme.candy} height={6} />
               <Text style={{ fontSize: 9.5, color: theme.textSoft }}>
                 {t('wallet.saved', {
@@ -172,39 +207,19 @@ export default function WalletScreen() {
             <Text style={{ fontSize: 10.5, color: theme.primary }}>{t('wallet.editWish')} →</Text>
           </Pressable>
         </View>
+      </BentoPanel>
 
-        <View style={{ height: 1, backgroundColor: theme.border, marginHorizontal: 16 }} />
-        <Row style={{ padding: 16 }}>
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 9.5, color: theme.textSoft }}>{t('wallet.earnedTotal')}</Text>
-            <CoinValue
-              value={totals.earned}
-              size={13}
-              color={theme.text}
-              prefix=""
-              style={{ marginTop: 2 }}
-            />
-          </View>
-          <View style={{ width: 1, backgroundColor: theme.border, marginHorizontal: 14 }} />
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 9.5, color: theme.textSoft }}>{t('wallet.redeemedTotal')}</Text>
-            <Text style={numberStyle(18, theme.text)}>¥ {formatMoney(totals.spentMoney)}</Text>
-          </View>
-        </Row>
-      </Board>
-
-      <SectionTitle
-        emoji="📒"
+      <BentoPanel
+        color={theme.secondary}
+        icon="📒"
         title={t('wallet.ledger')}
-        right={<Text style={{ fontSize: 10, color: theme.textSoft }}>{t('wallet.recent')}</Text>}
-      />
-
-      {groups.length === 0 ? (
-        <Card>
+        subtitle={t('wallet.recent')}
+        style={{ marginBottom: 10 }}
+      >
+        {groups.length === 0 ? (
           <Empty emoji="💰" title={t('wallet.emptyTitle')} hint={t('wallet.emptyHint')} />
-        </Card>
-      ) : (
-        <Board>
+        ) : (
+          <>
           {groups.map(([date, list], groupIndex) => (
             <View key={date}>
               {groupIndex > 0 ? (
@@ -301,8 +316,9 @@ export default function WalletScreen() {
               </Text>
             </Pressable>
           ) : null}
-        </Board>
-      )}
+          </>
+        )}
+      </BentoPanel>
 
       <Text style={{ fontSize: 10, color: theme.textSoft, textAlign: 'center', marginTop: 12 }}>
         {t('wallet.footer')}

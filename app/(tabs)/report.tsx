@@ -7,7 +7,8 @@ import { addDays, todayISO } from '@/domain/date';
 import { coinsToMoney, rangeFor, statsForRange } from '@/domain/logic';
 import { CATEGORIES } from '@/domain/constants';
 import type { Category } from '@/types';
-import { Board, Empty, Row, Screen, Segmented } from '@/components/ui';
+import { Empty, Row, Screen, Segmented } from '@/components/ui';
+import { BentoPanel } from '@/components/BentoPanel';
 import { CoinBars, Donut, Ring } from '@/components/charts';
 import { Coin } from '@/components/Coin';
 import { useI18n } from '@/i18n';
@@ -74,13 +75,6 @@ export default function ReportScreen() {
 
   const tip = t(ratePct >= 80 ? 'report.tipHigh' : ratePct >= 50 ? 'report.tipMid' : 'report.tipLow');
 
-  const label = (emoji: string, text: string) => (
-    <Row style={{ gap: 6, marginBottom: 10 }}>
-      <Text style={{ fontSize: 15 }}>{emoji}</Text>
-      <Text style={heading(14, theme.text)}>{text}</Text>
-    </Row>
-  );
-
   const statCell = (
     emoji: string,
     value: string,
@@ -102,7 +96,10 @@ export default function ReportScreen() {
       <Text style={{ fontSize: 10, color: theme.textSoft }}>
         {emoji} {text}
       </Text>
-      <Text style={smallValue ? heading(14, theme.text) : numberStyle(20, theme.text)} numberOfLines={1}>
+      <Text
+        style={smallValue ? heading(14, theme.text) : numberStyle(20, theme.text)}
+        numberOfLines={1}
+      >
         {value}
       </Text>
       {sub ? <Text style={{ fontSize: 9.5, color: theme.textSoft }}>{sub}</Text> : null}
@@ -116,8 +113,14 @@ export default function ReportScreen() {
         {t('report.subtitle')}
       </Text>
 
-      <Board style={{ marginBottom: 14 }}>
-        <View style={{ padding: 16, paddingBottom: 12 }}>
+      <BentoPanel
+        color={theme.primary}
+        icon="📊"
+        title={t('report.overview')}
+        subtitle={`${formatShort(stats.start)} - ${formatShort(stats.end)}`}
+        style={{ marginBottom: 10 }}
+      >
+        <View style={{ padding: 14 }}>
           <Segmented
             inline
             value={mode}
@@ -127,13 +130,8 @@ export default function ReportScreen() {
               label: t(`report.range.${m}`),
             }))}
           />
-          <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 9 }}>
-            {formatShort(stats.start)} - {formatShort(stats.end)}
-          </Text>
-        </View>
-        <View style={{ height: 1, backgroundColor: theme.border, marginHorizontal: 16 }} />
-        <View style={{ padding: 16 }}>
-          <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+
+          <Row style={{ justifyContent: 'space-between', alignItems: 'center', marginTop: 14 }}>
             <View style={{ gap: 2 }}>
               <Text style={{ fontSize: 11, color: theme.textSoft }}>{t('report.earned')}</Text>
               <Row style={{ alignItems: 'flex-end', gap: 7 }}>
@@ -154,13 +152,15 @@ export default function ReportScreen() {
               center={
                 <View style={{ alignItems: 'center' }}>
                   <Text style={numberStyle(20, theme.text)}>{ratePct}%</Text>
-                  <Text style={{ fontSize: 9, color: theme.textSoft }}>{t('report.completion')}</Text>
+                  <Text style={{ fontSize: 9, color: theme.textSoft }}>
+                    {t('report.completion')}
+                  </Text>
                 </View>
               }
             />
           </Row>
 
-          <Row style={{ marginTop: 10 }}>
+          <Row style={{ marginTop: 12 }}>
             <View style={{ flex: 1 }}>
               <Text style={numberStyle(18, theme.text)}>🔥 {stats.streak}</Text>
               <Text style={{ fontSize: 9.5, color: theme.textSoft }}>{t('report.streakDays')}</Text>
@@ -171,21 +171,32 @@ export default function ReportScreen() {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={numberStyle(18, theme.text)}>🚀 {stats.onceCompleted}</Text>
-              <Text style={{ fontSize: 9.5, color: theme.textSoft }}>{t('report.challenges')}</Text>
+              <Text style={{ fontSize: 9.5, color: theme.textSoft }}>
+                {t('report.challenges')}
+              </Text>
             </View>
           </Row>
         </View>
+      </BentoPanel>
 
-        <View style={{ height: 1, backgroundColor: theme.border, marginHorizontal: 16 }} />
-        <View style={{ padding: 16, paddingBottom: 6 }}>
-          {label('💰', t('report.last7'))}
+      <BentoPanel
+        color={theme.secondary}
+        icon="💰"
+        title={t('report.last7')}
+        style={{ marginBottom: 10 }}
+      >
+        <View style={{ padding: 14, paddingBottom: 6 }}>
           <CoinBars points={last7.series} height={100} />
         </View>
-      </Board>
+      </BentoPanel>
 
-      <Board style={{ marginBottom: 14 }}>
-        <View style={{ padding: 16 }}>
-          {label('🍭', t('report.where'))}
+      <BentoPanel
+        color={theme.candy}
+        icon="🍭"
+        title={t('report.where')}
+        style={{ marginBottom: 10 }}
+      >
+        <View style={{ padding: 14 }}>
           <Row style={{ gap: 14, alignItems: 'center' }}>
             <Donut
               segments={segments}
@@ -204,7 +215,7 @@ export default function ReportScreen() {
                       <Text style={{ fontSize: 10.5, color: theme.textSoft }}>
                         {cat.emoji} {t(`category.${cat.id}.short`)}
                       </Text>
-                      <Text style={{ ...heading(10.5, theme.text) }}>
+                      <Text style={{ fontSize: 10.5, color: theme.text, fontWeight: '700' }}>
                         {t('report.categoryValue', {
                           coins: value.coins,
                           count: value.count,
@@ -238,10 +249,15 @@ export default function ReportScreen() {
             <Empty emoji="🌤️" title={t('report.emptyTitle')} hint={t('report.emptyHint')} />
           ) : null}
         </View>
+      </BentoPanel>
 
-        <View style={{ height: 1, backgroundColor: theme.border, marginHorizontal: 16 }} />
-        <View style={{ padding: 16 }}>
-          {label('📌', t('report.habits'))}
+      <BentoPanel
+        color={theme.accent}
+        icon="🎯"
+        title={t('report.habits')}
+        style={{ marginBottom: 10 }}
+      >
+        <View style={{ padding: 14 }}>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
             {statCell(
               '🎯',
@@ -282,48 +298,45 @@ export default function ReportScreen() {
               true,
             )}
           </View>
-
-          <View
-            style={{
-              backgroundColor: theme.chip,
-              borderRadius: 16,
-              padding: 13,
-              marginTop: 12,
-            }}
-          >
-            <Text style={{ ...heading(12.5, theme.text), marginBottom: 4 }}>
-              👨‍👩‍👧 {t('report.parent')}
-            </Text>
-            <Text style={{ fontSize: 11, color: theme.textSoft, lineHeight: 18 }}>{summary}</Text>
-            <Text style={{ fontSize: 10.5, color: theme.text, lineHeight: 17, marginTop: 8 }}>
-              💡 {tip}
-            </Text>
-          </View>
         </View>
+      </BentoPanel>
 
-        <View style={{ height: 1, backgroundColor: theme.border, marginHorizontal: 16 }} />
-        <Pressable
-          onPress={() => router.push('/wallet')}
-          accessibilityRole="button"
-          accessibilityLabel={t('report.goWallet')}
-          style={({ pressed }) => ({
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            paddingHorizontal: 16,
-            paddingVertical: 14,
-            opacity: pressed ? 0.7 : 1,
-          })}
-        >
-          <View>
-            <Text style={heading(12.5, theme.text)}>{t('report.goWallet')}</Text>
-            <Text style={{ fontSize: 9.5, color: theme.textSoft, marginTop: 1 }}>
-              {t('report.goWalletHint')}
-            </Text>
-          </View>
-          <Text style={{ fontSize: 18 }}>💰 →</Text>
-        </Pressable>
-      </Board>
+      <BentoPanel
+        color={theme.primary}
+        icon="👨‍👩‍👧"
+        title={t('report.parent')}
+        style={{ marginBottom: 10 }}
+      >
+        <View style={{ padding: 14 }}>
+          <Text style={{ fontSize: 11, color: theme.textSoft, lineHeight: 18 }}>{summary}</Text>
+          <Text style={{ fontSize: 10.5, color: theme.text, lineHeight: 17, marginTop: 8 }}>
+            💡 {tip}
+          </Text>
+          <Pressable
+            onPress={() => router.push('/wallet')}
+            accessibilityRole="button"
+            accessibilityLabel={t('report.goWallet')}
+            style={({ pressed }) => ({
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginTop: 12,
+              paddingTop: 10,
+              borderTopWidth: 1,
+              borderTopColor: theme.border,
+              opacity: pressed ? 0.7 : 1,
+            })}
+          >
+            <View>
+              <Text style={heading(12, theme.text)}>{t('report.goWallet')}</Text>
+              <Text style={{ fontSize: 9.5, color: theme.textSoft, marginTop: 1 }}>
+                {t('report.goWalletHint')}
+              </Text>
+            </View>
+            <Text style={{ fontSize: 18 }}>💰 →</Text>
+          </Pressable>
+        </View>
+      </BentoPanel>
     </Screen>
   );
 }

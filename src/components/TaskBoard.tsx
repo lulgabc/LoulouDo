@@ -2,9 +2,10 @@ import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import type { Category, Task } from '@/types';
 import { CATEGORY_MAP } from '@/domain/constants';
-import { TaskCard, colorForCategory } from '@/components/TaskCard';
-import { Board } from '@/components/ui';
-import { useTheme, heading } from '@/theme/themes';
+import { BentoPanel } from '@/components/BentoPanel';
+import { Coin } from '@/components/Coin';
+import { colorForCategory } from '@/theme/categoryColors';
+import { heading, numberStyle, useTheme } from '@/theme/themes';
 import { useI18n } from '@/i18n';
 
 export interface TaskGroup {
@@ -12,190 +13,85 @@ export interface TaskGroup {
   tasks: Task[];
 }
 
+/**
+ * 任务管理面板：沿用首页的分类便当结构，
+ * 但所有任务都是未完成状态，只提供铅笔编辑。
+ */
 export function TaskBoard({
   groups,
-  doneIds,
   coinsFor,
   noteFor,
-  onToggle,
   onEdit,
   onAdd,
   addLabel,
   onAddCategory,
   emptyLabel,
-  header,
-  emptyNode,
-  completionEnabled = true,
-  emphasizeGroups = false,
+  holidayActive = false,
 }: {
   groups: TaskGroup[];
-  doneIds: Set<string>;
   coinsFor: (task: Task) => number;
   noteFor?: (task: Task) => string | undefined;
-  onToggle?: (task: Task, done: boolean) => void;
   onEdit?: (task: Task) => void;
   onAdd?: () => void;
   addLabel?: string;
   onAddCategory?: (category: Category) => void;
   emptyLabel?: string;
-  header?: React.ReactNode;
-  emptyNode?: React.ReactNode;
-  /** 首页开启点击完成；任务管理页关闭 */
-  completionEnabled?: boolean;
-  /** 任务管理页：每个类别做成独立的彩色卡片 */
-  emphasizeGroups?: boolean;
+  holidayActive?: boolean;
 }) {
   const theme = useTheme();
   const { t } = useI18n();
 
+  const categoryNote = (category: Category) => {
+    switch (category) {
+      case 'daily':
+        return t('bento.dailyNote');
+      case 'weekend':
+        return t('bento.weekendNote');
+      case 'holiday':
+        return holidayActive ? t('bento.holidayOn') : t('settings.notHoliday');
+      case 'special':
+        return t('bento.challengeNote');
+      default:
+        return '';
+    }
+  };
+
   return (
-    <Board>
-      {header ? (
-        <>
-          <View style={{ paddingHorizontal: 12, paddingTop: 10, paddingBottom: 8 }}>
-            {header}
-          </View>
-          <View style={{ height: 1, backgroundColor: theme.border }} />
-        </>
-      ) : null}
-      {groups.length === 0 && emptyNode ? emptyNode : null}
-      {groups.map((group, groupIndex) => {
+    <View>
+      {groups.map((group) => {
         const color = colorForCategory(group.category, theme);
         const meta = CATEGORY_MAP[group.category];
-        const dashed = group.category === 'weekend';
-        const double = group.category === 'special';
-        const groupCardStyle = emphasizeGroups
-          ? {
-              marginHorizontal: 9,
-              marginTop: 9,
-              marginBottom: groupIndex === groups.length - 1 ? 9 : 0,
-              borderRadius: 18,
-              borderWidth: double ? 2 : 1.5,
-              borderColor: color + (double ? '88' : '55'),
-              borderStyle: dashed ? ('dashed' as const) : ('solid' as const),
-              backgroundColor: color + (theme.dark ? '14' : '0A'),
-              overflow: 'hidden' as const,
-            }
-          : undefined;
         return (
-          <View key={group.category} style={groupCardStyle}>
-            {emphasizeGroups ? (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 9,
-                  paddingHorizontal: 11,
-                  paddingVertical: 10,
-                  backgroundColor: color + (theme.dark ? '26' : '16'),
-                  borderBottomWidth: 1,
-                  borderBottomColor: color + '33',
-                }}
-              >
-                <View
-                  style={{
-                    width: 34,
-                    height: 34,
-                    borderRadius: 12,
-                    backgroundColor: color,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Text style={{ fontSize: 18 }}>{meta.emoji}</Text>
-                </View>
-                <View style={{ flex: 1, minWidth: 0 }}>
-                  <Text style={heading(13.5, color)} numberOfLines={1}>
-                    {t(`category.${group.category}.name`)}
-                  </Text>
-                  <Text style={{ fontSize: 9.5, color: theme.textSoft, marginTop: 1 }}>
-                    {t('tasks.taskCount', { n: group.tasks.length })}
-                  </Text>
-                </View>
-                {onAddCategory ? (
-                  <Pressable
-                    onPress={() => onAddCategory(group.category)}
-                    hitSlop={8}
-                    accessibilityRole="button"
-                    accessibilityLabel={`${t('common.add')} ${t(`category.${group.category}.short`)}`}
-                    style={({ pressed }) => ({
-                      width: 28,
-                      height: 28,
-                      borderRadius: 14,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      backgroundColor: theme.card,
-                      borderWidth: 1.5,
-                      borderColor: color + '66',
-                      opacity: pressed ? 0.6 : 1,
-                    })}
-                  >
-                    <Text style={{ fontSize: 17, color, marginTop: -2 }}>＋</Text>
-                  </Pressable>
-                ) : null}
-              </View>
-            ) : (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 7,
-                  paddingHorizontal: 14,
-                  paddingTop: 15,
-                  paddingBottom: 5,
-                }}
-              >
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 4,
-                    paddingHorizontal: 8,
-                    paddingVertical: 3,
-                    borderRadius: 999,
-                    backgroundColor: color + (theme.dark ? '26' : '14'),
-                    borderWidth: double ? 2 : 1,
-                    borderColor: color + (double ? 'AA' : '55'),
-                    borderStyle: dashed ? 'dashed' : 'solid',
-                  }}
-                >
-                  <Text style={{ fontSize: 10 }}>{meta.emoji}</Text>
-                  <Text style={{ ...heading(10, color), fontWeight: '700' }}>
-                    {t(`category.${group.category}.short`)}
-                  </Text>
-                </View>
-                <Text style={{ fontSize: 10, color: theme.textSoft }}>{group.tasks.length}</Text>
-                <View style={{ flex: 1 }} />
-                {onAddCategory ? (
-                  <Pressable
-                    onPress={() => onAddCategory(group.category)}
-                    hitSlop={8}
-                    accessibilityRole="button"
-                    accessibilityLabel={`${t('common.add')} ${t(`category.${group.category}.short`)}`}
-                  >
-                    <Text style={{ fontSize: 10.5, color: theme.textSoft }}>
-                      ＋ {t('common.add')}
-                    </Text>
-                  </Pressable>
-                ) : null}
-              </View>
-            )}
-
+          <BentoPanel
+            key={group.category}
+            color={color}
+            icon={meta.emoji}
+            title={t(`category.${group.category}.name`)}
+            subtitle={`${t('tasks.taskCount', { n: group.tasks.length })} · ${categoryNote(
+              group.category,
+            )}`}
+            dashed={group.category === 'weekend'}
+            onAdd={
+              onAddCategory ? () => onAddCategory(group.category) : undefined
+            }
+            addLabel={`${t('common.add')} ${t(`category.${group.category}.short`)}`}
+            style={{ marginBottom: 10 }}
+          >
             {group.tasks.length === 0 ? (
               <Text
                 style={{
-                  fontSize: 11,
+                  fontSize: 10.5,
                   color: theme.textSoft,
-                  paddingHorizontal: 16,
-                  paddingBottom: 14,
+                  paddingHorizontal: 12,
+                  paddingVertical: 12,
                 }}
               >
                 {emptyLabel ?? t('tasks.emptyTitle')}
               </Text>
             ) : (
               group.tasks.map((task, index) => {
-                // 管理页不承载打卡：所有任务一律按未完成展示
-                const done = completionEnabled && doneIds.has(task.id);
+                const title = task.titleKey ? t(task.titleKey) : task.title;
+                const note = noteFor?.(task);
                 return (
                   <View key={task.id}>
                     {index > 0 ? (
@@ -203,26 +99,81 @@ export function TaskBoard({
                         style={{
                           height: 1,
                           backgroundColor: theme.border,
-                          marginLeft: 72,
-                          marginRight: 14,
+                          marginLeft: 52,
+                          marginRight: 12,
                         }}
                       />
                     ) : null}
-                    <TaskCard
-                      task={task}
-                      done={done}
-                      coins={coinsFor(task)}
-                      note={noteFor?.(task)}
-                      onToggle={
-                        completionEnabled && onToggle ? () => onToggle(task, done) : undefined
-                      }
-                      onEdit={onEdit ? () => onEdit(task) : undefined}
-                    />
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 9,
+                        paddingHorizontal: 11,
+                        paddingVertical: 8,
+                      }}
+                    >
+                      <View
+                        style={{
+                          width: 33,
+                          height: 33,
+                          borderRadius: 11,
+                          backgroundColor: color + (theme.dark ? '2E' : '20'),
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                        }}
+                      >
+                        <Text style={{ fontSize: 18 }}>{task.emoji}</Text>
+                      </View>
+                      <View style={{ flex: 1, minWidth: 0 }}>
+                        <Text style={heading(12.5, theme.text)} numberOfLines={2}>
+                          {title}
+                        </Text>
+                        {note ? (
+                          <Text style={{ fontSize: 9, color: theme.textSoft, marginTop: 2 }}>
+                            {note}
+                          </Text>
+                        ) : null}
+                      </View>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 3,
+                          paddingHorizontal: 6,
+                          paddingVertical: 2,
+                          borderRadius: 999,
+                          backgroundColor: theme.chip,
+                          borderWidth: 1,
+                          borderColor: theme.border,
+                          flexShrink: 0,
+                        }}
+                      >
+                        <Coin size={11} muted />
+                        <Text style={numberStyle(9.5, theme.textSoft)}>+{coinsFor(task)}</Text>
+                      </View>
+                      {onEdit ? (
+                        <Pressable
+                          onPress={() => onEdit(task)}
+                          hitSlop={8}
+                          accessibilityRole="button"
+                          accessibilityLabel={t('task.a11yEdit', { title })}
+                          style={({ pressed }) => ({
+                            paddingHorizontal: 4,
+                            paddingVertical: 6,
+                            opacity: pressed ? 0.5 : 0.7,
+                          })}
+                        >
+                          <Text style={{ fontSize: 13 }}>✏️</Text>
+                        </Pressable>
+                      ) : null}
+                    </View>
                   </View>
                 );
               })
             )}
-          </View>
+          </BentoPanel>
         );
       })}
 
@@ -234,29 +185,22 @@ export function TaskBoard({
           style={({ pressed }) => ({
             flexDirection: 'row',
             alignItems: 'center',
-            gap: 9,
-            paddingHorizontal: 14,
-            paddingVertical: 13,
-            borderTopWidth: 1,
-            borderTopColor: theme.border,
+            justifyContent: 'center',
+            gap: 6,
+            paddingVertical: 11,
+            borderRadius: theme.radiusSm,
+            borderWidth: 1.5,
+            borderStyle: 'dashed',
+            borderColor: theme.border,
+            backgroundColor: theme.card + '99',
+            marginTop: 2,
             opacity: pressed ? 0.65 : 1,
           })}
         >
-          <View
-            style={{
-              width: 28,
-              height: 28,
-              borderRadius: 14,
-              backgroundColor: theme.chip,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Text style={{ fontSize: 16, color: theme.text, marginTop: -1 }}>＋</Text>
-          </View>
-          <Text style={{ ...heading(12.5, theme.textSoft) }}>{addLabel ?? t('home.addTask')}</Text>
+          <Text style={{ fontSize: 16, color: theme.primary, marginTop: -1 }}>＋</Text>
+          <Text style={heading(12, theme.textSoft)}>{addLabel ?? t('home.addTask')}</Text>
         </Pressable>
       ) : null}
-    </Board>
+    </View>
   );
 }

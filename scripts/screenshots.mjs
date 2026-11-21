@@ -136,7 +136,7 @@ await tab('今日');
 await shot('13-home-fantasy');
 
 await tab('设置');
-await click('假期设置', { wait: 800 });
+await clickAria('假期设置', 800);
 await page.locator('[role="switch"]').nth(1).click();
 await page.waitForTimeout(600);
 await shot('14-holidays', 600);
@@ -144,6 +144,13 @@ await page.locator('[role="switch"]').nth(1).click();
 await page.waitForTimeout(300);
 await page.getByText('✕').first().click();
 await page.waitForTimeout(800);
+
+// 首页特别任务快捷入口
+await tab('今日');
+await clickAria('添加特别任务', 700);
+await shot('14b-quick-task', 500);
+await page.getByText('✕').first().click();
+await page.waitForTimeout(600);
 
 // 新建任务，验证 CRUD
 await tab('任务');

@@ -140,6 +140,13 @@ for (const viewport of VIEWPORTS) {
   pages['tasks-bottom'] = await measure(page, viewport, 'tasks-bottom');
   await scrollToTop(page);
 
+  await tab(page, '今日');
+  await clickVisible(page.locator('[aria-label="添加特别任务"]'));
+  await page.waitForTimeout(700);
+  pages.quick = await measure(page, viewport, 'quick');
+  await clickVisible(page.getByText('✕'));
+  await page.waitForTimeout(600);
+
   await tab(page, '报表');
   pages.report = await measure(page, viewport, 'report');
   await scrollToBottom(page);
@@ -174,7 +181,7 @@ for (const viewport of VIEWPORTS) {
 
   await tab(page, '设置');
   await scrollToBottom(page);
-  await clickVisible(page.getByText('假期设置'));
+  await clickVisible(page.locator('[aria-label="假期设置"]'));
   await page.waitForTimeout(700);
   await page.locator('[role="switch"]').nth(1).click();
   await page.waitForTimeout(500);

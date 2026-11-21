@@ -6,20 +6,20 @@ const BASE = 'http://localhost:4173';
 const OUT = 'docs/i18n';
 const LANGS = {
   en: {
-    name: 'English', settings: 'Settings', wallet: 'Wallet', tasks: 'Tasks',
-    redeem: 'Redeem pocket money', add: 'Add', addTask: 'Add a new task', holiday: /^Holiday settings$/,
+    name: 'English', settings: 'Settings', wallet: 'Wallet', tasks: 'Tasks', today: 'Today', quickAdd: 'Add special task',
+    redeem: 'Redeem pocket money', add: 'Add', addTask: 'Add a new task', holiday: 'Holiday settings',
   },
   de: {
-    name: 'Deutsch', settings: 'Mehr', wallet: 'Geld', tasks: 'Plan',
-    redeem: 'Taschengeld abholen', add: 'Hinzufügen', addTask: 'Neue Aufgabe hinzufügen', holiday: /^Ferien-Einstellungen$/,
+    name: 'Deutsch', settings: 'Mehr', wallet: 'Geld', tasks: 'Plan', today: 'Start', quickAdd: 'Spezialaufgabe hinzufügen',
+    redeem: 'Taschengeld abholen', add: 'Hinzufügen', addTask: 'Neue Aufgabe hinzufügen', holiday: 'Ferien-Einstellungen',
   },
   fr: {
-    name: 'Français', settings: 'Réglages', wallet: 'Argent', tasks: 'Tâches',
-    redeem: 'Retirer de l’argent de poche', add: 'Ajouter', addTask: 'Ajouter une nouvelle tâche', holiday: /^Réglages des vacances$/,
+    name: 'Français', settings: 'Réglages', wallet: 'Argent', tasks: 'Tâches', today: 'Accueil', quickAdd: 'Ajouter une tâche spéciale',
+    redeem: 'Retirer de l’argent de poche', add: 'Ajouter', addTask: 'Ajouter une nouvelle tâche', holiday: 'Réglages des vacances',
   },
   pt: {
-    name: 'Português', settings: 'Ajustes', wallet: 'Carteira', tasks: 'Tarefas',
-    redeem: 'Resgatar mesada', add: 'Adicionar', addTask: 'Adicionar uma nova tarefa', holiday: /^Configurações de férias$/,
+    name: 'Português', settings: 'Ajustes', wallet: 'Carteira', tasks: 'Tarefas', today: 'Hoje', quickAdd: 'Adicionar tarefa especial',
+    redeem: 'Resgatar mesada', add: 'Adicionar', addTask: 'Adicionar uma nova tarefa', holiday: 'Configurações de férias',
   },
 };
 
@@ -110,18 +110,28 @@ for (const [locale, meta] of Object.entries(LANGS)) {
   await close(page);
   await page.waitForTimeout(600);
 
+  // 首页快捷特别任务
+  await page.locator(`[aria-label="${meta.today}"]`).first().click();
+  await page.waitForTimeout(700);
+  await clickNonInert(page.locator(`[aria-label="${meta.quickAdd}"]`));
+  await page.waitForTimeout(700);
+  const quick = await measure(page);
+  await page.screenshot({ path: `${OUT}/${locale}-quick-320.jpg`, type: 'jpeg', quality: 82 });
+  await close(page);
+  await page.waitForTimeout(600);
+
   // 假期
   await page.locator(`[aria-label="${meta.settings}"]`).first().click();
   await page.waitForTimeout(800);
   await page.mouse.move(160, 400);
   await page.mouse.wheel(0, 1400);
   await page.waitForTimeout(400);
-  await clickNonInert(page.getByText(meta.holiday));
+  await clickNonInert(page.locator(`[aria-label="${meta.holiday}"]`));
   await page.waitForTimeout(800);
   const holidays = await measure(page);
   await page.screenshot({ path: `${OUT}/${locale}-holidays-320.jpg`, type: 'jpeg', quality: 82 });
 
-  results.push({ locale, errors, redeem, editor, holidays });
+  results.push({ locale, errors, redeem, editor, quick, holidays });
   await context.close();
 }
 
