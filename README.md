@@ -36,6 +36,7 @@ LoulouDo 是一款面向 4–10 岁孩子的**跨平台（iOS / Android / Web）
 | 👤 钱包头像 | 钱包页使用当前宝贝的头像（自定义图片或 Emoji），不再使用小鹿插画 |
 | 🧾 金币存折 | 默认展示最近 5 条，可展开全部，避免长列表把钱包页拖得过长 |
 | ✏️ 任务管理 | 「任务」页只负责定制和修改，所有任务一律按未完成展示；打卡统一在「今日」页 |
+| 🗂️ 分类模块 | 任务管理页把每日 / 周末 / 假期 / 挑战做成 4 张独立彩色卡片：图标色块、分类名、数量与快捷添加都在卡片头部 |
 | 👨‍👩‍👧 多宝贝 | 一台设备可以给多个孩子分别记录任务、金币和报表 |
 | 🏖️ 假期管理 | 自定义假期日期段，并在设置里手动开启/结束假期模式；开启后首页才显示假期任务 |
 | 🌍 七种语言 | 中文 / English / Français / Deutsch / Italiano / Español / Português，自动识别系统语言，随时切换 |
@@ -131,6 +132,17 @@ LoulouDo 是一款面向 4–10 岁孩子的**跨平台（iOS / Android / Web）
 
 > 截图与机器可读结果：`docs/i18n/`、`docs/i18n/report.json`、`docs/i18n/modals-report.json`。
 > 复跑：`npm run media:i18n`、`npm run media:i18n-modals`。
+
+---
+
+## 🧪 首页任务列表重构样稿
+
+任务区的 3 个候选方向：**贴纸便当盒 / 冒险小径 / 专注卡组**。共用现有日期卡、进度星和贴纸语言，只改变任务区的组织方式与互动节奏。
+
+![首页任务列表 3 个方向](docs/design/overview.png)
+
+- 单张样稿：`docs/design/concept-1-bento.png`、`docs/design/concept-2-quest.png`、`docs/design/concept-3-focus.png`
+- 可交互样稿：打开 `docs/design/home-concepts.html`
 
 ---
 

@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LoulouDo · 首页任务列表 3 个设计方向</title>
+<style>
+  @font-face { font-family: 'ZCOOL'; src: url('fonts/ZCOOLKuaiLe_400Regular.ttf') format('truetype'); }
+  @font-face { font-family: 'Baloo'; src: url('fonts/Baloo2_700Bold.ttf') format('truetype'); font-weight: 700; }
+  @font-face { font-family: 'Baloo'; src: url('fonts/Baloo2_800ExtraBold.ttf') format('truetype'); font-weight: 800; }
+  :root {
+    --ink:#4A2A3C; --soft:#8C6B7B; --pink:#FF6FA5; --pink-tint:#FFE3EF;
+    --amber:#FFB020; --amber-tint:#FFF0D2; --mint:#39C6A3; --mint-tint:#DDF7EF;
+    --purple:#A78BFA; --purple-tint:#EFE8FF; --coin:#FFC53D; --line:#F58BB2;
+    --heading: 'ZCOOL', 'PingFang SC', sans-serif;
+    --body: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    --num: 'Baloo', 'PingFang SC', sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; }
+  body { background:#F1EEF6; color:var(--ink); font-family:var(--body); -webkit-font-smoothing:antialiased; }
+  .page { min-width:1360px; padding:44px 48px 60px; }
+  .page-head { max-width:1280px; margin:0 auto 34px; }
+  .kicker { display:inline-flex; align-items:center; gap:8px; background:#fff; border:1.5px solid #E3D8EE; border-radius:999px; padding:6px 12px; font-size:12px; color:#7C6A8A; box-shadow:1px 2px 0 #E4D9EE; }
+  .page-head h1 { font-family:var(--heading); font-size:38px; margin:14px 0 8px; letter-spacing:.5px; }
+  .page-head p { margin:0; color:#7C6A8A; font-size:14px; line-height:1.7; max-width:880px; }
+  .concepts { display:flex; gap:34px; justify-content:center; align-items:flex-start; }
+  .concept { width:408px; }
+  .concept-head { display:flex; align-items:flex-start; gap:10px; margin:0 4px 14px; }
+  .num { width:34px; height:34px; border-radius:12px; display:grid; place-items:center; font-family:var(--num); font-weight:800; font-size:15px; color:#fff; background:var(--pink); box-shadow:2px 2px 0 rgba(163,58,102,.2); flex:none; }
+  .concept:nth-child(2) .num { background:var(--mint); }
+  .concept:nth-child(3) .num { background:var(--purple); }
+  .concept-head h2 { font-family:var(--heading); font-size:21px; margin:1px 0 3px; }
+  .concept-head p { margin:0; font-size:11.5px; color:var(--soft); line-height:1.5; }
+  .device { width:407px; padding:7px; border-radius:48px; background:#2B2028; box-shadow:0 26px 60px rgba(48,27,45,.25), inset 0 0 0 1.5px #4B3945; }
+  .phone { width:393px; height:852px; border-radius:42px; overflow:hidden; position:relative; background:linear-gradient(160deg,#FFF5FA 0%,#FFF0F7 52%,#E9FBF4 100%); }
+  .statusbar { height:24px; display:flex; align-items:center; justify-content:space-between; padding:0 18px; font-family:var(--num); font-weight:700; font-size:10px; color:var(--ink); }
+  .statusbar .icons { letter-spacing:2px; font-size:9px; }
+  .screen { height:764px; overflow:hidden; padding:0 16px 0; position:relative; }
+  .tabbar { position:absolute; left:0; right:0; bottom:0; height:64px; background:rgba(255,255,255,.94); border-top:1.5px solid #F3D8E5; display:flex; align-items:center; justify-content:space-around; padding:0 12px; backdrop-filter:blur(8px); }
+  .tab { display:flex; flex-direction:column; align-items:center; gap:2px; font-size:9px; color:#A08A97; }
+  .tab .ic { font-size:18px; line-height:1; }
+  .tab.active { color:var(--pink); font-weight:700; }
+  .fade { position:absolute; left:0; right:0; bottom:64px; height:30px; background:linear-gradient(to top, rgba(255,248,251,.96), rgba(255,248,251,0)); pointer-events:none; z-index:4; }
+  .tab.active .ic { transform:rotate(-3deg); background:var(--pink-tint); width:40px; height:30px; border:1.5px solid var(--pink); border-radius:12px; display:grid; place-items:center; }
+  .appbar { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:5px 0 9px; }
+  .greet .hi { font-size:11px; color:var(--soft); }
+  .greet .name { font-family:var(--heading); font-size:20px; line-height:1.15; }
+  .balance { display:flex; align-items:center; gap:5px; background:#fff; border:1.5px solid var(--line); border-radius:999px; padding:6px 10px; box-shadow:2px 2px 0 rgba(163,58,102,.14); font-family:var(--num); font-weight:800; font-size:16px; }
+  .coin-dot { width:18px; height:18px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #FFE58F, #FFC53D 60%, #E8A21A); border:1px solid #D79512; display:grid; place-items:center; font-size:9px; color:#8A5B05; }
+  .hero { position:relative; border:2px solid var(--line); border-radius:24px; padding:10px 14px 9px; background:linear-gradient(135deg,#FFB3D0 0%,#FFDCE9 100%); box-shadow:2px 3px 0 rgba(163,58,102,.18); overflow:hidden; }
+  .hero-row { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .date { font-family:var(--heading); font-size:16px; }
+  .streak { display:flex; align-items:center; gap:4px; background:rgba(255,255,255,.72); padding:4px 8px; border-radius:999px; font-family:var(--num); font-weight:700; font-size:10.5px; }
+  .cheer { font-family:var(--heading); font-size:14px; line-height:1.4; margin:9px 0 7px; }
+  .progress-label { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:6px; font-size:10px; color:rgba(74,42,60,.68); }
+  .progress-label b { font-family:var(--num); font-size:12px; color:var(--ink); }
+  .track { height:12px; border-radius:999px; background:rgba(255,255,255,.62); position:relative; }
+  .fill { height:100%; border-radius:999px; background:#fff; }
+  .star-thumb { width:22px; height:22px; border-radius:50%; background:#fff; border:1.5px solid var(--coin); display:grid; place-items:center; color:var(--coin); font-size:13px; position:absolute; top:50%; transform:translate(-50%,-50%); box-shadow:0 1px 2px rgba(74,42,60,.14); }
+  .section-bar { display:flex; justify-content:space-between; align-items:center; margin:9px 2px 6px; }
+  .section-bar .t { font-family:var(--heading); font-size:16px; }
+  .section-bar .r { font-size:10px; color:var(--soft); }
+  .panel { border:2px solid; border-radius:20px; overflow:hidden; margin-bottom:7px; background:#fff; box-shadow:2px 3px 0 rgba(74,42,60,.09); }
+  .panel.pink { border-color:#F58BB2; }
+  .panel.amber { border-color:#F2C46A; }
+  .panel.mint { border-color:#8BDCC6; }
+  .panel.purple { border-color:#C3B3EE; }
+  .panel-head { display:flex; align-items:center; gap:8px; padding:6px 9px; }
+  .panel.pink .panel-head { background:#FFE3EF; }
+  .panel.amber .panel-head { background:#FFF0D2; }
+  .panel.mint .panel-head { background:#DDF7EF; }
+  .panel.purple .panel-head { background:#EFE8FF; }
+  .panel-ic { width:29px; height:29px; border-radius:10px; display:grid; place-items:center; font-size:15px; flex:none; }
+  .panel.pink .panel-ic { background:var(--pink); }
+  .panel.amber .panel-ic { background:var(--amber); }
+  .panel.mint .panel-ic { background:var(--mint); }
+  .panel.purple .panel-ic { background:var(--purple); }
+  .panel-name { font-family:var(--heading); font-size:13px; }
+  .panel.pink .panel-name { color:#E84F8B; }
+  .panel.amber .panel-name { color:#D99110; }
+  .panel.mint .panel-name { color:#239B7F; }
+  .panel.purple .panel-name { color:#8264D8; }
+  .panel-count { font-size:9px; color:var(--soft); }
+  .panel-add { margin-left:auto; font-size:9px; border-radius:999px; padding:3px 8px; background:#fff; border:1px solid currentColor; }
+  .panel.pink .panel-add { color:#E84F8B; }
+  .panel.amber .panel-add { color:#D99110; }
+  .panel.mint .panel-add { color:#239B7F; }
+  .panel.purple .panel-add { color:#8264D8; }
+  .daily-grid { display:grid; grid-template-columns:1fr 1fr; }
+  .task-tile { min-height:48px; padding:6px 8px; display:flex; align-items:center; gap:8px; border-top:1px solid #F6DFE8; position:relative; }
+  .task-tile:nth-child(odd) { border-right:1px solid #F6DFE8; }
+  .task-tile:nth-child(1), .task-tile:nth-child(2) { border-top:0; }
+  .task-emoji { width:30px; height:30px; border-radius:11px; background:var(--pink-tint); display:grid; place-items:center; font-size:17px; flex:none; }
+  .task-tile > div:nth-child(2) { display:flex; flex-direction:column; justify-content:center; gap:2px; min-width:0; }
+  .task-name { font-size:11px; font-weight:700; line-height:1.2; }
+  .task-coins { margin-top:0; align-self:flex-start; display:inline-flex; align-items:center; gap:3px; font-family:var(--num); font-weight:700; font-size:9.5px; color:#B08A1A; background:#FFF6DA; border:1px solid #F0D384; border-radius:999px; padding:1px 6px; }
+  .task-tile.done { background-image:radial-gradient(circle, rgba(255,111,165,.22) 2.4px, transparent 2.6px); background-size:12px 12px; }
+  .task-tile.done .task-emoji { background:rgba(255,255,255,.75); }
+  .task-tile.done .task-name { color:#A98C9B; text-decoration:line-through; }
+  .check-stamp { position:absolute; right:6px; top:5px; width:16px; height:16px; border-radius:50%; background:var(--coin); border:1.5px solid #fff; display:grid; place-items:center; color:#7A4B00; font-size:9px; font-weight:800; }
+  .mini-list { padding:2px 10px 4px; }
+  .mini-row { display:flex; align-items:center; gap:7px; padding:3.5px 0; border-top:1px dashed #F1DDE5; }
+  .mini-row:first-child { border-top:0; }
+  .mini-emoji { width:24px; height:24px; border-radius:9px; background:var(--amber-tint); display:grid; place-items:center; font-size:13px; }
+  .mini-name { font-size:10.5px; font-weight:700; }
+  .mini-coins { margin-left:auto; font-family:var(--num); font-size:9.5px; font-weight:700; color:#B08A1A; }
+  .challenge-row { display:flex; gap:8px; padding:5px 8px 6px; }
+  .ticket { flex:1; border-radius:14px; padding:6px 8px; background:linear-gradient(135deg,#F6F0FF,#FFF); border:1.5px dashed #C3B3EE; position:relative; }
+  .ticket .em { font-size:20px; }
+  .ticket .tt { font-size:10.5px; font-weight:700; margin-top:2px; line-height:1.25; }
+  .ticket .cc { font-family:var(--num); font-weight:800; font-size:12px; color:#8264D8; margin-top:3px; }
+  .ticket .corner { position:absolute; right:5px; top:5px; font-size:10px; }
+  .holiday-strip { display:flex; align-items:center; gap:8px; padding:7px 10px; }
+  .holiday-strip .em { font-size:18px; }
+  .holiday-strip .tt { font-size:10.5px; font-weight:700; }
+  .holiday-strip .sub { font-size:9px; color:var(--soft); }
+  .holiday-strip .switch { margin-left:auto; font-size:8.5px; color:#239B7F; border:1px solid #8BDCC6; background:#F2FCF8; border-radius:999px; padding:3px 8px; }
+
+  /* Concept 2 */
+  .map-hero { border:2px solid #8BDCC6; border-radius:24px; padding:13px 15px 12px; background:linear-gradient(135deg,#C3DEB1,#EAF4DB); box-shadow:2px 3px 0 rgba(62,116,90,.16); position:relative; overflow:hidden; }
+  .map-hero .path-mini { margin-top:9px; height:24px; position:relative; }
+  .map-hero .path-mini:before { content:''; position:absolute; left:2px; right:2px; top:11px; border-top:2.5px dashed rgba(51,75,55,.28); }
+  .map-hero .pin { position:absolute; top:2px; width:20px; height:20px; border-radius:50%; background:#fff; border:2px solid #5F9B6B; display:grid; place-items:center; font-size:9px; }
+  .zone { border:2px solid; border-radius:22px; padding:9px 10px 8px; margin-bottom:10px; position:relative; overflow:hidden; }
+  .zone.pink { border-color:#F58BB2; background:linear-gradient(180deg,#FFF0F6,#FFF9FC); }
+  .zone.amber { border-color:#EFC168; background:linear-gradient(180deg,#FFF8E8,#FFFDF8); }
+  .zone.mint { border-color:#8BDCC6; background:linear-gradient(180deg,#EFFBF6,#FBFFFD); }
+  .zone.purple { border-color:#C3B3EE; background:linear-gradient(180deg,#F4EFFF,#FDFBFF); }
+  .zone-head { display:flex; align-items:center; gap:7px; padding:0 2px 6px; }
+  .zone-ic { width:26px; height:26px; border-radius:10px; display:grid; place-items:center; font-size:14px; }
+  .zone.pink .zone-ic { background:var(--pink); }
+  .zone.amber .zone-ic { background:var(--amber); }
+  .zone.mint .zone-ic { background:var(--mint); }
+  .zone.purple .zone-ic { background:var(--purple); }
+  .zone-name { font-family:var(--heading); font-size:12.5px; }
+  .zone.pink .zone-name { color:#E84F8B; }
+  .zone.amber .zone-name { color:#D99110; }
+  .zone.mint .zone-name { color:#239B7F; }
+  .zone.purple .zone-name { color:#8264D8; }
+  .zone-count { font-size:8.5px; color:var(--soft); }
+  .zone-state { margin-left:auto; font-size:8.5px; padding:2px 7px; border-radius:999px; background:rgba(255,255,255,.7); }
+  .trail { position:relative; padding:2px 0 0 3px; }
+  .trail:before { content:''; position:absolute; left:22px; top:9px; bottom:9px; border-left:2.5px dashed rgba(95,155,107,.3); }
+  .zone.pink .trail:before { border-color:rgba(232,79,139,.24); }
+  .zone.amber .trail:before { border-color:rgba(217,145,16,.24); }
+  .zone.purple .trail:before { border-color:rgba(130,100,216,.24); }
+  .step { display:flex; align-items:center; gap:8px; padding:3px 0; position:relative; }
+  .node { width:36px; height:36px; flex:none; border-radius:50%; background:#fff; border:2.5px solid; display:grid; place-items:center; font-size:17px; z-index:1; box-shadow:1px 2px 0 rgba(74,42,60,.12); }
+  .zone.pink .node { border-color:#F58BB2; }
+  .zone.amber .node { border-color:#EFC168; }
+  .zone.mint .node { border-color:#8BDCC6; }
+  .zone.purple .node { border-color:#C3B3EE; }
+  .step.done .node { background:var(--coin); border-color:#D79512; font-size:15px; }
+  .quest { flex:1; min-width:0; background:#fff; border:1.5px solid; border-radius:13px; padding:6px 9px; display:flex; align-items:center; gap:6px; box-shadow:1px 2px 0 rgba(74,42,60,.08); }
+  .zone.pink .quest { border-color:#FAD1E0; }
+  .zone.amber .quest { border-color:#F6E2B8; }
+  .zone.mint .quest { border-color:#C7EEE3; }
+  .zone.purple .quest { border-color:#DFD4F8; }
+  .q-name { font-size:10.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .q-sub { font-size:8.5px; color:var(--soft); margin-top:1px; }
+  .q-coin { margin-left:auto; font-family:var(--num); font-weight:800; font-size:10.5px; color:#B08A1A; background:#FFF6DA; border:1px solid #F0D384; border-radius:999px; padding:2px 6px; flex:none; }
+  .step.done .q-name { color:#A98C9B; text-decoration:line-through; }
+  .step.done .quest { background:#FFFDF6; }
+  .done-stamp { font-size:8px; color:#B08A1A; background:#FFF1C6; border-radius:999px; padding:1px 5px; margin-left:4px; }
+  .locked { display:flex; align-items:center; gap:8px; padding:7px 2px 3px; }
+  .locked .lk { width:36px; height:36px; border-radius:50%; background:#fff; border:2px dashed #8BDCC6; display:grid; place-items:center; font-size:14px; color:#239B7F; }
+  .locked .lt { font-size:10px; font-weight:700; color:#239B7F; }
+  .locked .ls { font-size:8.5px; color:var(--soft); }
+  .locked .go { margin-left:auto; font-size:8.5px; color:#239B7F; border:1px solid #8BDCC6; background:#fff; border-radius:999px; padding:3px 8px; }
+
+  /* Concept 3 */
+  .focus-hero { display:flex; align-items:center; gap:10px; border:2px solid var(--line); border-radius:20px; padding:8px 11px; background:linear-gradient(135deg,#FFD3E4,#FFF0F7); box-shadow:2px 3px 0 rgba(163,58,102,.14); }
+  .focus-hero .col { flex:1; }
+  .focus-hero .d { font-family:var(--heading); font-size:14px; }
+  .focus-hero .s { font-size:9.5px; color:var(--soft); margin-top:2px; }
+  .focus-hero .pct { font-family:var(--num); font-weight:800; font-size:18px; color:var(--pink); }
+  .cat-chips { display:flex; gap:6px; margin:9px 0 7px; }
+  .chip { flex:1; text-align:center; border-radius:13px; padding:6px 3px 5px; background:#fff; border:1.5px solid #F1DCE6; font-size:9px; color:var(--soft); }
+  .chip b { display:block; font-family:var(--num); font-size:12px; color:var(--ink); }
+  .chip.on { background:var(--pink); border-color:var(--pink); color:#fff; box-shadow:2px 2px 0 rgba(163,58,102,.18); }
+  .chip.on b { color:#fff; }
+  .focus-zone { border:2px solid var(--line); border-radius:26px; padding:10px; background:linear-gradient(165deg,#FFE5F0,#FFF9FC 58%,#FFF); box-shadow:2px 3px 0 rgba(163,58,102,.16); }
+  .focus-card { position:relative; background:#fff; border:2px solid #F58BB2; border-radius:22px; padding:12px 14px 10px; text-align:center; box-shadow:3px 4px 0 rgba(163,58,102,.14); }
+  .focus-card:before { content:'⭐'; position:absolute; right:10px; top:8px; font-size:16px; transform:rotate(10deg); }
+  .focus-emoji { width:68px; height:68px; border-radius:23px; margin:0 auto 6px; background:var(--pink-tint); display:grid; place-items:center; font-size:36px; border:2px solid #FFD0E1; }
+  .focus-title { font-family:var(--heading); font-size:21px; line-height:1.2; }
+  .focus-sub { font-size:9.5px; color:var(--soft); margin-top:4px; }
+  .focus-coins { display:inline-flex; align-items:center; gap:5px; margin-top:9px; font-family:var(--num); font-weight:800; font-size:16px; color:#B08A1A; background:#FFF4CF; border:1.5px solid #F0D384; border-radius:999px; padding:4px 12px; }
+  .focus-hint { margin-top:7px; font-size:9px; color:var(--soft); }
+  .focus-dots { display:flex; justify-content:center; gap:5px; margin-top:7px; }
+  .focus-dots i { width:7px; height:7px; border-radius:50%; background:#F3D5E2; }
+  .focus-dots i.on { background:var(--pink); }
+  .next-title { display:flex; align-items:center; justify-content:space-between; margin:9px 2px 6px; }
+  .next-title .t { font-family:var(--heading); font-size:14px; }
+  .next-title .r { font-size:9px; color:var(--soft); }
+  .next-card { background:#fff; border:1.5px solid #F1DCE6; border-radius:18px; padding:3px 10px; box-shadow:2px 2px 0 rgba(74,42,60,.06); }
+  .next-row { display:flex; align-items:center; gap:8px; padding:5px 0; border-top:1px dashed #F3DFE8; }
+  .next-row:first-child { border-top:0; }
+  .next-em { width:30px; height:30px; border-radius:11px; background:var(--pink-tint); display:grid; place-items:center; font-size:16px; }
+  .next-name { font-size:10.5px; font-weight:700; }
+  .next-sub { font-size:8.5px; color:var(--soft); }
+  .next-coin { margin-left:auto; font-family:var(--num); font-weight:800; font-size:10px; color:#B08A1A; background:#FFF6DA; border:1px solid #F0D384; border-radius:999px; padding:2px 6px; }
+  .swipe-hint { text-align:center; font-size:8.5px; color:var(--soft); margin-top:7px; }
+  .collect { display:flex; align-items:center; gap:6px; background:#fff; border:1.5px solid #F1DCE6; border-radius:18px; padding:7px 10px; box-shadow:2px 2px 0 rgba(74,42,60,.06); }
+  .collect .ce { width:30px; height:30px; border-radius:10px; background:var(--pink-tint); display:grid; place-items:center; font-size:16px; }
+  .collect .ch { margin-left:auto; max-width:98px; text-align:right; font-size:8.5px; color:var(--soft); line-height:1.35; }
+  .notes { margin:14px 4px 0; padding:12px 14px; background:#fff; border:1.5px solid #E9DFEF; border-radius:16px; box-shadow:1px 2px 0 #E9DFEF; }
+  .notes b { font-size:11px; display:block; margin-bottom:4px; }
+  .notes ul { margin:0; padding-left:16px; color:#7C6A8A; font-size:10.5px; line-height:1.65; }
+  .footer-note { max-width:1280px; margin:38px auto 0; color:#8B7A97; font-size:12px; line-height:1.7; text-align:center; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-head">
+    <span class="kicker">LoulouDo · Home task list</span>
+    <h1>首页任务列表 · 3 个重构方向</h1>
+    <p>共用同一套贴纸语言、日期卡和进度星，只重做“任务区”的组织方式。每个方案都保留整行点击完成、金币在右、完成圆点底纹，但信息层级和节奏完全不同。</p>
+  </div>
+
+  <div class="concepts">
+    <!-- CONCEPT 1 -->
+    <section class="concept">
+      <div class="concept-head">
+        <div class="num">01</div>
+        <div>
+          <h2>贴纸便当盒</h2>
+          <p>分类色块 + 2 列小贴纸，任务多也能一眼扫完</p>
+        </div>
+      </div>
+      <div class="device" id="phone-bento">
+        <div class="phone">
+          <div class="statusbar"><span>9:41</span><span class="icons">▮▮▮ ⌁ ▰</span></div>
+          <div class="screen">
+            <div class="appbar">
+              <div class="greet"><div class="hi">下午好呀</div><div class="name">朵朵</div></div>
+              <div class="balance"><span class="coin-dot">★</span>18</div>
+            </div>
+            <div class="hero">
+              <div class="hero-row"><div class="date">11月21日 周六</div><div class="streak">🔥 连续 6 天</div></div>
+              <div class="cheer">完成 3 件啦，还差 8 件就全勤咯！</div>
+              <div class="progress-label"><span>今日进度</span><b>3 / 11</b></div>
+              <div class="track"><div class="fill" style="width:27%"></div><div class="star-thumb" style="left:27%">★</div></div>
+            </div>
+
+            <div class="section-bar"><div class="t">🌈 今天的任务</div><div class="r">3/11 已完成</div></div>
+
+            <div class="panel pink">
+              <div class="panel-head"><div class="panel-ic">☀️</div><div><div class="panel-name">每日任务</div><div class="panel-count">6 个任务 · 每天都有</div></div><div class="panel-add">＋ 添加</div></div>
+              <div class="daily-grid">
+                <div class="task-tile done"><div class="task-emoji">🪥</div><div><div class="task-name">自己刷牙洗脸</div><span class="task-coins">★ +2</span></div><span class="check-stamp">✓</span></div>
+                <div class="task-tile done"><div class="task-emoji">🎒</div><div><div class="task-name">收拾小书包</div><span class="task-coins">★ +2</span></div><span class="check-stamp">✓</span></div>
+                <div class="task-tile done"><div class="task-emoji">📚</div><div><div class="task-name">阅读 20 分钟</div><span class="task-coins">★ +4</span></div><span class="check-stamp">✓</span></div>
+                <div class="task-tile"><div class="task-emoji">💧</div><div><div class="task-name">喝够 8 杯水</div><span class="task-coins">★ +3</span></div></div>
+                <div class="task-tile"><div class="task-emoji">🎹</div><div><div class="task-name">练琴 15 分钟</div><span class="task-coins">★ +4</span></div></div>
+                <div class="task-tile"><div class="task-emoji">🌙</div><div><div class="task-name">九点前睡觉</div><span class="task-coins">★ +3</span></div></div>
+              </div>
+            </div>
+
+            <div class="panel amber">
+              <div class="panel-head"><div class="panel-ic">🎈</div><div><div class="panel-name">周末任务</div><div class="panel-count">3 个任务 · 周末限定</div></div><div class="panel-add">＋ 添加</div></div>
+              <div class="mini-list">
+                <div class="mini-row"><div class="mini-emoji">🚴</div><div class="mini-name">户外运动 1 小时</div><div class="mini-coins">+6</div></div>
+                <div class="mini-row"><div class="mini-emoji">🧹</div><div class="mini-name">帮家里做一件家务</div><div class="mini-coins">+5</div></div>
+                <div class="mini-row"><div class="mini-emoji">🧸</div><div class="mini-name">整理自己的房间</div><div class="mini-coins">+4</div></div>
+              </div>
+            </div>
+
+            <div class="panel mint">
+              <div class="holiday-strip"><div class="em">🏖️</div><div><div class="tt">假期任务 · 秋假</div><div class="sub">2 个任务 · 假期模式已开启</div></div><div class="switch">管理</div></div>
+            </div>
+
+            <div class="panel purple">
+              <div class="panel-head"><div class="panel-ic">🚀</div><div><div class="panel-name">特别挑战</div><div class="panel-count">2 个挑战 · 限定日期</div></div></div>
+              <div class="challenge-row">
+                <div class="ticket"><span class="corner">⭐</span><div class="em">🤸</div><div class="tt">连续跳绳 100 下</div><div class="cc">+20 ★</div></div>
+                <div class="ticket"><span class="corner">⭐</span><div class="em">🧩</div><div class="tt">完成 1000 片拼图</div><div class="cc">+30 ★</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="tabbar">
+            <div class="tab active"><span class="ic">☀️</span><span>今日</span></div>
+            <div class="tab"><span class="ic">📋</span><span>任务</span></div>
+            <div class="tab"><span class="ic">📊</span><span>报表</span></div>
+            <div class="tab"><span class="ic">👛</span><span>钱包</span></div>
+            <div class="tab"><span class="ic">⚙️</span><span>设置</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="notes">
+        <b>适合：任务多、想一屏看全</b>
+        <ul><li>4 个类别 = 4 种颜色的独立模块</li><li>每日任务用 2 列贴纸网格，页面高度省一半</li><li>周末 / 挑战用更轻的横条和票券，强弱有节奏</li></ul>
+      </div>
+    </section>
+
+    <!-- CONCEPT 2 -->
+    <section class="concept">
+      <div class="concept-head">
+        <div class="num">02</div>
+        <div>
+          <h2>冒险小径</h2>
+          <p>把任务变成沿路的小关卡，完成一个点亮一颗星</p>
+        </div>
+      </div>
+      <div class="device" id="phone-quest">
+        <div class="phone">
+          <div class="statusbar"><span>9:41</span><span class="icons">▮▮▮ ⌁ ▰</span></div>
+          <div class="screen">
+            <div class="appbar">
+              <div class="greet"><div class="hi">下午好呀</div><div class="name">朵朵</div></div>
+              <div class="balance"><span class="coin-dot">★</span>18</div>
+            </div>
+            <div class="map-hero">
+              <div class="hero-row"><div class="date">11月21日 周六</div><div class="streak">🔥 连续 6 天</div></div>
+              <div class="cheer">今天的小冒险，已经走过 3 个关卡啦！</div>
+              <div class="progress-label"><span>冒险进度</span><b>3 / 11</b></div>
+              <div class="track"><div class="fill" style="width:27%"></div><div class="star-thumb" style="left:27%">★</div></div>
+              <div class="path-mini"><span class="pin" style="left:2px">🏁</span><span class="pin" style="left:33%">🪥</span><span class="pin" style="left:63%">📚</span><span class="pin" style="left:88%;background:#FFC53D;border-color:#D79512">★</span></div>
+            </div>
+
+            <div class="zone pink">
+              <div class="zone-head"><div class="zone-ic">☀️</div><div class="zone-name">每日小径</div><div class="zone-count">6 关</div><div class="zone-state">每天开放</div></div>
+              <div class="trail">
+                <div class="step done"><div class="node">✓</div><div class="quest"><div><div class="q-name">自己刷牙洗脸</div><div class="q-sub">清晨关卡</div></div><span class="done-stamp">已通关</span><div class="q-coin">+2</div></div></div>
+                <div class="step done"><div class="node">✓</div><div class="quest"><div><div class="q-name">收拾小书包</div><div class="q-sub">出门关卡</div></div><span class="done-stamp">已通关</span><div class="q-coin">+2</div></div></div>
+                <div class="step done"><div class="node">✓</div><div class="quest"><div><div class="q-name">阅读 20 分钟</div><div class="q-sub">安静关卡</div></div><div class="q-coin">+4</div></div></div>
+                <div class="step"><div class="node">💧</div><div class="quest"><div><div class="q-name">喝够 8 杯水</div><div class="q-sub">补水关卡</div></div><div class="q-coin">+3</div></div></div>
+                <div class="step"><div class="node">🎹</div><div class="quest"><div><div class="q-name">练琴 15 分钟</div><div class="q-sub">音乐关卡</div></div><div class="q-coin">+4</div></div></div>
+                <div class="step"><div class="node">🌙</div><div class="quest"><div><div class="q-name">九点前上床睡觉</div><div class="q-sub">晚安关卡</div></div><div class="q-coin">+3</div></div></div>
+              </div>
+            </div>
+
+            <div class="zone amber">
+              <div class="zone-head"><div class="zone-ic">🎈</div><div class="zone-name">周末营地</div><div class="zone-count">3 关</div><div class="zone-state">仅周末</div></div>
+              <div class="trail">
+                <div class="step"><div class="node">🚴</div><div class="quest"><div><div class="q-name">户外运动 1 小时</div><div class="q-sub">体力关卡</div></div><div class="q-coin">+6</div></div></div>
+                <div class="step"><div class="node">🧹</div><div class="quest"><div><div class="q-name">帮家里做一件家务</div><div class="q-sub">帮手关卡</div></div><div class="q-coin">+5</div></div></div>
+                <div class="step"><div class="node">🧸</div><div class="quest"><div><div class="q-name">整理自己的房间</div><div class="q-sub">整理关卡</div></div><div class="q-coin">+4</div></div></div>
+              </div>
+            </div>
+
+            <div class="zone mint">
+              <div class="zone-head"><div class="zone-ic">🏖️</div><div class="zone-name">假期海岛</div><div class="zone-count">2 关</div><div class="zone-state">已开启</div></div>
+              <div class="trail">
+                <div class="step"><div class="node">✍️</div><div class="quest"><div><div class="q-name">写一篇假期日记</div><div class="q-sub">记录关卡</div></div><div class="q-coin">+6</div></div></div>
+                <div class="step"><div class="node">🍳</div><div class="quest"><div><div class="q-name">学做一道新菜</div><div class="q-sub">厨房关卡</div></div><div class="q-coin">+8</div></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="fade"></div>
+          <div class="tabbar">
+            <div class="tab active"><span class="ic">☀️</span><span>今日</span></div>
+            <div class="tab"><span class="ic">📋</span><span>任务</span></div>
+            <div class="tab"><span class="ic">📊</span><span>报表</span></div>
+            <div class="tab"><span class="ic">👛</span><span>钱包</span></div>
+            <div class="tab"><span class="ic">⚙️</span><span>设置</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="notes">
+        <b>适合：低龄、需要闯关感</b>
+        <ul><li>每个类别是一条有颜色的“关卡路线”</li><li>完成任务 = 通关，节点变成金色星星</li><li>冒险感最强，但页面更长，适合滚动浏览</li></ul>
+      </div>
+    </section>
+
+    <!-- CONCEPT 3 -->
+    <section class="concept">
+      <div class="concept-head">
+        <div class="num">03</div>
+        <div>
+          <h2>专注卡组</h2>
+          <p>一次只呈现一件事，像抽一张任务卡来完成</p>
+        </div>
+      </div>
+      <div class="device" id="phone-focus">
+        <div class="phone">
+          <div class="statusbar"><span>9:41</span><span class="icons">▮▮▮ ⌁ ▰</span></div>
+          <div class="screen">
+            <div class="appbar">
+              <div class="greet"><div class="hi">下午好呀</div><div class="name">朵朵</div></div>
+              <div class="balance"><span class="coin-dot">★</span>18</div>
+            </div>
+            <div class="focus-hero">
+              <div class="col"><div class="d">11月21日 周六</div><div class="s">🔥 连续 6 天 · 今天还差 7 件</div></div>
+              <div style="text-align:right"><div class="pct">4/11</div><div class="s" style="margin-top:0">已完成</div></div>
+            </div>
+            <div class="cat-chips">
+              <div class="chip on"><b>4/6</b>每日</div>
+              <div class="chip"><b>0/3</b>周末</div>
+              <div class="chip"><b>0/2</b>假期</div>
+              <div class="chip"><b>0/2</b>挑战</div>
+            </div>
+
+            <div class="focus-zone">
+              <div class="focus-card">
+                <div class="focus-emoji">💧</div>
+                <div class="focus-title">喝够 8 杯水</div>
+                <div class="focus-sub">补水关卡 · 每天都有</div>
+                <div class="focus-coins">★ +3 金币</div>
+                <div class="focus-hint">点一下这张卡片，就完成啦</div>
+                <div class="focus-dots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
+              </div>
+            </div>
+
+            <div class="next-title"><div class="t">接下来</div><div class="r">每日任务 · 还剩 2 件</div></div>
+            <div class="next-card">
+              <div class="next-row"><div class="next-em">🎹</div><div><div class="next-name">练琴 15 分钟</div><div class="next-sub">音乐关卡</div></div><div class="next-coin">+4</div></div>
+              <div class="next-row"><div class="next-em">🌙</div><div><div class="next-name">九点前上床睡觉</div><div class="next-sub">晚安关卡</div></div><div class="next-coin">+3</div></div>
+            </div>
+            <div class="swipe-hint">← 左右滑动切换分类 →</div>
+
+            <div class="next-title"><div class="t">今日宝箱</div><div class="r">全部完成 +5</div></div>
+            <div class="next-card" style="padding:10px 12px">
+              <div class="next-row" style="border:0;padding:0"><div class="next-em" style="background:#FFF3D0">🎁</div><div><div class="next-name">全勤宝箱</div><div class="next-sub">完成 11 件任务就能打开</div></div><div class="next-coin">+5</div></div>
+            </div>
+
+            <div class="next-title"><div class="t">今日收集</div><div class="r">4 件已完成</div></div>
+            <div class="collect">
+              <div class="ce">🪥</div><div class="ce">🎒</div><div class="ce">📚</div><div class="ce">💧</div>
+              <div class="ch">再完成 7 件，就把今天的小格子填满啦</div>
+            </div>
+          </div>
+          <div class="tabbar">
+            <div class="tab active"><span class="ic">☀️</span><span>今日</span></div>
+            <div class="tab"><span class="ic">📋</span><span>任务</span></div>
+            <div class="tab"><span class="ic">📊</span><span>报表</span></div>
+            <div class="tab"><span class="ic">👛</span><span>钱包</span></div>
+            <div class="tab"><span class="ic">⚙️</span><span>设置</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="notes">
+        <b>适合：容易分心、需要聚焦</b>
+        <ul><li>一次只展示一张大任务卡，压力更小</li><li>分类用顶部小标签切换，保留全貌入口</li><li>互动变成“抽卡 + 完成”，但看全所有任务需要滑动</li></ul>
+      </div>
+    </section>
+  </div>
+
+  <div class="footer-note">样稿仅用于确定方向：确认后再按现有交互（整行点击、金币置右、完成圆点底纹）落地到 Expo / React Native。</div>
+</div>
+</body>
+</html>

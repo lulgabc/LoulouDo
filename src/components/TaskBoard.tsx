@@ -26,6 +26,7 @@ export function TaskBoard({
   header,
   emptyNode,
   completionEnabled = true,
+  emphasizeGroups = false,
 }: {
   groups: TaskGroup[];
   doneIds: Set<string>;
@@ -41,6 +42,8 @@ export function TaskBoard({
   emptyNode?: React.ReactNode;
   /** 首页开启点击完成；任务管理页关闭 */
   completionEnabled?: boolean;
+  /** 任务管理页：每个类别做成独立的彩色卡片 */
+  emphasizeGroups?: boolean;
 }) {
   const theme = useTheme();
   const { t } = useI18n();
@@ -56,57 +59,127 @@ export function TaskBoard({
         </>
       ) : null}
       {groups.length === 0 && emptyNode ? emptyNode : null}
-      {groups.map((group) => {
+      {groups.map((group, groupIndex) => {
         const color = colorForCategory(group.category, theme);
         const meta = CATEGORY_MAP[group.category];
         const dashed = group.category === 'weekend';
         const double = group.category === 'special';
+        const groupCardStyle = emphasizeGroups
+          ? {
+              marginHorizontal: 9,
+              marginTop: 9,
+              marginBottom: groupIndex === groups.length - 1 ? 9 : 0,
+              borderRadius: 18,
+              borderWidth: double ? 2 : 1.5,
+              borderColor: color + (double ? '88' : '55'),
+              borderStyle: dashed ? ('dashed' as const) : ('solid' as const),
+              backgroundColor: color + (theme.dark ? '14' : '0A'),
+              overflow: 'hidden' as const,
+            }
+          : undefined;
         return (
-          <View key={group.category}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 7,
-                paddingHorizontal: 14,
-                paddingTop: 15,
-                paddingBottom: 5,
-              }}
-            >
+          <View key={group.category} style={groupCardStyle}>
+            {emphasizeGroups ? (
               <View
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
-                  gap: 4,
-                  paddingHorizontal: 8,
-                  paddingVertical: 3,
-                  borderRadius: 999,
-                  backgroundColor: color + (theme.dark ? '26' : '14'),
-                  borderWidth: double ? 2 : 1,
-                  borderColor: color + (double ? 'AA' : '55'),
-                  borderStyle: dashed ? 'dashed' : 'solid',
+                  gap: 9,
+                  paddingHorizontal: 11,
+                  paddingVertical: 10,
+                  backgroundColor: color + (theme.dark ? '26' : '16'),
+                  borderBottomWidth: 1,
+                  borderBottomColor: color + '33',
                 }}
               >
-                <Text style={{ fontSize: 10 }}>{meta.emoji}</Text>
-                <Text style={{ ...heading(10, color), fontWeight: '700' }}>
-                  {t(`category.${group.category}.short`)}
-                </Text>
-              </View>
-              <Text style={{ fontSize: 10, color: theme.textSoft }}>{group.tasks.length}</Text>
-              <View style={{ flex: 1 }} />
-              {onAddCategory ? (
-                <Pressable
-                  onPress={() => onAddCategory(group.category)}
-                  hitSlop={8}
-                  accessibilityRole="button"
-                  accessibilityLabel={`${t('common.add')} ${t(`category.${group.category}.short`)}`}
+                <View
+                  style={{
+                    width: 34,
+                    height: 34,
+                    borderRadius: 12,
+                    backgroundColor: color,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
                 >
-                  <Text style={{ fontSize: 10.5, color: theme.textSoft }}>
-                    ＋ {t('common.add')}
+                  <Text style={{ fontSize: 18 }}>{meta.emoji}</Text>
+                </View>
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  <Text style={heading(13.5, color)} numberOfLines={1}>
+                    {t(`category.${group.category}.name`)}
                   </Text>
-                </Pressable>
-              ) : null}
-            </View>
+                  <Text style={{ fontSize: 9.5, color: theme.textSoft, marginTop: 1 }}>
+                    {t('tasks.taskCount', { n: group.tasks.length })}
+                  </Text>
+                </View>
+                {onAddCategory ? (
+                  <Pressable
+                    onPress={() => onAddCategory(group.category)}
+                    hitSlop={8}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${t('common.add')} ${t(`category.${group.category}.short`)}`}
+                    style={({ pressed }) => ({
+                      width: 28,
+                      height: 28,
+                      borderRadius: 14,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: theme.card,
+                      borderWidth: 1.5,
+                      borderColor: color + '66',
+                      opacity: pressed ? 0.6 : 1,
+                    })}
+                  >
+                    <Text style={{ fontSize: 17, color, marginTop: -2 }}>＋</Text>
+                  </Pressable>
+                ) : null}
+              </View>
+            ) : (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 7,
+                  paddingHorizontal: 14,
+                  paddingTop: 15,
+                  paddingBottom: 5,
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 4,
+                    paddingHorizontal: 8,
+                    paddingVertical: 3,
+                    borderRadius: 999,
+                    backgroundColor: color + (theme.dark ? '26' : '14'),
+                    borderWidth: double ? 2 : 1,
+                    borderColor: color + (double ? 'AA' : '55'),
+                    borderStyle: dashed ? 'dashed' : 'solid',
+                  }}
+                >
+                  <Text style={{ fontSize: 10 }}>{meta.emoji}</Text>
+                  <Text style={{ ...heading(10, color), fontWeight: '700' }}>
+                    {t(`category.${group.category}.short`)}
+                  </Text>
+                </View>
+                <Text style={{ fontSize: 10, color: theme.textSoft }}>{group.tasks.length}</Text>
+                <View style={{ flex: 1 }} />
+                {onAddCategory ? (
+                  <Pressable
+                    onPress={() => onAddCategory(group.category)}
+                    hitSlop={8}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${t('common.add')} ${t(`category.${group.category}.short`)}`}
+                  >
+                    <Text style={{ fontSize: 10.5, color: theme.textSoft }}>
+                      ＋ {t('common.add')}
+                    </Text>
+                  </Pressable>
+                ) : null}
+              </View>
+            )}
 
             {group.tasks.length === 0 ? (
               <Text

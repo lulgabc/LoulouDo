@@ -7,19 +7,19 @@ const OUT = 'docs/i18n';
 const LANGS = {
   en: {
     name: 'English', settings: 'Settings', wallet: 'Wallet', tasks: 'Tasks',
-    redeem: 'Redeem pocket money', add: 'Add', holiday: /^Holiday settings$/,
+    redeem: 'Redeem pocket money', add: 'Add', addTask: 'Add a new task', holiday: /^Holiday settings$/,
   },
   de: {
     name: 'Deutsch', settings: 'Mehr', wallet: 'Geld', tasks: 'Plan',
-    redeem: 'Taschengeld abholen', add: 'Hinzufügen', holiday: /^Ferien-Einstellungen$/,
+    redeem: 'Taschengeld abholen', add: 'Hinzufügen', addTask: 'Neue Aufgabe hinzufügen', holiday: /^Ferien-Einstellungen$/,
   },
   fr: {
     name: 'Français', settings: 'Réglages', wallet: 'Argent', tasks: 'Tâches',
-    redeem: 'Retirer de l’argent de poche', add: 'Ajouter', holiday: /^Réglages des vacances$/,
+    redeem: 'Retirer de l’argent de poche', add: 'Ajouter', addTask: 'Ajouter une nouvelle tâche', holiday: /^Réglages des vacances$/,
   },
   pt: {
     name: 'Português', settings: 'Ajustes', wallet: 'Carteira', tasks: 'Tarefas',
-    redeem: 'Resgatar mesada', add: 'Adicionar', holiday: /^Configurações de férias$/,
+    redeem: 'Resgatar mesada', add: 'Adicionar', addTask: 'Adicionar uma nova tarefa', holiday: /^Configurações de férias$/,
   },
 };
 
@@ -103,7 +103,7 @@ for (const [locale, meta] of Object.entries(LANGS)) {
   // 任务编辑器
   await page.locator(`[aria-label="${meta.tasks}"]`).first().click();
   await page.waitForTimeout(800);
-  await page.getByText(`＋ ${meta.add}`).first().click();
+  await clickNonInert(page.locator(`[aria-label="${meta.addTask}"]`));
   await page.waitForTimeout(800);
   const editor = await measure(page);
   await page.screenshot({ path: `${OUT}/${locale}-editor-320.jpg`, type: 'jpeg', quality: 82 });

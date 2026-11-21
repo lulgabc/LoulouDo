@@ -166,7 +166,7 @@ for (const viewport of VIEWPORTS) {
   await page.waitForTimeout(600);
 
   await tab(page, '任务');
-  await clickVisible(page.getByText('＋ 添加'));
+  await clickVisible(page.locator('[aria-label="添加一个新任务"]'));
   await page.waitForTimeout(700);
   pages.editor = await measure(page, viewport, 'editor');
   await clickVisible(page.getByText('✕'));

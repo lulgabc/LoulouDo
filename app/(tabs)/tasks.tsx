@@ -87,6 +87,7 @@ export default function TasksScreen() {
         }
         emptyLabel={t('tasks.emptyTitle')}
         completionEnabled={false}
+        emphasizeGroups
       />
 
       <View

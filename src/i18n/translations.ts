@@ -70,6 +70,7 @@ const zh = {
   'task.a11yEdit': '编辑 {title}',
 
   'tasks.title': '任务清单',
+  'tasks.taskCount': '{n} 个任务',
   'tasks.subtitle': '固定任务会自动重复 · 单次挑战只出现一次',
   'tasks.hint': '点右侧铅笔可以编辑任务',
   'tasks.lessonTitle': '任务小课堂',
@@ -427,6 +428,7 @@ const en: Dict = {
   'task.a11yEdit': 'Edit {title}',
 
   'tasks.title': 'Task list',
+  'tasks.taskCount': '{n} tasks',
   'tasks.subtitle': 'Fixed tasks repeat automatically · one-time challenges appear once',
   'tasks.hint': 'Tap the pencil to edit a task',
   'tasks.lessonTitle': 'Task tips',
@@ -782,6 +784,7 @@ const fr: Dict = {
   'task.a11yEdit': 'Modifier {title}',
 
   'tasks.title': 'Mes tâches',
+  'tasks.taskCount': '{n} tâches',
   'tasks.subtitle': 'Les tâches fixes se répètent · les défis uniques une seule fois',
   'tasks.hint': 'Touche le crayon pour modifier une tâche',
   'tasks.lessonTitle': 'Le coin des tâches',
@@ -1137,6 +1140,7 @@ const de: Dict = {
   'task.a11yEdit': 'Bearbeiten: {title}',
 
   'tasks.title': 'Aufgaben',
+  'tasks.taskCount': '{n} Aufgaben',
   'tasks.subtitle': 'Feste Aufgaben wiederholen sich · Einmal-Challenges nur einmal',
   'tasks.hint': 'Tippe auf den Stift, um eine Aufgabe zu bearbeiten',
   'tasks.lessonTitle': 'Aufgaben-Tipps',
@@ -1492,6 +1496,7 @@ const it: Dict = {
   'task.a11yEdit': 'Modifica {title}',
 
   'tasks.title': 'I miei compiti',
+  'tasks.taskCount': '{n} compiti',
   'tasks.subtitle': 'I compiti fissi si ripetono · le sfide uniche una volta',
   'tasks.hint': 'Tocca la matita per modificare un compito',
   'tasks.lessonTitle': 'Consigli sui compiti',
@@ -1847,6 +1852,7 @@ const es: Dict = {
   'task.a11yEdit': 'Editar {title}',
 
   'tasks.title': 'Mis tareas',
+  'tasks.taskCount': '{n} tareas',
   'tasks.subtitle': 'Las tareas fijas se repiten · los retos únicos solo una vez',
   'tasks.hint': 'Toca el lápiz para editar una tarea',
   'tasks.lessonTitle': 'Trucos de tareas',
@@ -2202,6 +2208,7 @@ const pt: Dict = {
   'task.a11yEdit': 'Editar {title}',
 
   'tasks.title': 'Minhas tarefas',
+  'tasks.taskCount': '{n} tarefas',
   'tasks.subtitle': 'Tarefas fixas se repetem · desafios únicos só uma vez',
   'tasks.hint': 'Toque no lápis para editar uma tarefa',
   'tasks.lessonTitle': 'Dicas de tarefas',

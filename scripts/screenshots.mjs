@@ -31,6 +31,18 @@ const click = async (text, { exact = false, wait = 500 } = {}) => {
   await page.getByText(text, { exact }).first().click();
   await page.waitForTimeout(wait);
 };
+const clickAria = async (label, wait = 500) => {
+  const locator = page.locator(`[aria-label="${label}"]`);
+  const count = await locator.count();
+  for (let i = 0; i < count; i += 1) {
+    const el = locator.nth(i);
+    if (!(await el.evaluate((node) => Boolean(node.closest('[inert]'))))) {
+      await el.click();
+      break;
+    }
+  }
+  await page.waitForTimeout(wait);
+};
 const tab = async (name, wait = 1300) => {
   await page.locator(`[aria-label="${name}"]`).first().click();
   await page.waitForTimeout(wait);
@@ -135,7 +147,7 @@ await page.waitForTimeout(800);
 
 // 新建任务，验证 CRUD
 await tab('任务');
-await page.getByText('＋ 添加').first().click();
+await clickAria('添加一个新任务', 700);
 await page.waitForTimeout(700);
 await shot('15-task-editor');
 await page.locator('input[placeholder*="整理床铺"]').fill('给植物浇水');
