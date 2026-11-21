@@ -194,14 +194,24 @@ export default function TaskEditorScreen() {
 
       <Label>{t('editor.emojiLabel')}</Label>
       <Card style={{ padding: 10, marginBottom: 13 }}>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            rowGap: 7,
+          }}
+        >
           {TASK_EMOJIS.map((e) => (
             <Pressable
               key={e}
               onPress={() => setEmoji(e)}
+              accessibilityRole="button"
+              accessibilityState={{ selected: emoji === e }}
+              accessibilityLabel={e}
               style={{
-                width: 38,
-                height: 38,
+                width: '12%',
+                aspectRatio: 1,
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: 12,
@@ -210,7 +220,7 @@ export default function TaskEditorScreen() {
                 borderColor: theme.primary,
               }}
             >
-              <Text style={{ fontSize: 22 }}>{e}</Text>
+              <Text style={{ fontSize: 20 }}>{e}</Text>
             </Pressable>
           ))}
         </View>

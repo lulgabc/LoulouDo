@@ -55,9 +55,14 @@ export const CATEGORY_MAP: Record<Category, CategoryMeta> = Object.fromEntries(
 ) as Record<Category, CategoryMeta>;
 
 export const TASK_EMOJIS = [
-  '🪥', '🛏️', '📚', '✏️', '🎹', '🎨', '🏃', '🚴', '🏊', '🧹', '🧸', '🍎',
-  '🥕', '💧', '🧦', '🎒', '🌱', '🐶', '🧩', '🎯', '🧘', '🍽️', '🪴', '🪄',
-  '🦷', '🧼', '📖', '🗣️', '🎻', '⚽', '🏀', '🤸', '🚀', '🌟', '🏆', '🎁',
+  // 生活习惯
+  '🪥', '🛏️', '🚿', '🧼', '🧦', '🍽️', '💧', '🌙',
+  // 学习与创作
+  '📚', '✏️', '📖', '🧮', '🎒', '🎨', '🎹', '🧩',
+  // 运动与健康
+  '🏃', '🚴', '🏊', '⚽', '🏀', '🤸', '🧘', '🍎',
+  // 家务、假期与挑战
+  '🧹', '🪴', '🐶', '🍳', '🏖️', '🌟', '🏆', '🚀',
 ];
 
 export const THEME_IDS: ThemeId[] = ['candy', 'forest', 'fantasy', 'cute'];
