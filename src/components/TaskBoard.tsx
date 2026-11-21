@@ -25,6 +25,7 @@ export function TaskBoard({
   emptyLabel,
   header,
   emptyNode,
+  completionEnabled = true,
 }: {
   groups: TaskGroup[];
   doneIds: Set<string>;
@@ -38,6 +39,8 @@ export function TaskBoard({
   emptyLabel?: string;
   header?: React.ReactNode;
   emptyNode?: React.ReactNode;
+  /** 首页开启点击完成；任务管理页关闭 */
+  completionEnabled?: boolean;
 }) {
   const theme = useTheme();
   const { t } = useI18n();
@@ -136,7 +139,7 @@ export function TaskBoard({
                       done={done}
                       coins={coinsFor(task)}
                       note={noteFor?.(task)}
-                      onToggle={() => onToggle(task, done)}
+                      onToggle={completionEnabled ? () => onToggle(task, done) : undefined}
                       onEdit={onEdit ? () => onEdit(task) : undefined}
                     />
                   </View>

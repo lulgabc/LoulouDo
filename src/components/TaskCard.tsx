@@ -112,7 +112,7 @@ export function TaskCard({
   task: Task;
   done: boolean;
   coins: number;
-  onToggle: () => void;
+  onToggle?: () => void;
   onEdit?: () => void;
   note?: string;
   toggleDisabled?: boolean;
@@ -234,11 +234,17 @@ export function TaskCard({
 
       <View style={{ flexDirection: 'row', zIndex: 1, alignItems: 'center' }}>
         <Pressable
-          onPress={toggleDisabled ? undefined : onToggle}
-          disabled={toggleDisabled}
-          accessibilityRole="button"
-          accessibilityState={{ checked: done, disabled: Boolean(toggleDisabled) }}
-          accessibilityLabel={done ? t('task.a11yUndo', { title }) : t('task.a11yComplete', { title })}
+          onPress={onToggle}
+          disabled={!onToggle || toggleDisabled}
+          accessibilityRole={onToggle ? 'button' : undefined}
+          accessibilityState={onToggle ? { checked: done, disabled: Boolean(toggleDisabled) } : undefined}
+          accessibilityLabel={
+            onToggle
+              ? done
+                ? t('task.a11yUndo', { title })
+                : t('task.a11yComplete', { title })
+              : undefined
+          }
           style={({ pressed }) => ({
             flex: 1,
             flexDirection: 'row',
@@ -247,7 +253,7 @@ export function TaskCard({
             paddingVertical: 10,
             paddingLeft: 14,
             paddingRight: onEdit ? 4 : 14,
-            opacity: toggleDisabled ? 0.5 : pressed ? 0.85 : 1,
+            opacity: toggleDisabled ? 0.5 : pressed && onToggle ? 0.85 : 1,
           })}
         >
           <View

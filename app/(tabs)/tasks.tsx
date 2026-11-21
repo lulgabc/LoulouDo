@@ -127,6 +127,7 @@ export default function TasksScreen() {
             router.push({ pathname: '/task-editor', params: { category } })
           }
           emptyLabel={t('tasks.emptyTitle')}
+          completionEnabled={false}
         />
 
         <View

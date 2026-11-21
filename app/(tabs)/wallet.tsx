@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
@@ -10,13 +10,14 @@ import { CATEGORY_MAP } from '@/domain/constants';
 import { Board, Btn, Card, Empty, ProgressBar, Row, Screen, SectionTitle } from '@/components/ui';
 import { Ring } from '@/components/charts';
 import { Coin, CoinValue } from '@/components/Coin';
-import { Mascot } from '@/components/Mascot';
+import { Avatar } from '@/components/Avatar';
 import { useI18n } from '@/i18n';
 
 export default function WalletScreen() {
   const theme = useTheme();
   const { t, formatDate, formatMoney } = useI18n();
   const { entries, balance, state, activeProfile } = useApp();
+  const [showAllLedger, setShowAllLedger] = useState(false);
   const rate = state.settings.rate;
   const value = coinsToMoney(balance, rate);
 
@@ -35,16 +36,21 @@ export default function WalletScreen() {
     return { earned, spentCoins, spentMoney };
   }, [entries]);
 
+  const flatEntries = useMemo(
+    () => [...entries].sort((a, b) => (a.at < b.at ? 1 : -1)),
+    [entries],
+  );
+  const visibleEntries = showAllLedger ? flatEntries : flatEntries.slice(0, 5);
   const groups = useMemo(() => {
-    const sorted = [...entries].sort((a, b) => (a.at < b.at ? 1 : -1));
-    const map = new Map<string, typeof sorted>();
-    for (const entry of sorted) {
+    const map = new Map<string, typeof flatEntries>();
+    for (const entry of visibleEntries) {
       const list = map.get(entry.date) ?? [];
       list.push(entry);
       map.set(entry.date, list);
     }
     return [...map.entries()];
-  }, [entries]);
+  }, [visibleEntries, flatEntries]);
+  const hasMoreLedger = flatEntries.length > 5;
 
   const wishPct = activeProfile.wish.target > 0 ? value / activeProfile.wish.target : 0;
   const heroInk = theme.dark ? '#F7F3FF' : theme.text;
@@ -95,7 +101,14 @@ export default function WalletScreen() {
                 {t('wallet.worth', { money: formatMoney(value) })}
               </Text>
             </View>
-            <Mascot size={78} mood={balance > 0 ? 'cheer' : 'happy'} />
+            <Avatar
+              uri={activeProfile.avatarUri}
+              emoji={activeProfile.avatar}
+              size={78}
+              bg={theme.dark ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.62)'}
+              borderWidth={2}
+              borderColor={theme.card}
+            />
           </Row>
 
           <Btn
@@ -264,6 +277,25 @@ export default function WalletScreen() {
               ))}
             </View>
           ))}
+          {hasMoreLedger ? (
+            <Pressable
+              onPress={() => setShowAllLedger((value) => !value)}
+              accessibilityRole="button"
+              style={({ pressed }) => ({
+                borderTopWidth: 1,
+                borderTopColor: theme.border,
+                paddingVertical: 12,
+                alignItems: 'center',
+                opacity: pressed ? 0.65 : 1,
+              })}
+            >
+              <Text style={{ ...heading(11, theme.primary) }}>
+                {showAllLedger
+                  ? t('wallet.collapse')
+                  : t('wallet.showAll', { n: flatEntries.length })}
+              </Text>
+            </Pressable>
+          ) : null}
         </Board>
       )}
 
