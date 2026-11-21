@@ -8,11 +8,12 @@ import {
   View,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import Svg, { Circle, Defs, Pattern, Rect } from 'react-native-svg';
 import type { Category, Task } from '@/types';
 import { CATEGORY_MAP } from '@/domain/constants';
 import { daysBetween, todayISO } from '@/domain/date';
 import { useTheme, heading, numberStyle } from '@/theme/themes';
-import { CoinValue } from '@/components/Coin';
+import { Coin } from '@/components/Coin';
 import { useI18n } from '@/i18n';
 
 const AnimatedGradient = Animated.createAnimatedComponent(LinearGradient);
@@ -34,7 +35,7 @@ function colorForCategory(category: Category, theme: ReturnType<typeof useTheme>
 
 export { colorForCategory };
 
-/** 每个类别不同的完成动效：光带颜色、粒子、时长 */
+/** 每种类别不同的完成光效 */
 const FX: Record<
   Category,
   { emojis: string[]; gradient: [string, string, string, string]; duration: number }
@@ -81,6 +82,24 @@ const FX: Record<
   },
 };
 
+function DotFill({ color, id }: { color: string; id: string }) {
+  return (
+    <Svg
+      pointerEvents="none"
+      width="100%"
+      height="100%"
+      style={{ position: 'absolute', left: 0, top: 0, right: 0, bottom: 0 }}
+    >
+      <Defs>
+        <Pattern id={id} width={13} height={13} patternUnits="userSpaceOnUse">
+          <Circle cx={3.5} cy={3.5} r={1.6} fill={color} opacity={0.26} />
+        </Pattern>
+      </Defs>
+      <Rect width="100%" height="100%" fill={`url(#${id})`} />
+    </Svg>
+  );
+}
+
 export function TaskCard({
   task,
   done,
@@ -113,7 +132,7 @@ export function TaskCard({
 
   const sweep = useRef(new Animated.Value(0)).current;
   const burst = useRef(new Animated.Value(0)).current;
-  const checkScale = useRef(new Animated.Value(1)).current;
+  const coinScale = useRef(new Animated.Value(1)).current;
   const prevDone = useRef(done);
 
   const particles = useMemo(
@@ -139,14 +158,14 @@ export function TaskCard({
       if (!done) {
         sweep.setValue(0);
         burst.setValue(0);
-        checkScale.setValue(1);
+        coinScale.setValue(1);
       }
       return;
     }
 
     sweep.setValue(0);
     burst.setValue(0);
-    checkScale.setValue(0.45);
+    coinScale.setValue(0.6);
 
     const anim = Animated.parallel([
       Animated.timing(sweep, {
@@ -161,7 +180,7 @@ export function TaskCard({
         easing: Easing.out(Easing.quad),
         useNativeDriver: native,
       }),
-      Animated.spring(checkScale, {
+      Animated.spring(coinScale, {
         toValue: 1,
         friction: 4,
         tension: 130,
@@ -170,7 +189,7 @@ export function TaskCard({
     ]);
     anim.start();
     return () => anim.stop();
-  }, [done, fx.duration, native, sweep, burst, checkScale]);
+  }, [done, fx.duration, native, sweep, burst, coinScale]);
 
   const shineOpacity = sweep.interpolate({
     inputRange: [0, 0.15, 0.75, 1],
@@ -189,137 +208,127 @@ export function TaskCard({
     outputRange: [0, -24],
   });
 
+  const onceLabel =
+    task.kind === 'once'
+      ? (note ??
+        (done
+          ? t('task.challengeDone')
+          : deadline !== null
+            ? deadline === 0
+              ? t('task.dueToday')
+              : t('task.daysLeft', { n: deadline })
+            : t('task.once')))
+      : note;
+
+  const coinRight = onEdit ? 44 : 16;
+
   return (
     <View
       style={{
         position: 'relative',
         overflow: 'hidden',
-        backgroundColor: done ? color + (theme.dark ? '14' : '0C') : 'transparent',
+        backgroundColor: done ? color + (theme.dark ? '12' : '08') : 'transparent',
       }}
     >
-      {/* 内容层：zIndex 保证在光带之上 */}
-      <View
-        style={{
-          position: 'relative',
-          zIndex: 1,
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 10,
-          paddingVertical: 10,
-          paddingHorizontal: 14,
-        }}
-      >
-        <View
-          style={{
-            width: 44,
-            height: 44,
-            borderRadius: 15,
-            backgroundColor: color + (theme.dark ? '2E' : '20'),
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Text style={{ fontSize: 23 }}>{task.emoji}</Text>
-        </View>
+      {done ? <DotFill color={color} id={`dots-${task.id}`} /> : null}
 
-        <View style={{ flex: 1, minWidth: 0 }}>
-          <Text
-            style={{
-              ...heading(14.5, done ? theme.textSoft : theme.text),
-              textDecorationLine: done ? 'line-through' : 'none',
-            }}
-            numberOfLines={2}
-          >
-            {title}
-          </Text>
+      <View style={{ flexDirection: 'row', zIndex: 1, alignItems: 'center' }}>
+        <Pressable
+          onPress={toggleDisabled ? undefined : onToggle}
+          disabled={toggleDisabled}
+          accessibilityRole="button"
+          accessibilityState={{ checked: done, disabled: Boolean(toggleDisabled) }}
+          accessibilityLabel={done ? t('task.a11yUndo', { title }) : t('task.a11yComplete', { title })}
+          style={({ pressed }) => ({
+            flex: 1,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 10,
+            paddingVertical: 10,
+            paddingLeft: 14,
+            paddingRight: onEdit ? 4 : 14,
+            opacity: toggleDisabled ? 0.5 : pressed ? 0.85 : 1,
+          })}
+        >
           <View
             style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 7,
-              marginTop: 3,
-              flexWrap: 'wrap',
-            }}
-          >
-            <CoinValue value={coins} size={10} color={theme.coin} />
-            {task.kind === 'once' ? (
-              <Text style={{ fontSize: 10, color: theme.textSoft }}>
-                {note ??
-                  (done
-                    ? t('task.challengeDone')
-                    : deadline !== null
-                      ? deadline === 0
-                        ? t('task.dueToday')
-                        : t('task.daysLeft', { n: deadline })
-                      : t('task.once'))}
-              </Text>
-            ) : note ? (
-              <Text style={{ fontSize: 10, color: theme.textSoft }}>{note}</Text>
-            ) : null}
-            {onEdit ? (
-              <Pressable
-                onPress={onEdit}
-                hitSlop={8}
-                accessibilityRole="button"
-                accessibilityLabel={t('task.a11yEdit', { title })}
-                style={({ pressed }) => ({
-                  paddingHorizontal: 3,
-                  paddingVertical: 2,
-                  opacity: pressed ? 0.5 : 0.7,
-                })}
-              >
-                <Text style={{ fontSize: 13 }}>✏️</Text>
-              </Pressable>
-            ) : null}
-          </View>
-        </View>
-
-        <Animated.View
-          style={{
-            transform: [
-              { scale: checkScale },
-              {
-                rotate: checkScale.interpolate({
-                  inputRange: [0.45, 1],
-                  outputRange: ['-22deg', '0deg'],
-                }),
-              },
-            ],
-          }}
-        >
-          <Pressable
-            onPress={toggleDisabled ? undefined : onToggle}
-            disabled={toggleDisabled}
-            accessibilityRole="button"
-            accessibilityState={{ checked: done }}
-            accessibilityLabel={done ? t('task.a11yUndo', { title }) : t('task.a11yComplete', { title })}
-            style={({ pressed }) => ({
-              width: 40,
-              height: 40,
-              borderRadius: 20,
+              width: 44,
+              height: 44,
+              borderRadius: 15,
+              backgroundColor: color + (theme.dark ? '2E' : '20'),
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: done ? color : 'transparent',
-              borderWidth: 2,
-              borderColor: done ? color : color + '99',
-              transform: [{ scale: pressed ? 0.88 : 1 }],
-              opacity: toggleDisabled ? 0.35 : 1,
-            })}
+            }}
           >
+            <Text style={{ fontSize: 23 }}>{task.emoji}</Text>
+          </View>
+
+          <View style={{ flex: 1, minWidth: 0 }}>
             <Text
               style={{
-                fontSize: 18,
-                color: done ? '#FFFFFF' : color,
-                fontWeight: '800',
+                ...heading(14.5, done ? theme.textSoft : theme.text),
+                textDecorationLine: done ? 'line-through' : 'none',
+              }}
+              numberOfLines={2}
+            >
+              {title}
+            </Text>
+            {onceLabel ? (
+              <Text style={{ fontSize: 10, color: theme.textSoft, marginTop: 3 }}>
+                {cat.emoji} {onceLabel}
+              </Text>
+            ) : null}
+          </View>
+
+          <Animated.View style={{ transform: [{ scale: coinScale }] }}>
+            <View
+              style={{
+                minWidth: 50,
+                height: 34,
+                borderRadius: 17,
+                paddingHorizontal: 8,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 4,
+                backgroundColor: done
+                  ? theme.coin + '22'
+                  : theme.dark
+                    ? 'rgba(255,255,255,0.08)'
+                    : 'rgba(122,104,114,0.08)',
+                borderWidth: 1,
+                borderColor: done ? theme.coin + '66' : theme.border,
               }}
             >
-              ✓
-            </Text>
+              <Coin size={15} muted={!done} />
+              <Text
+                style={numberStyle(11.5, done ? theme.coin : theme.textSoft)}
+                numberOfLines={1}
+              >
+                +{coins}
+              </Text>
+            </View>
+          </Animated.View>
+        </Pressable>
+
+        {onEdit ? (
+          <Pressable
+            onPress={onEdit}
+            hitSlop={6}
+            accessibilityRole="button"
+            accessibilityLabel={t('task.a11yEdit', { title })}
+            style={({ pressed }) => ({
+              paddingHorizontal: 10,
+              paddingVertical: 14,
+              opacity: pressed ? 0.5 : 0.75,
+            })}
+          >
+            <Text style={{ fontSize: 13 }}>✏️</Text>
           </Pressable>
-        </Animated.View>
+        ) : null}
       </View>
 
-      {/* 完成光效：在内容层之下 */}
+      {/* 完成光效：彩色光带从卡片上扫过 */}
       <AnimatedGradient
         pointerEvents="none"
         colors={fx.gradient}
@@ -369,13 +378,13 @@ export function TaskCard({
         pointerEvents="none"
         style={{
           position: 'absolute',
-          right: 16,
-          top: 22,
+          right: coinRight,
+          top: 13,
           width: 40,
           height: 40,
           borderRadius: 20,
           borderWidth: 2,
-          borderColor: color,
+          borderColor: theme.coin,
           zIndex: 3,
           opacity: burst.interpolate({
             inputRange: [0, 0.1, 0.7, 1],
@@ -397,8 +406,8 @@ export function TaskCard({
           pointerEvents="none"
           style={{
             position: 'absolute',
-            right: 18,
-            top: 26,
+            right: coinRight + 2,
+            top: 16,
             fontSize: p.size,
             zIndex: 3,
             opacity: burst.interpolate({
@@ -428,9 +437,9 @@ export function TaskCard({
         pointerEvents="none"
         style={{
           position: 'absolute',
-          right: 16,
-          top: 6,
-          ...numberStyle(13, color),
+          right: coinRight,
+          top: 2,
+          ...numberStyle(13, theme.coin),
           zIndex: 3,
           opacity: rewardOpacity,
           transform: [{ translateY: rewardY }],

@@ -15,12 +15,11 @@ import {
 import { CATEGORIES } from '@/domain/constants';
 import type { Category, Task } from '@/types';
 import { Card, Empty, ProgressBar, Row, Screen, SectionTitle, Segmented } from '@/components/ui';
-import { Mascot } from '@/components/Mascot';
 import { colorForCategory } from '@/components/TaskCard';
 import { TaskBoard } from '@/components/TaskBoard';
 import { Confetti } from '@/components/Confetti';
-import { Coin } from '@/components/Coin';
 import { Avatar } from '@/components/Avatar';
+import { PiggyBankButton } from '@/components/PiggyBank';
 import { greetingKey, useI18n } from '@/i18n';
 import { tapFeedback } from '@/utils/feedback';
 
@@ -94,55 +93,37 @@ export default function HomeScreen() {
   return (
     <View style={{ flex: 1 }}>
       <Screen>
-        <Row style={{ justifyContent: 'space-between', marginBottom: 14, marginTop: 4 }}>
+        <Row style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, marginTop: 4 }}>
           <Pressable
             onPress={() => router.push('/settings')}
-            style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1, minWidth: 0, paddingRight: 8, opacity: pressed ? 0.75 : 1 })}
+            style={({ pressed }) => ({
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 10,
+              flex: 1,
+              minWidth: 0,
+              paddingRight: 10,
+              opacity: pressed ? 0.75 : 1,
+            })}
           >
-            <Avatar
-              uri={activeProfile.avatarUri}
-              emoji={activeProfile.avatar}
-              size={46}
-              bg={theme.primary}
-              borderWidth={theme.borderWidth}
-              borderColor={theme.border}
-              style={shadowStyle(theme)}
-            />
+            {activeProfile.avatarUri ? (
+              <Avatar
+                uri={activeProfile.avatarUri}
+                emoji={activeProfile.avatar}
+                size={42}
+                bg={theme.primary}
+                borderWidth={theme.borderWidth}
+                borderColor={theme.border}
+              />
+            ) : null}
             <View style={{ flex: 1, minWidth: 0 }}>
-              <Text style={heading(19, theme.text)} numberOfLines={2}>
+              <Text style={heading(21, theme.text)} numberOfLines={2}>
                 {t(greetingKey())}，{activeProfile.name}
-              </Text>
-              <Text
-                style={{ fontSize: 11, color: theme.textSoft, marginTop: 1 }}
-                numberOfLines={2}
-              >
-                {formatDate(today)} · {t('home.subtitle')}
               </Text>
             </View>
           </Pressable>
 
-          <Pressable
-            onPress={() => router.push('/wallet')}
-            style={({ pressed }) => [
-              {
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 5,
-                flexShrink: 0,
-                backgroundColor: theme.card,
-                paddingVertical: 8,
-                paddingHorizontal: 12,
-                borderRadius: 999,
-                borderWidth: theme.borderWidth,
-                borderColor: theme.border,
-                transform: [{ scale: pressed ? 0.95 : 1 }],
-              },
-              shadowStyle(theme),
-            ]}
-          >
-            <Coin size={18} />
-            <Text style={numberStyle(18, theme.text)}>{balance}</Text>
-          </Pressable>
+          <PiggyBankButton balance={balance} onPress={() => router.push('/wallet')} />
         </Row>
 
         <View style={{ borderRadius: theme.radius + 6, overflow: 'hidden', ...shadowStyle(theme), marginBottom: 16 }}>
@@ -153,6 +134,9 @@ export default function HomeScreen() {
             style={{ padding: 16, borderWidth: theme.borderWidth, borderColor: theme.border, borderRadius: theme.radius + 6 }}
           >
             <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+              <View>
+                <Text style={{ ...heading(16, heroInk) }}>{formatDate(today)}</Text>
+              </View>
               <View
                 style={{
                   flexDirection: 'row',
@@ -169,13 +153,17 @@ export default function HomeScreen() {
               </View>
             </Row>
 
-            <Row style={{ alignItems: 'center', gap: 10, marginTop: 8 }}>
-              <Mascot size={96} mood={complete ? 'cheer' : 'happy'} />
-              <View style={{ flex: 1, paddingRight: 4 }}>
-                <Text style={{ ...heading(15, heroInk), lineHeight: 23 }}>{cheer}</Text>
-              </View>
-            </Row>
-            <View style={{ marginTop: 10 }}>
+            <Text
+              style={{
+                ...heading(16, heroInk),
+                lineHeight: 24,
+                marginTop: 16,
+                paddingRight: 8,
+              }}
+            >
+              {cheer}
+            </Text>
+            <View style={{ marginTop: 16 }}>
               <Row style={{ justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 6 }}>
                 <Text style={heading(11, heroSoft)}>{t('home.progress')}</Text>
                 <Text style={numberStyle(13, heroInk)}>
