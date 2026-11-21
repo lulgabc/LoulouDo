@@ -34,7 +34,11 @@ type Action =
   | { type: 'completeOnboarding'; name: string; avatar: string; themeId: ThemeId }
   | { type: 'addProfile'; name: string; avatar: string }
   | { type: 'switchProfile'; id: string }
-  | { type: 'updateProfile'; id: string; patch: Partial<Pick<Profile, 'name' | 'avatar' | 'wish'>> }
+  | {
+      type: 'updateProfile';
+      id: string;
+      patch: Partial<Pick<Profile, 'name' | 'avatar' | 'avatarUri' | 'avatarHistory' | 'wish'>>;
+    }
   | { type: 'removeProfile'; id: string }
   | { type: 'addHoliday'; name: string; start: string; end: string }
   | { type: 'removeHoliday'; id: string }
@@ -312,7 +316,10 @@ interface StoreValue {
   completeOnboarding: (name: string, avatar: string, themeId: ThemeId) => void;
   addProfile: (name: string, avatar: string) => void;
   switchProfile: (id: string) => void;
-  updateProfile: (id: string, patch: Partial<Pick<Profile, 'name' | 'avatar' | 'wish'>>) => void;
+  updateProfile: (
+    id: string,
+    patch: Partial<Pick<Profile, 'name' | 'avatar' | 'avatarUri' | 'avatarHistory' | 'wish'>>,
+  ) => void;
   removeProfile: (id: string) => void;
   addHoliday: (name: string, start: string, end: string) => void;
   removeHoliday: (id: string) => void;
@@ -373,6 +380,8 @@ function normalize(raw: unknown): AppState {
   const taskKeyById = new Map(tasks.map((task) => [task.id, task.titleKey]));
   const profiles = (parsed.profiles as Profile[]).map((profile) => ({
     ...profile,
+    avatarUri: typeof profile.avatarUri === 'string' ? profile.avatarUri : undefined,
+    avatarHistory: Array.isArray(profile.avatarHistory) ? profile.avatarHistory : undefined,
     wish: {
       ...profile.wish,
       titleKey:
@@ -501,8 +510,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   );
   const switchProfile = useCallback((id: string) => dispatch({ type: 'switchProfile', id }), []);
   const updateProfile = useCallback(
-    (id: string, patch: Partial<Pick<Profile, 'name' | 'avatar' | 'wish'>>) =>
-      dispatch({ type: 'updateProfile', id, patch }),
+    (
+      id: string,
+      patch: Partial<Pick<Profile, 'name' | 'avatar' | 'avatarUri' | 'avatarHistory' | 'wish'>>,
+    ) => dispatch({ type: 'updateProfile', id, patch }),
     [],
   );
   const removeProfile = useCallback((id: string) => dispatch({ type: 'removeProfile', id }), []);

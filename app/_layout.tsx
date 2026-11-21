@@ -64,6 +64,7 @@ function Shell() {
         <Stack.Screen name="task-editor" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
         <Stack.Screen name="redeem" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
         <Stack.Screen name="holidays" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+        <Stack.Screen name="avatar" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
       </Stack>
     </>
   );

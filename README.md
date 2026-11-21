@@ -31,6 +31,7 @@ LoulouDo 是一款面向 4–10 岁孩子的**跨平台（iOS / Android / Web）
 | 🎁 心愿存钱罐 | 设置心愿和目标金额，用余额展示进度 |
 | 🎨 4 套皮肤 | 糖果星球 / 撞色波普 / 贴纸手账 / 星空梦想，全部即时切换 |
 | 📊 成长报表 | 本周 / 本月 / 全部：金币柱状图、类别环图、完成率、最佳一天、家长小报告 |
+| 🖼️ 自定义头像 | 从相册或图片链接选图，拖动 + 缩放裁剪成圆形头像；每次保存的历史头像留在本机可选 |
 | 👨‍👩‍👧 多宝贝 | 一台设备可以给多个孩子分别记录任务、金币和报表 |
 | 🏖️ 假期管理 | 自定义假期日期段，假期任务只在假期出现 |
 | 🌍 七种语言 | 中文 / English / Français / Deutsch / Italiano / Español / Português，自动识别系统语言，随时切换 |
@@ -74,6 +75,23 @@ LoulouDo 是一款面向 4–10 岁孩子的**跨平台（iOS / Android / Web）
 | ![假期](docs/screenshots/14-holidays.png) | ![编辑任务](docs/screenshots/15-task-editor.png) |
 
 > 截图全部由 `scripts/screenshots.mjs` 用真实 Chrome 跑完整交互后自动生成（见文末验证）。
+
+---
+
+## 🖼️ 自定义头像
+
+- 支持**相册图片**和**网络图片链接**两种来源；
+- 圆形取景框内可**拖动选区域**，用 `− / +`（1×–3×）缩放；
+- 保存时按当前取景裁剪成 320×320 方形小图，并转成压缩后的 data URI；
+- 头像以**圆形**显示在首页、设置页、宝贝切换器和历史列表中；
+- 每次保存都会加入「历史头像」，最多保留 12 个，全部存在本机 AsyncStorage；
+- 可在历史头像中随时切换，也可以一键恢复 Emoji 头像。
+
+| 裁剪 & 缩放 | 历史头像 |
+| --- | --- |
+| ![裁剪头像](docs/avatar/editor.jpg) | ![历史头像](docs/avatar/history.jpg) |
+
+裁剪计算是纯函数（`src/domain/avatar.ts`），有 6 个边界测试覆盖横图、竖图、缩放、拖动和越界限制。
 
 ---
 
@@ -271,8 +289,8 @@ $ npx tsc --noEmit
 （通过，无输出）
 
 $ npx vitest run
-Test Files  2 passed (2)
-     Tests  35 passed (35)
+Test Files  3 passed (3)
+     Tests  41 passed (41)
 
 $ npx expo export -p web
 Exported: dist
@@ -288,6 +306,7 @@ Exported: dist
 - 刷新页面 → 昵称、任务、皮肤（localStorage 中 `themeId: "galaxy"`）全部保留
 - 全程 **0 条 console error / page error**
 - 七语言巡检：非中文界面 0 中文残留，393/320 宽度下 0 溢出/裁切，三个弹层同样通过
+- 头像：URL 选图 → 放大/拖动 → 保存 → 二次保存 → 历史切换 → 刷新后头像与两条历史仍在
 - DE → EN 切换后，示例任务和存折标题即时翻译
 
 ---

@@ -11,6 +11,7 @@ import { AVATARS } from '@/domain/constants';
 import { Board, Btn, IconBtn, Label, Pill, Row, Screen, Stepper } from '@/components/ui';
 import { SkinPicker } from '@/components/SkinPicker';
 import { LanguageMenu } from '@/components/LanguageMenu';
+import { Avatar } from '@/components/Avatar';
 import { useI18n } from '@/i18n';
 
 export default function SettingsScreen() {
@@ -79,7 +80,12 @@ export default function SettingsScreen() {
       {AVATARS.map((a) => (
         <Pressable
           key={a}
-          onPress={() => setAvatar(a)}
+          onPress={() => {
+            setAvatar(a);
+            if (activeProfile.avatarUri) {
+              updateProfile(activeProfile.id, { avatarUri: undefined });
+            }
+          }}
           style={{
             width: 38,
             height: 38,
@@ -135,20 +141,38 @@ export default function SettingsScreen() {
             <>
               <Row style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <Row style={{ gap: 12, flex: 1, minWidth: 0 }}>
-                  <View
-                    style={{
-                      width: 54,
-                      height: 54,
-                      borderRadius: 27,
-                      backgroundColor: theme.chip,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderWidth: 1,
-                      borderColor: theme.border,
-                    }}
+                  <Pressable
+                    onPress={() => router.push('/avatar')}
+                    accessibilityRole="button"
+                    accessibilityLabel={t('avatar.change')}
+                    style={({ pressed }) => ({ opacity: pressed ? 0.75 : 1 })}
                   >
-                    <Text style={{ fontSize: 28 }}>{activeProfile.avatar}</Text>
-                  </View>
+                    <Avatar
+                      uri={activeProfile.avatarUri}
+                      emoji={activeProfile.avatar}
+                      size={54}
+                      bg={theme.chip}
+                      borderWidth={1}
+                      borderColor={theme.border}
+                    />
+                    <View
+                      style={{
+                        position: 'absolute',
+                        right: -2,
+                        bottom: -2,
+                        width: 20,
+                        height: 20,
+                        borderRadius: 10,
+                        backgroundColor: theme.primary,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderWidth: 2,
+                        borderColor: theme.cardSoft,
+                      }}
+                    >
+                      <Text style={{ fontSize: 9 }}>📷</Text>
+                    </View>
+                  </Pressable>
                   <View style={{ flex: 1, minWidth: 0, paddingTop: 2 }}>
                     <Text style={heading(18, theme.text)} numberOfLines={1}>
                       {activeProfile.name}
@@ -177,15 +201,37 @@ export default function SettingsScreen() {
                 {t('settings.family')}
               </Text>
               <Row style={{ gap: 7, flexWrap: 'wrap' }}>
-                {profiles.map((p) => (
-                  <Pill
-                    key={p.id}
-                    emoji={p.avatar}
-                    label={p.name}
-                    active={p.id === activeProfile.id}
-                    onPress={() => switchProfile(p.id)}
-                  />
-                ))}
+                {profiles.map((p) => {
+                  const active = p.id === activeProfile.id;
+                  return (
+                    <Pressable
+                      key={p.id}
+                      onPress={() => switchProfile(p.id)}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected: active }}
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 5,
+                        paddingVertical: 4,
+                        paddingLeft: 4,
+                        paddingRight: 11,
+                        borderRadius: 999,
+                        backgroundColor: active ? theme.primary : theme.chip,
+                      }}
+                    >
+                      <Avatar
+                        uri={p.avatarUri}
+                        emoji={p.avatar}
+                        size={22}
+                        bg={active ? 'rgba(255,255,255,0.35)' : theme.card}
+                      />
+                      <Text style={heading(11, active ? theme.onPrimary : theme.text)}>
+                        {p.name}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
                 <Pill label={`＋ ${t('settings.add')}`} onPress={startAdd} />
               </Row>
             </>
@@ -206,6 +252,36 @@ export default function SettingsScreen() {
                 </Pressable>
               </Row>
               {input(name, setName, t('settings.name'))}
+              <Pressable
+                onPress={() => router.push('/avatar')}
+                accessibilityRole="button"
+                accessibilityLabel={t('avatar.custom')}
+                style={({ pressed }) => ({
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 10,
+                  paddingVertical: 4,
+                  opacity: pressed ? 0.7 : 1,
+                })}
+              >
+                <Avatar
+                  uri={activeProfile.avatarUri}
+                  emoji={avatar}
+                  size={42}
+                  bg={theme.chip}
+                  borderWidth={1}
+                  borderColor={theme.border}
+                />
+                <View>
+                  <Text style={{ ...heading(12.5, theme.text) }}>{t('avatar.change')}</Text>
+                  <Text style={{ fontSize: 9.5, color: theme.textSoft, marginTop: 1 }}>
+                    {t('avatar.custom')}
+                  </Text>
+                </View>
+                <View style={{ flex: 1 }} />
+                <Text style={{ fontSize: 14, color: theme.textSoft }}>›</Text>
+              </Pressable>
+              <View style={{ height: 1, backgroundColor: theme.border, marginVertical: 10 }} />
               {avatarRow}
               {mode === 'edit' ? (
                 <View style={{ marginTop: 12 }}>

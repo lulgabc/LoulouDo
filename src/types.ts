@@ -29,10 +29,22 @@ export interface Task {
   archived?: boolean;
 }
 
+export interface AvatarRecord {
+  id: string;
+  /** 本地保存的 data URI（裁剪后的方形小图） */
+  uri: string;
+  createdAt: string;
+}
+
 export interface Profile {
   id: string;
   name: string;
+  /** Emoji 兜底头像 */
   avatar: string;
+  /** 当前自定义图片头像（data URI） */
+  avatarUri?: string;
+  /** 最近使用的自定义头像，保存在本机 */
+  avatarHistory?: AvatarRecord[];
   /** 心愿存钱罐（金额单位：元） */
   wish: {
     title: string;

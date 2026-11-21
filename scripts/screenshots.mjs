@@ -83,6 +83,15 @@ if (!reportText.includes('家长小报告')) throw new Error('家长报告缺失
 
 await tab('钱包', 1800);
 await shot('08-wallet');
+const expectedBalance = await page.evaluate(() => {
+  const raw = localStorage.getItem('louloudou.state.v1');
+  if (!raw) return 0;
+  const stored = JSON.parse(raw);
+  const profileId = stored.activeProfileId;
+  return stored.entries
+    .filter((e) => e.profileId === profileId)
+    .reduce((sum, e) => (e.type === 'redeem' ? sum - e.coins : sum + e.coins), 0);
+});
 const walletText = await page.locator('body').innerText();
 if (!walletText.includes('金币存折')) throw new Error('钱包存折缺失');
 
@@ -99,7 +108,7 @@ if (!successText.includes('兑换成功')) throw new Error('兑换没有成功')
 await page.getByRole('button', { name: '完成', exact: true }).click();
 await page.waitForTimeout(800);
 const afterRedeem = await page.locator('body').innerText();
-if (!afterRedeem.includes('48')) throw new Error('兑换后余额不是 48');
+if (!afterRedeem.includes(String(expectedBalance - 50))) throw new Error(`兑换后余额不是 ${expectedBalance - 50}`);
 
 await tab('设置');
 await shot('11-settings-pop');

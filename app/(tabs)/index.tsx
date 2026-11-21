@@ -20,6 +20,7 @@ import { colorForCategory } from '@/components/TaskCard';
 import { TaskBoard } from '@/components/TaskBoard';
 import { Confetti } from '@/components/Confetti';
 import { Coin } from '@/components/Coin';
+import { Avatar } from '@/components/Avatar';
 import { greetingKey, useI18n } from '@/i18n';
 import { tapFeedback } from '@/utils/feedback';
 
@@ -98,21 +99,15 @@ export default function HomeScreen() {
             onPress={() => router.push('/settings')}
             style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1, minWidth: 0, paddingRight: 8, opacity: pressed ? 0.75 : 1 })}
           >
-            <View
-              style={{
-                width: 46,
-                height: 46,
-                borderRadius: 23,
-                backgroundColor: theme.primary,
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderWidth: theme.borderWidth,
-                borderColor: theme.border,
-                ...shadowStyle(theme),
-              }}
-            >
-              <Text style={{ fontSize: 24 }}>{activeProfile.avatar}</Text>
-            </View>
+            <Avatar
+              uri={activeProfile.avatarUri}
+              emoji={activeProfile.avatar}
+              size={46}
+              bg={theme.primary}
+              borderWidth={theme.borderWidth}
+              borderColor={theme.border}
+              style={shadowStyle(theme)}
+            />
             <View style={{ flex: 1, minWidth: 0 }}>
               <Text style={heading(19, theme.text)} numberOfLines={2}>
                 {t(greetingKey())}，{activeProfile.name}
