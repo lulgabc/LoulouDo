@@ -74,7 +74,6 @@ export default function HomeScreen() {
     [todayTasks],
   );
   const holidayActive = holidays.some((holiday) => holiday.active);
-  const hasHolidayTasks = tasks.some((task) => task.category === 'holiday' && !task.archived);
 
   const complete = isToday && progressFull.allClear;
   const streak = useMemo(() => currentStreak(entries, today), [entries, today]);
@@ -232,7 +231,14 @@ export default function HomeScreen() {
               </Text>
             </Row>
             <View style={{ height: 20, justifyContent: 'center' }}>
-              <ProgressBar value={percent} track={heroTrack} color={heroFill} height={10} />
+              <ProgressBar
+                value={percent}
+                track={heroTrack}
+                color={heroFill}
+                height={10}
+                striped
+                stripeColor={theme.dark ? 'rgba(255,255,255,0.52)' : theme.primary + '88'}
+              />
               <View
                 pointerEvents="none"
                 style={{
@@ -333,8 +339,6 @@ export default function HomeScreen() {
           onAdd={() => router.push({ pathname: '/quick-task', params: { date: selectedDate } })}
           addLabel={t('quickTask.add')}
           holidayActive={holidayActive}
-          hasHolidayTasks={hasHolidayTasks}
-          onOpenHoliday={() => router.push('/holidays')}
           readOnly={!isToday}
           emptyNode={
             <View style={{ paddingHorizontal: 16, paddingVertical: 10 }}>

@@ -69,6 +69,15 @@ export function weekdayShort(locale: Locale, iso: string): string {
   return safeFormat(locale, fromISO(iso), { weekday: 'short' }, '');
 }
 
+export function formatMonth(locale: Locale, iso: string, short = false): string {
+  return safeFormat(
+    locale,
+    fromISO(iso),
+    { year: 'numeric', month: short ? 'short' : 'long' },
+    iso.slice(0, 7),
+  );
+}
+
 export function formatMoneyShort(
   locale: Locale,
   value: number,

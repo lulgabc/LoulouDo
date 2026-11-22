@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useId, useMemo } from 'react';
 import {
   Platform,
   Pressable,
@@ -10,6 +10,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import Svg, { Defs, Line, Pattern, Rect } from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme, shadowStyle, heading } from '@/theme/themes';
 
@@ -447,15 +448,22 @@ export function ProgressBar({
   height = 12,
   track,
   style,
+  striped = false,
+  stripeColor,
 }: {
   value: number;
   color?: string;
   height?: number;
   track?: string;
   style?: ViewStyle;
+  striped?: boolean;
+  stripeColor?: string;
 }) {
   const theme = useTheme();
   const pct = Math.max(0, Math.min(1, value));
+  const rawId = useId();
+  const patternId = `progress-stripes-${rawId.replace(/[^a-zA-Z0-9_-]/g, '')}`;
+  const fill = color ?? theme.primary;
   return (
     <View
       style={[
@@ -473,9 +481,35 @@ export function ProgressBar({
           width: `${pct * 100}%`,
           height: '100%',
           borderRadius: height,
-          backgroundColor: color ?? theme.primary,
+          backgroundColor: fill,
+          overflow: 'hidden',
         }}
-      />
+      >
+        {striped ? (
+          <Svg width="100%" height="100%" style={StyleSheet.absoluteFill}>
+            <Defs>
+              <Pattern
+                id={patternId}
+                width={8}
+                height={8}
+                patternUnits="userSpaceOnUse"
+                patternTransform="rotate(45)"
+              >
+                <Rect width={8} height={8} fill={fill} />
+                <Line
+                  x1={1}
+                  y1={0}
+                  x2={1}
+                  y2={8}
+                  stroke={stripeColor ?? 'rgba(255,255,255,0.45)'}
+                  strokeWidth={3}
+                />
+              </Pattern>
+            </Defs>
+            <Rect width="100%" height="100%" fill={`url(#${patternId})`} />
+          </Svg>
+        ) : null}
+      </View>
     </View>
   );
 }

@@ -7,7 +7,7 @@ import { useTheme, numberStyle, shadowStyle } from '@/theme/themes';
 import { useI18n } from '@/i18n';
 import { tapFeedback } from '@/utils/feedback';
 
-/** 首页日期条：当前周 7 天，支持前后翻周。 */
+/** 首页日期条：显示当前周 7 天，支持按天滑动。 */
 export function DayStrip({
   selectedDate,
   today,
@@ -24,10 +24,11 @@ export function DayStrip({
   holidays: HolidayRange[];
 }) {
   const theme = useTheme();
-  const { t, formatDate, weekdayShort } = useI18n();
+  const { t, formatDate, formatMonth, weekdayShort } = useI18n();
 
   const weekStart = useMemo(() => startOfWeek(selectedDate), [selectedDate]);
-  const days = useMemo(() => eachDay(weekStart, addDays(weekStart, 6)), [weekStart]);
+  const weekEnd = addDays(weekStart, 6);
+  const days = useMemo(() => eachDay(weekStart, weekEnd), [weekStart, weekEnd]);
   const summaries = useMemo(
     () =>
       days.map((date) => {
@@ -37,11 +38,22 @@ export function DayStrip({
     [days, tasks, entries, holidays],
   );
 
+  const monthLabel = useMemo(() => {
+    const startMonth = weekStart.slice(0, 7);
+    const endMonth = weekEnd.slice(0, 7);
+    if (startMonth === endMonth) return formatMonth(weekStart);
+    const startYear = weekStart.slice(0, 4);
+    const endYear = weekEnd.slice(0, 4);
+    return `${formatMonth(weekStart, true)}${
+      startYear !== endYear ? ` ${startYear}` : ''
+    } – ${formatMonth(weekEnd, true)} ${endYear}`;
+  }, [formatMonth, weekEnd, weekStart]);
+
   const selectedRef = useRef(selectedDate);
   selectedRef.current = selectedDate;
   const translateX = useRef(new Animated.Value(0)).current;
 
-  const shiftWeek = (delta: number) => {
+  const shiftDay = (delta: number) => {
     tapFeedback('light');
     onChange(addDays(selectedRef.current, delta));
   };
@@ -58,7 +70,7 @@ export function DayStrip({
         translateX.setValue(0);
         const shouldShift = Math.abs(gesture.dx) > 42 || Math.abs(gesture.vx) > 0.5;
         if (!shouldShift) return;
-        shiftWeek(gesture.dx < 0 ? 7 : -7);
+        shiftDay(gesture.dx < 0 ? 1 : -1);
       },
       onPanResponderTerminate: () => {
         translateX.setValue(0);
@@ -68,12 +80,10 @@ export function DayStrip({
 
   return (
     <View
-      {...panResponder.panHandlers}
       style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 2,
-        padding: 6,
+        paddingHorizontal: 6,
+        paddingBottom: 6,
+        paddingTop: 2,
         borderRadius: 18,
         borderWidth: 1.5,
         borderColor: theme.border,
@@ -82,10 +92,27 @@ export function DayStrip({
         ...shadowStyle(theme),
       }}
     >
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          paddingHorizontal: 3,
+          paddingVertical: 3,
+        }}
+      >
+        <Text style={{ fontSize: 10, color: theme.textSoft, fontWeight: '600' }}>
+          {monthLabel}
+        </Text>
+      </View>
+      <View
+        {...panResponder.panHandlers}
+        style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}
+      >
       <Pressable
-        onPress={() => shiftWeek(-7)}
+        onPress={() => shiftDay(-1)}
         accessibilityRole="button"
-        accessibilityLabel={t('home.prevWeek')}
+        accessibilityLabel={t('home.prevDay')}
         style={({ pressed }) => ({
           width: 22,
           height: 42,
@@ -180,9 +207,9 @@ export function DayStrip({
       </Animated.View>
 
       <Pressable
-        onPress={() => shiftWeek(7)}
+        onPress={() => shiftDay(1)}
         accessibilityRole="button"
-        accessibilityLabel={t('home.nextWeek')}
+        accessibilityLabel={t('home.nextDay')}
         style={({ pressed }) => ({
           width: 22,
           height: 42,
@@ -193,6 +220,7 @@ export function DayStrip({
       >
         <Text style={{ fontSize: 20, color: theme.textSoft }}>›</Text>
       </Pressable>
+      </View>
     </View>
   );
 }

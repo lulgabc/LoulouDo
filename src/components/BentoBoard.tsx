@@ -378,8 +378,6 @@ export function BentoBoard({
   addLabel,
   emptyNode,
   holidayActive,
-  hasHolidayTasks,
-  onOpenHoliday,
   readOnly = false,
 }: {
   groups: BentoGroup[];
@@ -391,8 +389,6 @@ export function BentoBoard({
   addLabel?: string;
   emptyNode?: React.ReactNode;
   holidayActive: boolean;
-  hasHolidayTasks: boolean;
-  onOpenHoliday?: () => void;
   readOnly?: boolean;
 }) {
   const theme = useTheme();
@@ -403,7 +399,6 @@ export function BentoBoard({
   const weekend = tasksOf('weekend');
   const holiday = tasksOf('holiday');
   const challenge = tasksOf('special');
-  const showHolidayPrompt = !readOnly && !holidayActive && hasHolidayTasks;
   const hasAny =
     daily.length > 0 ||
     weekend.length > 0 ||
@@ -476,40 +471,6 @@ export function BentoBoard({
         </BentoPanel>
       ) : null}
 
-      {showHolidayPrompt ? (
-        <Pressable
-          onPress={onOpenHoliday}
-          accessibilityRole="button"
-          accessibilityLabel={`${t('category.holiday.name')} · ${t('bento.openHoliday')}`}
-          style={{ marginBottom: 10 }}
-        >
-          <BentoPanel
-            color={theme.secondary}
-            icon="🏖️"
-            title={t('category.holiday.name')}
-            subtitle={t('settings.notHoliday')}
-            right={
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 2,
-                  paddingHorizontal: 9,
-                  paddingVertical: 4,
-                  borderRadius: 999,
-                  backgroundColor: theme.card,
-                  borderWidth: 1,
-                  borderColor: theme.secondary + '66',
-                }}
-              >
-                <Text style={heading(9.5, theme.secondary)}>{t('bento.openHoliday')}</Text>
-                <Text style={{ fontSize: 11, color: theme.secondary }}>›</Text>
-              </View>
-            }
-          />
-        </Pressable>
-      ) : null}
-
       {holidayActive && holiday.length > 0 ? (
         <BentoPanel
           color={colorForCategory('holiday', theme)}
@@ -572,7 +533,7 @@ export function BentoBoard({
         </BentoPanel>
       ) : null}
 
-      {!hasAny && !showHolidayPrompt && emptyNode ? emptyNode : null}
+      {!hasAny && emptyNode ? emptyNode : null}
 
       {onAdd ? (
         <Pressable

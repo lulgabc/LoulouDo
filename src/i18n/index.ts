@@ -8,6 +8,7 @@ import {
   formatDate,
   formatMoney,
   formatMoneyShort,
+  formatMonth,
   formatShort,
   translate,
   translatePlural,
@@ -28,6 +29,7 @@ export interface I18n {
   formatDate: (iso: string) => string;
   formatShort: (iso: string) => string;
   weekdayShort: (iso: string) => string;
+  formatMonth: (iso: string, short?: boolean) => string;
   formatMoney: (value: number) => string;
   formatMoneyShort: (value: number) => string;
   currency: CurrencyCode;
@@ -60,6 +62,7 @@ export function useI18n(): I18n {
       formatDate: (iso: string) => formatDate(locale, iso),
       formatShort: (iso: string) => formatShort(locale, iso),
       weekdayShort: (iso: string) => weekdayShort(locale, iso),
+      formatMonth: (iso: string, short = false) => formatMonth(locale, iso, short),
       formatMoney: (value: number) => formatMoney(locale, value, currency),
       formatMoneyShort: (value: number) => formatMoneyShort(locale, value, currency),
       currency,
