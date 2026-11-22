@@ -12,7 +12,7 @@ import { tapFeedback } from '@/utils/feedback';
 
 export default function RedeemScreen() {
   const theme = useTheme();
-  const { t, formatMoney } = useI18n();
+  const { t, formatMoney, formatMoneyShort } = useI18n();
   const { balance, redeem, state } = useApp();
   const rate = state.settings.rate;
   const [raw, setRaw] = useState('');
@@ -26,13 +26,13 @@ export default function RedeemScreen() {
 
   const quick = useMemo(() => {
     const items = [
-      { label: '¥1', coins: rate },
-      { label: '¥5', coins: rate * 5 },
-      { label: '¥10', coins: rate * 10 },
+      { label: formatMoneyShort(1), coins: rate },
+      { label: formatMoneyShort(5), coins: rate * 5 },
+      { label: formatMoneyShort(10), coins: rate * 10 },
       { label: t('redeem.quickAll'), coins: balance },
     ];
     return items.filter((item, i, arr) => item.coins > 0 && arr.findIndex((x) => x.coins === item.coins) === i);
-  }, [rate, balance, t]);
+  }, [rate, balance, t, formatMoneyShort]);
 
   const confirm = () => {
     if (!valid) return;
@@ -52,7 +52,7 @@ export default function RedeemScreen() {
             <View>
               <Text style={heading(20, theme.text)}>{t('redeem.title')}</Text>
               <Text style={{ fontSize: 10, color: theme.textSoft }}>
-                {t('redeem.rate', { rate })}
+                {t('redeem.rate', { rate, unit: formatMoneyShort(1) })}
               </Text>
             </View>
           </Row>
@@ -64,7 +64,7 @@ export default function RedeemScreen() {
               <Text style={{ fontSize: 60 }}>💰</Text>
               <Text style={heading(22, theme.text)}>{t('redeem.success')}</Text>
               <Text style={numberStyle(40, theme.primary)}>
-                ¥{formatMoney(result.money)}
+                {formatMoney(result.money)}
               </Text>
               <Text style={{ fontSize: 12, color: theme.textSoft }}>
                 {t('redeem.spent', { coins: result.coins, balance })}
@@ -99,7 +99,7 @@ export default function RedeemScreen() {
                 <View style={{ alignItems: 'flex-end' }}>
                   <Text style={{ fontSize: 10, color: theme.textSoft }}>{t('redeem.allWorth')}</Text>
                   <Text style={numberStyle(22, theme.secondary)}>
-                    ¥{formatMoney(coinsToMoney(balance, rate))}
+                    {formatMoney(coinsToMoney(balance, rate))}
                   </Text>
                 </View>
               </Row>
@@ -160,7 +160,7 @@ export default function RedeemScreen() {
                 <Row style={{ justifyContent: 'space-between' }}>
                   <Text style={{ fontSize: 11, color: theme.textSoft }}>{t('redeem.canGet')}</Text>
                   <Text style={numberStyle(28, valid ? theme.primary : theme.textSoft)}>
-                    ¥{valid ? formatMoney(money) : formatMoney(0)}
+                    {valid ? formatMoney(money) : formatMoney(0)}
                   </Text>
                 </Row>
                 {coins > balance ? (

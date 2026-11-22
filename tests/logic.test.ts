@@ -35,6 +35,7 @@ const settings: AppState['settings'] = {
   themeId: 'candy',
   locale: 'zh',
   rate: 100,
+  currency: 'CNY',
   categoryCoins: Object.fromEntries(CATEGORIES.map((c) => [c.id, c.defaultCoins])) as Record<
     Category,
     number

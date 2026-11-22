@@ -98,6 +98,7 @@ function BentoTaskTile({
   index,
   total,
   onToggle,
+  readOnly = false,
 }: {
   task: Task;
   done: boolean;
@@ -106,6 +107,7 @@ function BentoTaskTile({
   index: number;
   total: number;
   onToggle: (task: Task, done: boolean) => void;
+  readOnly?: boolean;
 }) {
   const theme = useTheme();
   const { t } = useI18n();
@@ -130,10 +132,15 @@ function BentoTaskTile({
       {done ? <DotFill color={color} id={`bento-dots-${task.id}`} opacity={0.18} /> : null}
       <Pressable
         onPress={() => onToggle(task, done)}
-        accessibilityRole="button"
-        accessibilityState={{ checked: done }}
+        disabled={readOnly}
+        accessibilityRole={readOnly ? undefined : 'button'}
+        accessibilityState={readOnly ? undefined : { checked: done }}
         accessibilityLabel={
-          done ? t('task.a11yUndo', { title }) : t('task.a11yComplete', { title })
+          readOnly
+            ? undefined
+            : done
+              ? t('task.a11yUndo', { title })
+              : t('task.a11yComplete', { title })
         }
         style={({ pressed }) => ({
           flex: 1,
@@ -145,7 +152,7 @@ function BentoTaskTile({
           paddingVertical: 7,
           paddingRight: done ? 22 : 8,
           zIndex: 1,
-          opacity: pressed ? 0.82 : 1,
+          opacity: pressed && !readOnly ? 0.82 : 1,
         })}
       >
         <View
@@ -190,12 +197,14 @@ function BentoTaskRow({
   coins,
   color,
   onToggle,
+  readOnly = false,
 }: {
   task: Task;
   done: boolean;
   coins: number;
   color: string;
   onToggle: (task: Task, done: boolean) => void;
+  readOnly?: boolean;
 }) {
   const theme = useTheme();
   const { t } = useI18n();
@@ -212,10 +221,15 @@ function BentoTaskRow({
       {done ? <DotFill color={color} id={`bento-dots-${task.id}`} opacity={0.18} /> : null}
       <Pressable
         onPress={() => onToggle(task, done)}
-        accessibilityRole="button"
-        accessibilityState={{ checked: done }}
+        disabled={readOnly}
+        accessibilityRole={readOnly ? undefined : 'button'}
+        accessibilityState={readOnly ? undefined : { checked: done }}
         accessibilityLabel={
-          done ? t('task.a11yUndo', { title }) : t('task.a11yComplete', { title })
+          readOnly
+            ? undefined
+            : done
+              ? t('task.a11yUndo', { title })
+              : t('task.a11yComplete', { title })
         }
         style={({ pressed }) => ({
           flexDirection: 'row',
@@ -224,7 +238,7 @@ function BentoTaskRow({
           paddingHorizontal: 10,
           paddingVertical: 7,
           zIndex: 1,
-          opacity: pressed ? 0.82 : 1,
+          opacity: pressed && !readOnly ? 0.82 : 1,
         })}
       >
         <View
@@ -264,6 +278,7 @@ function ChallengeTicket({
   color,
   lastOdd,
   onToggle,
+  readOnly = false,
 }: {
   task: Task;
   done: boolean;
@@ -271,6 +286,7 @@ function ChallengeTicket({
   color: string;
   lastOdd: boolean;
   onToggle: (task: Task, done: boolean) => void;
+  readOnly?: boolean;
 }) {
   const theme = useTheme();
   const { t } = useI18n();
@@ -295,10 +311,15 @@ function ChallengeTicket({
       {done ? <DotFill color={color} id={`bento-dots-${task.id}`} opacity={0.18} /> : null}
       <Pressable
         onPress={() => onToggle(task, done)}
-        accessibilityRole="button"
-        accessibilityState={{ checked: done }}
+        disabled={readOnly}
+        accessibilityRole={readOnly ? undefined : 'button'}
+        accessibilityState={readOnly ? undefined : { checked: done }}
         accessibilityLabel={
-          done ? t('task.a11yUndo', { title }) : t('task.a11yComplete', { title })
+          readOnly
+            ? undefined
+            : done
+              ? t('task.a11yUndo', { title })
+              : t('task.a11yComplete', { title })
         }
         style={({ pressed }) => ({
           flex: 1,
@@ -308,7 +329,7 @@ function ChallengeTicket({
           paddingHorizontal: 8,
           paddingVertical: 7,
           zIndex: 1,
-          opacity: pressed ? 0.82 : 1,
+          opacity: pressed && !readOnly ? 0.82 : 1,
         })}
       >
         <View
@@ -359,6 +380,7 @@ export function BentoBoard({
   holidayActive,
   hasHolidayTasks,
   onOpenHoliday,
+  readOnly = false,
 }: {
   groups: BentoGroup[];
   doneIds: Set<string>;
@@ -371,6 +393,7 @@ export function BentoBoard({
   holidayActive: boolean;
   hasHolidayTasks: boolean;
   onOpenHoliday?: () => void;
+  readOnly?: boolean;
 }) {
   const theme = useTheme();
   const { t } = useI18n();
@@ -380,7 +403,7 @@ export function BentoBoard({
   const weekend = tasksOf('weekend');
   const holiday = tasksOf('holiday');
   const challenge = tasksOf('special');
-  const showHolidayPrompt = !holidayActive && hasHolidayTasks;
+  const showHolidayPrompt = !readOnly && !holidayActive && hasHolidayTasks;
   const hasAny =
     daily.length > 0 ||
     weekend.length > 0 ||
@@ -395,7 +418,7 @@ export function BentoBoard({
           icon={CATEGORY_MAP.daily.emoji}
           title={t('category.daily.name')}
           subtitle={`${t('tasks.taskCount', { n: daily.length })} · ${t('bento.dailyNote')}`}
-          onAdd={onAddCategory ? () => onAddCategory('daily') : undefined}
+          onAdd={!readOnly && onAddCategory ? () => onAddCategory('daily') : undefined}
           addLabel={`${t('common.add')} ${t('category.daily.short')}`}
           style={{ marginBottom: 10 }}
         >
@@ -410,6 +433,7 @@ export function BentoBoard({
                 index={index}
                 total={daily.length}
                 onToggle={onToggle}
+                readOnly={readOnly}
               />
             ))}
           </View>
@@ -422,7 +446,7 @@ export function BentoBoard({
           icon={CATEGORY_MAP.weekend.emoji}
           title={t('category.weekend.name')}
           subtitle={`${t('tasks.taskCount', { n: weekend.length })} · ${t('bento.weekendNote')}`}
-          onAdd={onAddCategory ? () => onAddCategory('weekend') : undefined}
+          onAdd={!readOnly && onAddCategory ? () => onAddCategory('weekend') : undefined}
           addLabel={`${t('common.add')} ${t('category.weekend.short')}`}
           dashed
           style={{ marginBottom: 10 }}
@@ -445,6 +469,7 @@ export function BentoBoard({
                 coins={coinsFor(task)}
                 color={colorForCategory('weekend', theme)}
                 onToggle={onToggle}
+                readOnly={readOnly}
               />
             </View>
           ))}
@@ -491,7 +516,7 @@ export function BentoBoard({
           icon={CATEGORY_MAP.holiday.emoji}
           title={t('category.holiday.name')}
           subtitle={`${t('tasks.taskCount', { n: holiday.length })} · ${t('bento.holidayOn')}`}
-          onAdd={onAddCategory ? () => onAddCategory('holiday') : undefined}
+          onAdd={!readOnly && onAddCategory ? () => onAddCategory('holiday') : undefined}
           addLabel={`${t('common.add')} ${t('category.holiday.short')}`}
           style={{ marginBottom: 10 }}
         >
@@ -513,6 +538,7 @@ export function BentoBoard({
                 coins={coinsFor(task)}
                 color={colorForCategory('holiday', theme)}
                 onToggle={onToggle}
+                readOnly={readOnly}
               />
             </View>
           ))}
@@ -525,7 +551,7 @@ export function BentoBoard({
           icon={CATEGORY_MAP.special.emoji}
           title={t('category.special.name')}
           subtitle={`${t('tasks.taskCount', { n: challenge.length })} · ${t('bento.challengeNote')}`}
-          onAdd={onAddCategory ? () => onAddCategory('special') : undefined}
+          onAdd={!readOnly && onAddCategory ? () => onAddCategory('special') : undefined}
           addLabel={`${t('common.add')} ${t('category.special.short')}`}
           style={{ marginBottom: 10 }}
         >
@@ -539,6 +565,7 @@ export function BentoBoard({
                 color={colorForCategory('special', theme)}
                 lastOdd={challenge.length % 2 === 1 && index === challenge.length - 1}
                 onToggle={onToggle}
+                readOnly={readOnly}
               />
             ))}
           </View>
@@ -547,7 +574,7 @@ export function BentoBoard({
 
       {!hasAny && !showHolidayPrompt && emptyNode ? emptyNode : null}
 
-      {onAdd ? (
+      {onAdd && !readOnly ? (
         <Pressable
           onPress={onAdd}
           accessibilityRole="button"

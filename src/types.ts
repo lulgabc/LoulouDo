@@ -1,4 +1,5 @@
 import type { Locale } from '@/i18n/locales';
+import type { CurrencyCode } from '@/domain/currency';
 
 /**
  * LoulouDo — 核心数据模型
@@ -93,8 +94,10 @@ export interface HolidayRange {
 export interface Settings {
   themeId: ThemeId;
   locale: Locale;
-  /** 多少金币兑换 1 元 */
+  /** 每 1 单位货币需要多少金币 */
   rate: number;
+  /** 零花钱使用的货币 */
+  currency: CurrencyCode;
   categoryCoins: Record<Category, number>;
   holidays: HolidayRange[];
 }

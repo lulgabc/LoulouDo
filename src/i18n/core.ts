@@ -1,6 +1,7 @@
 import { fromISO } from '@/domain/date';
 import { DICTS, type TKey } from '@/i18n/translations';
 import type { Locale } from '@/i18n/locales';
+import { CURRENCY_SYMBOLS, type CurrencyCode } from '@/domain/currency';
 
 export type TParams = Record<string, string | number>;
 
@@ -68,14 +69,39 @@ export function weekdayShort(locale: Locale, iso: string): string {
   return safeFormat(locale, fromISO(iso), { weekday: 'short' }, '');
 }
 
-export function formatMoney(locale: Locale, value: number): string {
+export function formatMoneyShort(
+  locale: Locale,
+  value: number,
+  currency: CurrencyCode = 'CNY',
+): string {
   try {
     return new Intl.NumberFormat(intlLocale(locale), {
+      style: 'currency',
+      currency,
+      currencyDisplay: 'narrowSymbol',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  } catch {
+    return `${CURRENCY_SYMBOLS[currency]}${Math.round(value)}`;
+  }
+}
+
+export function formatMoney(
+  locale: Locale,
+  value: number,
+  currency: CurrencyCode = 'CNY',
+): string {
+  try {
+    return new Intl.NumberFormat(intlLocale(locale), {
+      style: 'currency',
+      currency,
+      currencyDisplay: 'narrowSymbol',
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(value);
   } catch {
-    return value.toFixed(2);
+    return `${CURRENCY_SYMBOLS[currency]}${value.toFixed(2)}`;
   }
 }
 

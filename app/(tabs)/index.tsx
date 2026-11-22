@@ -17,6 +17,7 @@ import { CATEGORIES } from '@/domain/constants';
 import type { Task } from '@/types';
 import { Card, Empty, ProgressBar, Row, Screen, SectionTitle } from '@/components/ui';
 import { BentoBoard } from '@/components/BentoBoard';
+import { DayStrip } from '@/components/DayStrip';
 import { Confetti } from '@/components/Confetti';
 import { Avatar } from '@/components/Avatar';
 import { Coin } from '@/components/Coin';
@@ -29,6 +30,8 @@ export default function HomeScreen() {
   const { activeProfile, tasks, entries, balance, toggleTask, state } = useApp();
   const [burst, setBurst] = useState(0);
   const today = todayISO();
+  const [selectedDate, setSelectedDate] = useState(today);
+  const isToday = selectedDate === today;
   const holidays = state.settings.holidays;
   const cheerPlayer = useAudioPlayer(require('../../assets/sounds/task-complete.wav'));
 
@@ -50,14 +53,17 @@ export default function HomeScreen() {
   };
 
   const progressFull = useMemo(
-    () => dayProgress(tasks, entries, today, holidays),
-    [tasks, entries, today, holidays],
+    () => dayProgress(tasks, entries, selectedDate, holidays),
+    [tasks, entries, selectedDate, holidays],
   );
   const todayTasks = useMemo(
-    () => tasksForDate(tasks, entries, today, holidays),
-    [tasks, entries, today, holidays],
+    () => tasksForDate(tasks, entries, selectedDate, holidays),
+    [tasks, entries, selectedDate, holidays],
   );
-  const doneTasks = useMemo(() => tasksDoneOn(tasks, entries, today), [tasks, entries, today]);
+  const doneTasks = useMemo(
+    () => tasksDoneOn(tasks, entries, selectedDate),
+    [tasks, entries, selectedDate],
+  );
   const doneIds = useMemo(() => new Set(doneTasks.map((task) => task.id)), [doneTasks]);
   const groups = useMemo(
     () =>
@@ -70,7 +76,7 @@ export default function HomeScreen() {
   const holidayActive = holidays.some((holiday) => holiday.active);
   const hasHolidayTasks = tasks.some((task) => task.category === 'holiday' && !task.archived);
 
-  const complete = progressFull.allClear;
+  const complete = isToday && progressFull.allClear;
   const streak = useMemo(() => currentStreak(entries, today), [entries, today]);
 
   const heroInk = theme.dark ? '#F7F3FF' : theme.text;
@@ -79,6 +85,7 @@ export default function HomeScreen() {
   const heroFill = theme.dark ? theme.accent : '#FFFFFF';
 
   const onToggle = (task: Task, done: boolean) => {
+    if (!isToday) return;
     if (task.kind === 'once' && done && !entries.some((e) => e.type === 'earn' && e.taskId === task.id && e.date === today)) {
       return;
     }
@@ -89,8 +96,11 @@ export default function HomeScreen() {
   };
 
   const percent = progressFull.total === 0 ? 0 : progressFull.done / progressFull.total;
-  const cheer =
-    progressFull.total === 0
+  const cheer = !isToday
+    ? progressFull.total === 0
+      ? t('home.dayEmpty')
+      : t('home.dayCheer', { done: progressFull.done, total: progressFull.total })
+    : progressFull.total === 0
       ? t('home.cheerEmpty')
       : complete
         ? t('home.cheerAll')
@@ -167,7 +177,7 @@ export default function HomeScreen() {
           >
             <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
               <View>
-                <Text style={{ ...heading(16, heroInk) }}>{formatDate(today)}</Text>
+                <Text style={{ ...heading(16, heroInk) }}>{formatDate(selectedDate)}</Text>
               </View>
               <View
                 style={{
@@ -197,7 +207,9 @@ export default function HomeScreen() {
             </Text>
             <View style={{ marginTop: 16 }}>
               <Row style={{ justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 6 }}>
-                <Text style={heading(11, heroSoft)}>{t('home.progress')}</Text>
+                <Text style={heading(11, heroSoft)}>
+                  {isToday ? t('home.progress') : t('home.progressDay')}
+                </Text>
                 <Text style={numberStyle(13, heroInk)}>
                   {progressFull.done}
                   <Text style={{ opacity: 0.6 }}> / {progressFull.total}</Text>
@@ -229,9 +241,45 @@ export default function HomeScreen() {
           </LinearGradient>
         </View>
 
+        <DayStrip
+          selectedDate={selectedDate}
+          today={today}
+          onChange={setSelectedDate}
+          tasks={tasks}
+          entries={entries}
+          holidays={holidays}
+        />
+        {!isToday ? (
+          <View
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              gap: 6,
+              backgroundColor: theme.chip,
+              borderRadius: 12,
+              paddingHorizontal: 9,
+              paddingVertical: 7,
+              marginBottom: 8,
+            }}
+          >
+            <Text style={{ flexGrow: 1, flexBasis: 150, fontSize: 9.5, color: theme.textSoft, lineHeight: 14 }}>
+              {t('home.viewOnly')}
+            </Text>
+            <Pressable
+              onPress={() => setSelectedDate(today)}
+              accessibilityRole="button"
+              accessibilityLabel={t('home.backToday')}
+              hitSlop={6}
+            >
+              <Text style={{ fontSize: 10.5, color: theme.primary }}>{t('home.backToday')}</Text>
+            </Pressable>
+          </View>
+        ) : null}
+
         <SectionTitle
           emoji="🌈"
-          title={t('home.todayTasks')}
+          title={isToday ? t('home.todayTasks') : t('home.dayTasks')}
           right={
             <Row style={{ alignItems: 'center', gap: 8 }}>
               <Text style={{ fontSize: 11, color: theme.textSoft }}>
@@ -240,24 +288,26 @@ export default function HomeScreen() {
                   total: progressFull.total,
                 })}
               </Text>
-              <Pressable
-                onPress={() => router.push('/quick-task')}
-                accessibilityRole="button"
-                accessibilityLabel={t('quickTask.add')}
-                style={({ pressed }) => ({
-                  width: 28,
-                  height: 28,
-                  borderRadius: 14,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: theme.card,
-                  borderWidth: 1.5,
-                  borderColor: theme.candy + '88',
-                  opacity: pressed ? 0.6 : 1,
-                })}
-              >
-                <Text style={{ fontSize: 17, color: theme.candy, marginTop: -2 }}>＋</Text>
-              </Pressable>
+              {isToday ? (
+                <Pressable
+                  onPress={() => router.push('/quick-task')}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('quickTask.add')}
+                  style={({ pressed }) => ({
+                    width: 28,
+                    height: 28,
+                    borderRadius: 14,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: theme.card,
+                    borderWidth: 1.5,
+                    borderColor: theme.candy + '88',
+                    opacity: pressed ? 0.6 : 1,
+                  })}
+                >
+                  <Text style={{ fontSize: 17, color: theme.candy, marginTop: -2 }}>＋</Text>
+                </Pressable>
+              ) : null}
             </Row>
           }
         />
@@ -272,9 +322,14 @@ export default function HomeScreen() {
           holidayActive={holidayActive}
           hasHolidayTasks={hasHolidayTasks}
           onOpenHoliday={() => router.push('/holidays')}
+          readOnly={!isToday}
           emptyNode={
             <View style={{ paddingHorizontal: 16, paddingVertical: 10 }}>
-              <Empty emoji="🌱" title={t('home.emptyTitle')} hint={t('home.emptyHint')} />
+              <Empty
+                emoji="🌱"
+                title={t('home.emptyTitle')}
+                hint={isToday ? t('home.emptyHint') : t('home.dayEmpty')}
+              />
             </View>
           }
         />

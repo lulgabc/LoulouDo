@@ -45,6 +45,8 @@ export function taskAppliesOn(
   scope: 'display' | 'schedule' = 'display',
 ): boolean {
   if (task.archived) return false;
+  // 查看历史日期时，不展示后来才创建的任务
+  if (task.createdAt > date) return false;
   if (task.kind === 'once') {
     const start = task.startDate ?? task.createdAt;
     const end = task.endDate ?? start;

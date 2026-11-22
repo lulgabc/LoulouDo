@@ -7,6 +7,7 @@ import { useTheme, heading } from '@/theme/themes';
 import { CATEGORIES } from '@/domain/constants';
 import type { ThemeId } from '@/types';
 import { DEFAULT_AVATAR } from '@/domain/avatars';
+import { CURRENCIES } from '@/domain/currency';
 import { Btn, IconBtn, Label, Pill, Row, Screen, Stepper } from '@/components/ui';
 import { BentoPanel } from '@/components/BentoPanel';
 import { SkinPicker } from '@/components/SkinPicker';
@@ -17,13 +18,14 @@ import { useI18n } from '@/i18n';
 
 export default function SettingsScreen() {
   const theme = useTheme();
-  const { t, formatMoney, localeFlag, localeName } = useI18n();
+  const { t, formatMoney, formatMoneyShort, currencySymbol, localeFlag, localeName } = useI18n();
   const {
     state,
     activeProfile,
     profiles,
     setTheme,
     setRate,
+    setCurrency,
     setCategoryCoins,
     updateProfile,
     switchProfile,
@@ -242,7 +244,7 @@ export default function SettingsScreen() {
                   {input(wishTitle, setWishTitle, t('settings.wishPlaceholder'))}
                   <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
                     <Text style={{ fontSize: 11, color: theme.textSoft }}>
-                      {t('settings.targetAmount')}
+                      {t('settings.targetAmount', { symbol: currencySymbol })}
                     </Text>
                     <Stepper
                       value={wishTarget}
@@ -250,7 +252,6 @@ export default function SettingsScreen() {
                       step={10}
                       min={0}
                       max={9999}
-                      suffix="¥"
                     />
                   </Row>
                 </View>
@@ -331,7 +332,10 @@ export default function SettingsScreen() {
           color={theme.accent}
           icon="💰"
           title={t('settings.rules')}
-          subtitle={t('settings.rateValue', { rate: state.settings.rate })}
+          subtitle={t('settings.rateValue', {
+            rate: state.settings.rate,
+            unit: formatMoneyShort(1),
+          })}
         >
           <View style={{ padding: 14 }}>
 
@@ -345,6 +349,52 @@ export default function SettingsScreen() {
               max={2000}
               suffix=":1"
             />
+          </Row>
+
+          <Row
+            style={{
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              paddingVertical: 8,
+              gap: 8,
+            }}
+          >
+            <Text
+              style={{ ...heading(12.5, theme.text), flex: 1, minWidth: 0, lineHeight: 15 }}
+              numberOfLines={2}
+            >
+              {t('settings.currency')}
+            </Text>
+            <Row style={{ gap: 5 }}>
+              {CURRENCIES.map((currency) => {
+                const active = state.settings.currency === currency.code;
+                return (
+                  <Pressable
+                    key={currency.code}
+                    onPress={() => setCurrency(currency.code)}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: active }}
+                    accessibilityLabel={currency.code}
+                    style={({ pressed }) => ({
+                      minWidth: 34,
+                      height: 30,
+                      paddingHorizontal: 6,
+                      borderRadius: 11,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: active ? theme.chip : theme.cardSoft,
+                      borderWidth: active ? 2 : 1,
+                      borderColor: active ? theme.primary : theme.border,
+                      opacity: pressed ? 0.7 : 1,
+                    })}
+                  >
+                    <Text style={heading(14, active ? theme.primary : theme.textSoft)}>
+                      {currency.symbol}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </Row>
           </Row>
 
           <View style={{ height: 1, backgroundColor: theme.border, marginVertical: 10 }} />

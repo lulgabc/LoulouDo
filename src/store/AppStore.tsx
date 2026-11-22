@@ -13,6 +13,7 @@ import { AppState, Category, LedgerEntry, Profile, Task, TaskDraft, ThemeId } fr
 import { createInitialState, DEFAULT_HOLIDAYS } from '@/domain/seed';
 import { normalizeAvatar } from '@/domain/avatars';
 import { normalizeTaskIcon } from '@/domain/taskIcons';
+import { currencyForLocale, isCurrencyCode, type CurrencyCode } from '@/domain/currency';
 import { CATEGORIES, ONBOARDING_BONUS, STORAGE_KEY } from '@/domain/constants';
 import { balanceOf, computeAllClearBonus, coinsToMoney, isTaskCompleted, taskCoinValue } from '@/domain/logic';
 import { todayISO } from '@/domain/date';
@@ -32,6 +33,7 @@ type Action =
   | { type: 'setTheme'; themeId: ThemeId }
   | { type: 'setLocale'; locale: Locale }
   | { type: 'setRate'; rate: number }
+  | { type: 'setCurrency'; currency: CurrencyCode }
   | { type: 'setCategoryCoins'; category: Category; coins: number }
   | { type: 'completeOnboarding'; name: string; avatar: string; themeId: ThemeId }
   | { type: 'addProfile'; name: string; avatar: string }
@@ -175,8 +177,18 @@ function reducer(state: AppState, action: Action): AppState {
         tasks: state.tasks.filter((t) => t.id !== action.id),
       };
 
-    case 'setLocale':
-      return { ...state, settings: { ...state.settings, locale: action.locale } };
+    case 'setLocale': {
+      // 没手动改过货币时，货币跟随语言的默认值；手动改过则保留家庭选择
+      const previousDefault = currencyForLocale(state.settings.locale);
+      const currency =
+        state.settings.currency === previousDefault
+          ? currencyForLocale(action.locale)
+          : state.settings.currency;
+      return {
+        ...state,
+        settings: { ...state.settings, locale: action.locale, currency },
+      };
+    }
 
     case 'setTheme': {
       if (state.settings.themeId === action.themeId) return state;
@@ -187,6 +199,12 @@ function reducer(state: AppState, action: Action): AppState {
       const rate = Math.min(10000, Math.max(1, Math.round(action.rate)));
       return { ...state, settings: { ...state.settings, rate } };
     }
+
+    case 'setCurrency':
+      return {
+        ...state,
+        settings: { ...state.settings, currency: action.currency },
+      };
 
     case 'setCategoryCoins': {
       const coins = Math.min(999, Math.max(1, Math.round(action.coins)));
@@ -311,7 +329,11 @@ function reducer(state: AppState, action: Action): AppState {
       return {
         ...fresh,
         onboarded: false,
-        settings: { ...fresh.settings, locale: state.settings.locale },
+        settings: {
+          ...fresh.settings,
+          locale: state.settings.locale,
+          currency: currencyForLocale(state.settings.locale),
+        },
       };
     }
 
@@ -335,6 +357,7 @@ interface StoreValue {
   setTheme: (themeId: ThemeId) => void;
   setLocale: (locale: Locale) => void;
   setRate: (rate: number) => void;
+  setCurrency: (currency: CurrencyCode) => void;
   setCategoryCoins: (category: Category, coins: number) => void;
   completeOnboarding: (name: string, avatar: string, themeId: ThemeId) => void;
   addProfile: (name: string, avatar: string) => void;
@@ -441,6 +464,8 @@ function normalize(raw: unknown): AppState {
     labelKey: entry.labelKey ?? legacyLabelKeys[entry.label ?? ''],
   }));
 
+  const locale = isLocale(parsed.settings?.locale) ? parsed.settings.locale : detectLocale();
+
   return {
     ...base,
     ...parsed,
@@ -452,11 +477,14 @@ function normalize(raw: unknown): AppState {
     tasks,
     entries,
     settings: {
-      locale: isLocale(parsed.settings?.locale) ? parsed.settings.locale : detectLocale(),
+      locale,
       themeId,
       rate: typeof parsed.settings?.rate === 'number' && parsed.settings.rate > 0
         ? parsed.settings.rate
         : base.settings.rate,
+      currency: isCurrencyCode(parsed.settings?.currency)
+        ? parsed.settings.currency
+        : currencyForLocale(locale),
       categoryCoins,
       holidays,
     },
@@ -533,6 +561,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const setTheme = useCallback((themeId: ThemeId) => dispatch({ type: 'setTheme', themeId }), []);
   const setLocale = useCallback((locale: Locale) => dispatch({ type: 'setLocale', locale }), []);
   const setRate = useCallback((rate: number) => dispatch({ type: 'setRate', rate }), []);
+  const setCurrency = useCallback(
+    (currency: CurrencyCode) => dispatch({ type: 'setCurrency', currency }),
+    [],
+  );
   const setCategoryCoins = useCallback(
     (category: Category, coins: number) => dispatch({ type: 'setCategoryCoins', category, coins }),
     [],
@@ -582,6 +614,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setTheme,
     setLocale,
     setRate,
+    setCurrency,
     setCategoryCoins,
     completeOnboarding,
     addProfile,

@@ -3,9 +3,11 @@ import { useApp } from '@/store/AppStore';
 import { applyLocaleToFonts } from '@/theme/themes';
 import type { TKey } from '@/i18n/translations';
 import { LOCALE_FLAGS, LOCALE_NAMES, type Locale } from '@/i18n/locales';
+import { currencySymbol, type CurrencyCode } from '@/domain/currency';
 import {
   formatDate,
   formatMoney,
+  formatMoneyShort,
   formatShort,
   translate,
   translatePlural,
@@ -27,11 +29,15 @@ export interface I18n {
   formatShort: (iso: string) => string;
   weekdayShort: (iso: string) => string;
   formatMoney: (value: number) => string;
+  formatMoneyShort: (value: number) => string;
+  currency: CurrencyCode;
+  currencySymbol: string;
 }
 
 export function useI18n(): I18n {
   const { state, setLocale } = useApp();
   const locale = state.settings.locale;
+  const currency = state.settings.currency;
   applyLocaleToFonts(locale);
 
   const t = useCallback(
@@ -54,8 +60,11 @@ export function useI18n(): I18n {
       formatDate: (iso: string) => formatDate(locale, iso),
       formatShort: (iso: string) => formatShort(locale, iso),
       weekdayShort: (iso: string) => weekdayShort(locale, iso),
-      formatMoney: (value: number) => formatMoney(locale, value),
+      formatMoney: (value: number) => formatMoney(locale, value, currency),
+      formatMoneyShort: (value: number) => formatMoneyShort(locale, value, currency),
+      currency,
+      currencySymbol: currencySymbol(currency),
     }),
-    [locale, setLocale, t, tn],
+    [locale, currency, setLocale, t, tn],
   );
 }

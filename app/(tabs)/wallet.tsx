@@ -17,7 +17,7 @@ import { useI18n } from '@/i18n';
 
 export default function WalletScreen() {
   const theme = useTheme();
-  const { t, formatDate, formatMoney } = useI18n();
+  const { t, formatDate, formatMoney, formatMoneyShort } = useI18n();
   const { entries, balance, state, activeProfile } = useApp();
   const [showAllLedger, setShowAllLedger] = useState(false);
   const rate = state.settings.rate;
@@ -60,7 +60,7 @@ export default function WalletScreen() {
     <Screen>
       <Text style={heading(24, theme.text)}>{t('wallet.title')}</Text>
       <Text style={{ fontSize: 11, color: theme.textSoft, marginTop: 3, marginBottom: 13 }}>
-        {t('wallet.rateNote', { rate })}
+        {t('wallet.rateNote', { rate, unit: formatMoneyShort(1) })}
       </Text>
 
       <View
@@ -148,7 +148,7 @@ export default function WalletScreen() {
               <Text style={{ fontSize: 9.5, color: heroInk, opacity: 0.7 }}>
                 {t('wallet.redeemedTotal')}
               </Text>
-              <Text style={numberStyle(16, heroInk)}>¥ {formatMoney(totals.spentMoney)}</Text>
+              <Text style={numberStyle(16, heroInk)}>{formatMoney(totals.spentMoney)}</Text>
             </View>
           </Row>
         </LinearGradient>

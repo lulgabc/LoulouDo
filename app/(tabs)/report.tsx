@@ -210,7 +210,7 @@ export default function ReportScreen() {
               size={120}
               centerTop={t('report.totalCoins')}
               centerMain={`${stats.earnedCoins}`}
-              centerBottom={`¥${formatMoney(money)}`}
+              centerBottom={formatMoney(money)}
             />
             <View style={{ flex: 1, gap: 9 }}>
               {CATEGORIES.map((cat) => {
@@ -304,7 +304,7 @@ export default function ReportScreen() {
             )}
             {statCell(
               '💰',
-              `¥${formatMoney(stats.redeemedMoney)}`,
+              formatMoney(stats.redeemedMoney),
               t('report.redeemed'),
               t('report.redeemedSub', { n: stats.redeemedCoins }),
               true,

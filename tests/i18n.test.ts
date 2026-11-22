@@ -6,6 +6,7 @@ import { createInitialState } from '@/domain/seed';
 import fs from 'node:fs';
 import path from 'node:path';
 import { CATEGORIES } from '@/domain/constants';
+import { currencyForLocale } from '@/domain/currency';
 
 const placeholders = (text: string) =>
   [...text.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();
@@ -50,11 +51,21 @@ describe('多语言字典', () => {
     expect(localeFromCode(undefined, 'en')).toBe('en');
   });
 
+  it('默认货币与语言匹配', () => {
+    expect(currencyForLocale('zh')).toBe('CNY');
+    expect(currencyForLocale('en')).toBe('USD');
+    expect(currencyForLocale('fr')).toBe('EUR');
+    expect(currencyForLocale('de')).toBe('EUR');
+    expect(createInitialState('fr').settings.currency).toBe('EUR');
+  });
+
   it('日期与金额按语言格式化', () => {
     expect(formatDate('en', '2026-11-19')).toMatch(/Nov/);
     expect(formatDate('de', '2026-11-19')).toMatch(/Nov/);
-    expect(formatMoney('de', 12.5)).toContain('12,50');
-    expect(formatMoney('en', 12.5)).toBe('12.50');
+    expect(formatMoney('de', 12.5, 'EUR')).toContain('12,50');
+    expect(formatMoney('en', 12.5, 'USD')).toBe('$12.50');
+    expect(formatMoney('zh', 12.5, 'CNY')).toContain('12.50');
+    expect(formatMoney('fr', 12.5, 'EUR')).toContain('12,50');
   });
 });
 

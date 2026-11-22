@@ -2,6 +2,7 @@ import type { AppState, Category, HolidayRange, Task } from '@/types';
 import { CATEGORIES } from '@/domain/constants';
 import { DEFAULT_LOCALE, type Locale } from '@/i18n/locales';
 import { DEFAULT_AVATAR } from '@/domain/avatars';
+import { currencyForLocale } from '@/domain/currency';
 
 const CREATED = '2026-01-01';
 
@@ -89,6 +90,7 @@ export function createInitialState(locale: Locale = DEFAULT_LOCALE): AppState {
       themeId: 'candy',
       locale,
       rate: 10,
+      currency: currencyForLocale(locale),
       categoryCoins,
       holidays: DEFAULT_HOLIDAYS,
     },
