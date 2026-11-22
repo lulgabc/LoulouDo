@@ -288,26 +288,24 @@ export default function HomeScreen() {
                   total: progressFull.total,
                 })}
               </Text>
-              {isToday ? (
-                <Pressable
-                  onPress={() => router.push('/quick-task')}
-                  accessibilityRole="button"
-                  accessibilityLabel={t('quickTask.add')}
-                  style={({ pressed }) => ({
-                    width: 28,
-                    height: 28,
-                    borderRadius: 14,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: theme.card,
-                    borderWidth: 1.5,
-                    borderColor: theme.candy + '88',
-                    opacity: pressed ? 0.6 : 1,
-                  })}
-                >
-                  <Text style={{ fontSize: 17, color: theme.candy, marginTop: -2 }}>＋</Text>
-                </Pressable>
-              ) : null}
+              <Pressable
+                onPress={() => router.push({ pathname: '/quick-task', params: { date: selectedDate } })}
+                accessibilityRole="button"
+                accessibilityLabel={t('quickTask.add')}
+                style={({ pressed }) => ({
+                  width: 28,
+                  height: 28,
+                  borderRadius: 14,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: theme.card,
+                  borderWidth: 1.5,
+                  borderColor: theme.candy + '88',
+                  opacity: pressed ? 0.6 : 1,
+                })}
+              >
+                <Text style={{ fontSize: 17, color: theme.candy, marginTop: -2 }}>＋</Text>
+              </Pressable>
             </Row>
           }
         />
@@ -317,7 +315,7 @@ export default function HomeScreen() {
           doneIds={doneIds}
           coinsFor={(task) => taskCoinValue(task, state.settings)}
           onToggle={(task, done) => onToggle(task, done)}
-          onAdd={() => router.push('/quick-task')}
+          onAdd={() => router.push({ pathname: '/quick-task', params: { date: selectedDate } })}
           addLabel={t('quickTask.add')}
           holidayActive={holidayActive}
           hasHolidayTasks={hasHolidayTasks}

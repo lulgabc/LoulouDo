@@ -574,7 +574,7 @@ export function BentoBoard({
 
       {!hasAny && !showHolidayPrompt && emptyNode ? emptyNode : null}
 
-      {onAdd && !readOnly ? (
+      {onAdd ? (
         <Pressable
           onPress={onAdd}
           accessibilityRole="button"

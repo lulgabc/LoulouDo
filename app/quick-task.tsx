@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useApp } from '@/store/AppStore';
 import { useTheme, heading, numberStyle } from '@/theme/themes';
 import { addDays, isISODate, todayISO } from '@/domain/date';
@@ -15,8 +15,11 @@ export default function QuickTaskScreen() {
   const theme = useTheme();
   const { t } = useI18n();
   const { state, saveTask } = useApp();
+  const params = useLocalSearchParams<{ date?: string }>();
+  const initialDate =
+    typeof params.date === 'string' && isISODate(params.date) ? params.date : todayISO();
   const [title, setTitle] = useState('');
-  const [date, setDate] = useState(todayISO());
+  const [date, setDate] = useState(initialDate);
   const [coins, setCoins] = useState(state.settings.categoryCoins.special);
   const [error, setError] = useState('');
 
@@ -37,6 +40,7 @@ export default function QuickTaskScreen() {
       coins,
       startDate: date,
       endDate: date,
+      createdAt: date,
     });
     tapFeedback('success');
     router.back();

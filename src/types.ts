@@ -124,4 +124,6 @@ export interface TaskDraft {
   coins?: number;
   startDate?: string;
   endDate?: string;
+  /** 快捷任务可以指定创建日期，用于给过去/未来某天排任务 */
+  createdAt?: string;
 }

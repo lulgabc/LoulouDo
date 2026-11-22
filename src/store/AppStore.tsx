@@ -166,7 +166,7 @@ function reducer(state: AppState, action: Action): AppState {
         coins: draft.coins,
         startDate: draft.kind === 'once' ? draft.startDate : undefined,
         endDate: draft.kind === 'once' ? draft.endDate : undefined,
-        createdAt: todayISO(),
+        createdAt: draft.createdAt ?? todayISO(),
       };
       return { ...state, tasks: [...state.tasks, task] };
     }
