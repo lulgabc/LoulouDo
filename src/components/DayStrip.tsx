@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import React, { useMemo, useRef } from 'react';
+import { Animated, PanResponder, Pressable, Text, View } from 'react-native';
 import { addDays, eachDay, startOfWeek } from '@/domain/date';
 import { dayProgress } from '@/domain/logic';
 import type { HolidayRange, LedgerEntry, Task } from '@/types';
@@ -37,13 +37,38 @@ export function DayStrip({
     [days, tasks, entries, holidays],
   );
 
+  const selectedRef = useRef(selectedDate);
+  selectedRef.current = selectedDate;
+  const translateX = useRef(new Animated.Value(0)).current;
+
   const shiftWeek = (delta: number) => {
     tapFeedback('light');
-    onChange(addDays(selectedDate, delta));
+    onChange(addDays(selectedRef.current, delta));
   };
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: (_, gesture) =>
+        Math.abs(gesture.dx) > 12 && Math.abs(gesture.dx) > Math.abs(gesture.dy) * 1.4,
+      onPanResponderMove: (_, gesture) => {
+        translateX.setValue(Math.max(-34, Math.min(34, gesture.dx / 3)));
+      },
+      onPanResponderRelease: (_, gesture) => {
+        translateX.setValue(0);
+        const shouldShift = Math.abs(gesture.dx) > 42 || Math.abs(gesture.vx) > 0.5;
+        if (!shouldShift) return;
+        shiftWeek(gesture.dx < 0 ? 7 : -7);
+      },
+      onPanResponderTerminate: () => {
+        translateX.setValue(0);
+      },
+    }),
+  ).current;
 
   return (
     <View
+      {...panResponder.panHandlers}
       style={{
         flexDirection: 'row',
         alignItems: 'center',
@@ -72,6 +97,15 @@ export function DayStrip({
         <Text style={{ fontSize: 20, color: theme.textSoft }}>‹</Text>
       </Pressable>
 
+      <Animated.View
+        style={{
+          flex: 1,
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 2,
+          transform: [{ translateX }],
+        }}
+      >
       {summaries.map(({ date, done, total, allClear }) => {
         const active = date === selectedDate;
         const isToday = date === today;
@@ -143,6 +177,7 @@ export function DayStrip({
           </Pressable>
         );
       })}
+      </Animated.View>
 
       <Pressable
         onPress={() => shiftWeek(7)}

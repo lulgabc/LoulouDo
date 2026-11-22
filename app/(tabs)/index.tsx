@@ -114,7 +114,7 @@ export default function HomeScreen() {
   return (
     <View style={{ flex: 1 }}>
       <Screen>
-        <Row style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, marginTop: 4 }}>
+        <Row style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, marginTop: 2 }}>
           <Pressable
             onPress={() => router.push('/settings')}
             style={({ pressed }) => ({
@@ -168,74 +168,89 @@ export default function HomeScreen() {
           </Pressable>
         </Row>
 
-        <View style={{ borderRadius: theme.radius + 6, overflow: 'hidden', ...shadowStyle(theme), marginBottom: 16 }}>
+        <View style={{ borderRadius: theme.radius + 4, overflow: 'hidden', ...shadowStyle(theme), marginBottom: 12 }}>
           <LinearGradient
             colors={theme.heroGradient}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            style={{ padding: 16, borderWidth: theme.borderWidth, borderColor: theme.border, borderRadius: theme.radius + 6 }}
+            style={{
+              paddingHorizontal: 14,
+              paddingTop: 13,
+              paddingBottom: 12,
+              borderWidth: theme.borderWidth,
+              borderColor: theme.border,
+              borderRadius: theme.radius + 4,
+            }}
           >
-            <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-              <View>
-                <Text style={{ ...heading(16, heroInk) }}>{formatDate(selectedDate)}</Text>
-              </View>
+            <Row style={{ justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+              <Text style={{ ...heading(17, heroInk), flex: 1 }} numberOfLines={1}>
+                {formatDate(selectedDate)}
+              </Text>
               <View
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
-                  gap: 5,
+                  gap: 4,
                   backgroundColor: theme.dark ? 'rgba(0,0,0,0.28)' : 'rgba(255,255,255,0.72)',
-                  paddingVertical: 4,
-                  paddingHorizontal: 10,
+                  paddingVertical: 3,
+                  paddingHorizontal: 8,
                   borderRadius: 999,
+                  flexShrink: 0,
                 }}
               >
-                <Text style={{ fontSize: 12 }}>🔥</Text>
-                <Text style={heading(12, heroInk)}>{t('home.streak', { n: streak })}</Text>
+                <Text style={{ fontSize: 11 }}>🔥</Text>
+                <Text style={heading(11, heroInk)}>{t('home.streak', { n: streak })}</Text>
               </View>
             </Row>
 
             <Text
               style={{
-                ...heading(16, heroInk),
-                lineHeight: 24,
-                marginTop: 16,
-                paddingRight: 8,
+                ...heading(14, heroInk),
+                lineHeight: 19,
+                marginTop: 8,
+                paddingRight: 4,
               }}
+              numberOfLines={3}
             >
               {cheer}
             </Text>
-            <View style={{ marginTop: 16 }}>
-              <Row style={{ justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 6 }}>
-                <Text style={heading(11, heroSoft)}>
-                  {isToday ? t('home.progress') : t('home.progressDay')}
-                </Text>
-                <Text style={numberStyle(13, heroInk)}>
-                  {progressFull.done}
-                  <Text style={{ opacity: 0.6 }}> / {progressFull.total}</Text>
-                </Text>
-              </Row>
-              <View style={{ height: 22, justifyContent: 'center', marginTop: 2 }}>
-                <ProgressBar value={percent} track={heroTrack} color={heroFill} height={12} />
-                <View
-                  pointerEvents="none"
-                  style={{
-                    position: 'absolute',
-                    left: `${Math.max(5, Math.min(95, percent * 100))}%`,
-                    top: 0,
-                    marginLeft: -11,
-                    width: 22,
-                    height: 22,
-                    borderRadius: 11,
-                    backgroundColor: theme.card,
-                    borderWidth: 1.5,
-                    borderColor: theme.coin,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Text style={{ fontSize: 13, color: theme.coin, marginTop: -1 }}>★</Text>
-                </View>
+
+            <Row
+              style={{
+                justifyContent: 'space-between',
+                alignItems: 'flex-end',
+                marginTop: 9,
+                marginBottom: 3,
+              }}
+            >
+              <Text style={heading(10.5, heroSoft)}>
+                {isToday ? t('home.progress') : t('home.progressDay')}
+              </Text>
+              <Text style={numberStyle(12.5, heroInk)}>
+                {progressFull.done}
+                <Text style={{ opacity: 0.6 }}> / {progressFull.total}</Text>
+              </Text>
+            </Row>
+            <View style={{ height: 20, justifyContent: 'center' }}>
+              <ProgressBar value={percent} track={heroTrack} color={heroFill} height={10} />
+              <View
+                pointerEvents="none"
+                style={{
+                  position: 'absolute',
+                  left: `${Math.max(5, Math.min(95, percent * 100))}%`,
+                  top: 0,
+                  marginLeft: -10,
+                  width: 20,
+                  height: 20,
+                  borderRadius: 10,
+                  backgroundColor: theme.card,
+                  borderWidth: 1.5,
+                  borderColor: theme.coin,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Text style={{ fontSize: 12, color: theme.coin, marginTop: -1 }}>★</Text>
               </View>
             </View>
           </LinearGradient>
